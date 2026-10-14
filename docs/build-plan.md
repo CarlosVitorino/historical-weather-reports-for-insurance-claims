@@ -15,9 +15,9 @@ A claims adjuster, public adjuster or policyholder has a loss at a specific addr
 We must also match what the sample already has: LSRs with IDs and reporters, NWS bulletins with VTEC IDs, timezone/DST handling, retrieval and generation times, and a canonical report ID.
 
 ### Assumptions (tell me if any are wrong)
-- **A1.** v1 is a command-line tool run by the founder: `address + date → PDF`. Sales go through a manual payment link (e.g. Stripe Payment Link), and the founder emails the PDF. No web app, accounts or checkout code until a handful of sales prove demand.
+- **A1.** v1 is an order page: the buyer enters address + loss date + email, pays $9.99 through **creem.io** checkout, and a creem webhook triggers report generation and delivery of a download link. The same generator is also a CLI for the founder. No accounts.
 - **A2.** "Deterministic" means the same inputs plus the same frozen data snapshot give a byte-identical PDF. Raw source responses are stored with their retrieval time and a SHA-256. The report ID is derived from those values, so any report can be regenerated and verified later. The printed "generated" time is the snapshot time, not the wall clock.
-- **A3.** Single region = one NWS forecast office area. I propose **NWS Indianapolis (IND), central Indiana**, so the first report can be compared head-to-head with the StormRecord sample (Bloomington, IN, 2026-02-19).
+- **A3.** ~~Single region~~ **Any US address** (decided by the founder; overrides the brief's "single region"). The first test case is Bloomington, IN, 2026-02-19, so it can be compared head-to-head with the StormRecord sample. Timezone is resolved offline from coordinates; the NWS office comes from the point.
 - **A4.** Geocoding uses the US Census Geocoder (a government source, free, no key).
 
 ### Where the brief contradicts itself or the data
@@ -39,7 +39,7 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 **Python 3.11 + ReportLab + requests + pandas**, run with one command (`make report ADDRESS=... DATE=...`). ReportLab has an `invariant` mode that gives byte-identical PDFs, and Python is the natural fit for parsing GHCNh files and gzip CSVs. Raw responses are cached on disk under `data/snapshots/<report-id>/` with a manifest. No database is needed in v1. Tests run under pytest using recorded real responses as fixtures.
 
 ## 2. Foundation
-- [ ] Python package `wxreport` with a CLI, `make setup` / `make report` / `make test`.
+- [ ] Python package `wxreport` with a CLI, `make setup` / `make report` / `make test`; FastAPI order-page skeleton (`make serve`).
 - [ ] Census geocoder → lat/lon, county, timezone; local-date window with DST (23/24/25-hour days).
 - [ ] Snapshot store: raw bytes + retrieval time + SHA-256 + manifest; canonical report ID.
 - [ ] A skeleton PDF (cover + sources page) generated deterministically.
@@ -59,10 +59,12 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Done when: you are comfortable sending a report to a real adjuster.
 
 ## 5. Ship and learn
-- [ ] Payment link + manual fulfilment; log each order (address, date, report ID, paid y/n, feedback).
+- [ ] creem.io checkout (test mode, then live) + webhook → generate → download link; order log (address, date, report ID, paid, feedback).
 - [ ] Lawyer review of L1–L4 → stop / go.
 - Done when: there is evidence for or against adjusters paying $9.99.
 
 ## Decisions
 - Python + ReportLab: deterministic PDF output and the best fit for parsing the source formats.
-- CLI + manual fulfilment instead of a web checkout: the brief excludes marketing sites and integrations, and a handful of sales doesn't need more.
+- Payments via creem.io (founder's choice): a minimal order page + webhook fulfilment; this is the order form, not a marketing site.
+- Nationwide coverage from v1 (founder's choice): all sources are national anyway; costs only station-inventory and timezone lookups.
+- Census Geocoder, with an operator coordinate override for addresses it can't match (rural routes, new builds); the PDF says when coordinates were supplied manually.
