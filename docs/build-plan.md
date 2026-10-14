@@ -46,12 +46,12 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Done when: `make report` produces an identical PDF twice from the same snapshot. ✅ (live Census calls untested: host blocked by the session network policy)
 
 ## 3. Core: the report
-- [ ] GHCNh: nearest stations with distance and bearing, hourly table from the nearest complete station, QC flags, ISD fallback.
-- [ ] NWS bulletins (with VTEC) and LSRs, each with distance and bearing from the site.
-- [ ] Storm Events: county and nearby events with distance and bearing, plus "not yet published" handling.
-- [ ] SWDI NEXRAD hail signatures and lightning counts near the site.
-- [ ] Full PDF matching or beating every section of the sample. First real report: Bloomington, IN, 2026-02-19.
-- Done when: that report is generated from live data and compared side by side with the sample.
+- [x] GHCNh: nearest stations with distance and bearing, hourly table from the nearest complete station, QC flags, ISD fallback.
+- [x] NWS bulletins (with VTEC) and LSRs, each with distance and bearing from the site.
+- [x] Storm Events: county and nearby events with distance and bearing, plus "not yet published" handling.
+- [x] SWDI NEXRAD hail signatures and lightning counts near the site.
+- [x] Full PDF matching or beating every section of the sample. First real report: Bloomington, IN, 2026-02-19.
+- Done when: that report is generated from live data and compared side by side with the sample. ✅ See docs/comparison-bloomington.md
 
 ## 4. Harden
 - [ ] Failures a user will meet: unmatched address, address outside the region, future date, missing station hours, a source being down (report says "unavailable", never zero), Storm Events lag.
@@ -59,14 +59,23 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Done when: you are comfortable sending a report to a real adjuster.
 
 ## 5. Ship and learn
+- [ ] Event log (SQLite): page views, form submits, checkout clicks, paid orders, report deliveries.
+- [ ] Admin stats page at `/admin`, protected by an admin password from the environment: visitors, funnel (view → submit → checkout → paid), revenue, orders list with report IDs and delivery status.
 - [ ] creem.io checkout (test mode, then live) + webhook → generate → download link; order log (address, date, report ID, paid, feedback).
 - [ ] Lawyer review of L1–L4 → stop / go.
 - Done when: there is evidence for or against adjusters paying $9.99.
 
 ## Decisions
 - Python + ReportLab: deterministic PDF output and the best fit for parsing the source formats.
+- Delivery email via Resend (founder's choice). Admin stats page requested by the founder.
 - Payments via creem.io (founder's choice): a minimal order page + webhook fulfilment; this is the order form, not a marketing site.
 - Nationwide coverage from v1 (founder's choice): all sources are national anyway; costs only station-inventory and timezone lookups.
 - Census Geocoder, with an operator coordinate override for addresses it can't match (rural routes, new builds); the PDF says when coordinates were supplied manually.
 - Report fingerprint covers retrieval times as well as content, so one ID always means one exact PDF. Failed retrievals are retried until the snapshot is frozen, then replayed as "unavailable".
 - Working product name "Loss-Site Weather Report", ID prefix `LWR-`; trivial to rename.
+- Station logs come from GHCNh per-station per-year PSV files (~1 MB gzipped each), not the legacy NCEI token API: GHCNh carries the raw METAR text (peak-wind remarks, lightning, maintenance flags) and is updated daily. ISD fallback was not needed: GHCNh already merges ISD.
+- Lightning: NLDN strike points are restricted to NOAA staff (SWDI says so), so the report uses NCEI's public daily 0.1° tile counts, stated as such.
+- Warnings are matched to the site by testing each bulletin's LAT...LON polygon, not just the county.
+- Precipitation is never zero-filled: METAR hourly periods without a routine report, or flagged PNO/P////, are counted as missing and the total is labelled a minimum.
+- The observation log uses the nearest airport (METAR) station unless another wind-measuring station is >5 mi closer. USCRN wind (1.5 m) is flagged as not comparable.
+- Report ID includes a renderer version (`wxreport.RENDER_VERSION`), bumped whenever content/layout changes.

@@ -33,3 +33,39 @@ def proximity(site_lat: float, site_lon: float, lat: float, lon: float) -> str:
     if d < 0.05:
         return "at the site"
     return f"{d:.1f} mi {compass(bearing_deg(site_lat, site_lon, lat, lon))}"
+
+
+def _xy(lat0: float, lon0: float, lat: float, lon: float) -> tuple[float, float]:
+    """Local flat projection (miles) centred on lat0/lon0 — accurate to well under 1% within ~50 miles."""
+    kx = 69.172 * cos(radians(lat0))
+    return (lon - lon0) * kx, (lat - lat0) * 69.0
+
+
+def nearest_on_segment(lat: float, lon: float, a: tuple[float, float], b: tuple[float, float]):
+    """Closest point to (lat, lon) on the segment a→b, as (lat, lon). Used for tornado paths."""
+    ax, ay = _xy(lat, lon, *a)
+    bx, by = _xy(lat, lon, *b)
+    dx, dy = bx - ax, by - ay
+    L2 = dx * dx + dy * dy
+    t = 0.0 if L2 == 0 else max(0.0, min(1.0, -(ax * dx + ay * dy) / L2))
+    return a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])
+
+
+def point_in_polygon(lat: float, lon: float, poly: list[tuple[float, float]]) -> bool:
+    inside, n = False, len(poly)
+    for i in range(n):
+        (y1, x1), (y2, x2) = poly[i], poly[(i + 1) % n]
+        if (y1 > lat) != (y2 > lat) and lon < (x2 - x1) * (lat - y1) / (y2 - y1) + x1:
+            inside = not inside
+    return inside
+
+
+def distance_to_polygon_mi(lat: float, lon: float, poly: list[tuple[float, float]]) -> float:
+    """0 when inside; otherwise distance to the nearest edge."""
+    if point_in_polygon(lat, lon, poly):
+        return 0.0
+    best = float("inf")
+    for i in range(len(poly)):
+        p = nearest_on_segment(lat, lon, poly[i], poly[(i + 1) % len(poly)])
+        best = min(best, distance_mi(lat, lon, *p))
+    return best

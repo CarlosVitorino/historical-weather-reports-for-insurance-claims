@@ -3,6 +3,7 @@
 A report is a pure function of (request, snapshot), so the same snapshot always renders the same PDF and
 any report can be re-verified later. Failed retrievals are recorded too, so "unavailable" is reproducible.
 """
+import gzip
 import hashlib
 import json
 import re
@@ -57,11 +58,14 @@ class Snapshot:
         return cls(path, request, offline)
 
     # -- retrieval ---------------------------------------------------------------------------
-    def fetch(self, name: str, url: str, params: dict | None = None, timeout: float = 60) -> bytes:
+    def fetch(self, name: str, url: str, params: dict | None = None, timeout: float = 120,
+              missing_ok: bool = False) -> bytes | None:
         """Return the stored bytes for `name`, retrieving them first if this snapshot doesn't have them."""
         entry = self.sources.get(name)
         if entry is not None and entry["status"] == "ok":
-            return (self.path / entry["file"]).read_bytes()
+            return self._read(entry)
+        if entry is not None and entry["status"] == "absent" and missing_ok:
+            return None
         if self.offline or self.frozen_at:
             # A frozen snapshot replays its recorded failures; an open one retries them.
             raise SourceUnavailable(entry.get("error", "unavailable") if entry else
@@ -70,6 +74,12 @@ class Snapshot:
         try:
             r = requests.get(url, params=params, timeout=timeout, headers={"User-Agent": USER_AGENT})
             final_url = r.url
+            if missing_ok and r.status_code == 404:
+                # A definite "no such file" (e.g. a station with no data that year) is recorded, not retried.
+                self.sources[name] = {"url": final_url, "params": params, "retrieved_at": retrieved_at,
+                                      "status": "absent", "error": "HTTP 404 Not Found"}
+                self._write()
+                return None
             r.raise_for_status()
             body = r.content
         except requests.RequestException as e:
@@ -81,13 +91,17 @@ class Snapshot:
 
     def put(self, name: str, body: bytes, url: str, params: dict | None = None,
             retrieved_at: str | None = None) -> bytes:
-        fname = re.sub(r"[^A-Za-z0-9_.-]", "_", name) + ".raw"
-        (self.path / fname).write_bytes(body)
+        fname = re.sub(r"[^A-Za-z0-9_.-]", "_", name) + ".raw.gz"
+        (self.path / fname).write_bytes(gzip.compress(body, mtime=0))
         self.sources[name] = {"url": url, "params": params, "retrieved_at": retrieved_at or _now(),
                               "status": "ok", "file": fname, "bytes": len(body),
                               "sha256": hashlib.sha256(body).hexdigest()}
         self._write()
         return body
+
+    def _read(self, entry: dict) -> bytes:
+        raw = (self.path / entry["file"]).read_bytes()
+        return gzip.decompress(raw) if entry["file"].endswith(".gz") else raw
 
     def fetch_json(self, name: str, url: str, params: dict | None = None, **kw):
         return json.loads(self.fetch(name, url, params, **kw))
@@ -116,6 +130,8 @@ class Snapshot:
         (self.path / "manifest.json").write_text(json.dumps(m, indent=2, sort_keys=True))
 
 
-def report_id(day: str, snap: Snapshot) -> str:
-    """Canonical report ID: loss date + first 12 hex of the snapshot digest. Same data → same ID."""
-    return f"LWR-{day}-{snap.digest()[:12].upper()}"
+def report_id(day: str, snap: Snapshot, render_version: str = "") -> str:
+    """Canonical report ID: loss date + 12 hex of SHA-256(snapshot digest, renderer version).
+    Same data and same renderer → same ID → byte-identical PDF."""
+    h = hashlib.sha256(f"{snap.digest()}|render:{render_version}".encode()).hexdigest()
+    return f"LWR-{day}-{h[:12].upper()}"

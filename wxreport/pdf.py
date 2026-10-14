@@ -31,6 +31,7 @@ STYLES = {
     "body": ParagraphStyle("body", parent=_base["BodyText"], fontSize=9, leading=12, textColor=INK),
     "small": ParagraphStyle("small", parent=_base["BodyText"], fontSize=7.5, leading=9.5, textColor=MUTED),
     "cell": ParagraphStyle("cell", parent=_base["BodyText"], fontSize=8, leading=10, textColor=INK),
+    "tiny": ParagraphStyle("tiny", parent=_base["BodyText"], fontSize=7, leading=8.4, textColor=INK),
     "big": ParagraphStyle("big", parent=_base["BodyText"], fontSize=16, leading=19, textColor=INK,
                           fontName="Helvetica-Bold"),
 }
@@ -45,9 +46,10 @@ def esc(s) -> str:
 
 
 def table(rows: list[list], col_widths: list[float] | None = None, header: bool = True,
-          zebra: bool = True) -> Table:
+          zebra: bool = True, small: bool = False) -> Table:
     """Plain values are escaped; pass a Paragraph (via P) for a cell that needs markup."""
-    cells = [[P(esc(c), "cell") if isinstance(c, (str, int, float)) else c for c in r] for r in rows]
+    style_name = "tiny" if small else "cell"
+    cells = [[P(esc(c), style_name) if isinstance(c, (str, int, float)) else c for c in r] for r in rows]
     t = Table(cells, colWidths=col_widths, repeatRows=1 if header else 0)
     style = [("VALIGN", (0, 0), (-1, -1), "TOP"),
              ("LINEBELOW", (0, 0), (-1, -1), 0.25, RULE),
