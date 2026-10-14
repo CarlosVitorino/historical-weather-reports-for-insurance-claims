@@ -1,0 +1,68 @@
+"""Loss-site location via the US Census Geocoder (free, government, no key), or operator-supplied coordinates."""
+from dataclasses import dataclass
+
+from .snapshot import Snapshot, SourceUnavailable
+from .timewin import timezone_for
+
+CENSUS = "https://geocoding.geo.census.gov/geocoder"
+BENCHMARK = "Public_AR_Current"
+VINTAGE = "Current_Current"
+
+STATE_FIPS = {
+    "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE",
+    "11": "DC", "12": "FL", "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN", "19": "IA",
+    "20": "KS", "21": "KY", "22": "LA", "23": "ME", "24": "MD", "25": "MA", "26": "MI", "27": "MN",
+    "28": "MS", "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH", "34": "NJ", "35": "NM",
+    "36": "NY", "37": "NC", "38": "ND", "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI",
+    "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT", "50": "VT", "51": "VA", "53": "WA",
+    "54": "WV", "55": "WI", "56": "WY", "72": "PR",
+}
+
+
+class AddressNotFound(Exception):
+    pass
+
+
+@dataclass(frozen=True)
+class Location:
+    input_address: str
+    matched_address: str | None
+    lat: float
+    lon: float
+    tz: str
+    county: str | None        # e.g. "Monroe County"
+    state: str | None         # e.g. "IN"
+    county_fips: str | None   # 5-digit GEOID, e.g. "18105"
+    method: str               # "census" | "operator"
+
+
+def _county(geos: dict) -> tuple[str | None, str | None, str | None]:
+    counties = (geos or {}).get("Counties") or []
+    if not counties:
+        return None, None, None
+    c = counties[0]
+    return c.get("NAME"), STATE_FIPS.get(c.get("STATE")), c.get("GEOID")
+
+
+def locate(snap: Snapshot, address: str, lat: float | None = None, lon: float | None = None) -> Location:
+    params = {"benchmark": BENCHMARK, "vintage": VINTAGE, "layers": "Counties", "format": "json"}
+    if lat is not None and lon is not None:
+        try:
+            data = snap.fetch_json("census_coordinates", f"{CENSUS}/geographies/coordinates",
+                                   {**params, "x": f"{lon:.6f}", "y": f"{lat:.6f}"})
+            county, state, fips = _county(data["result"].get("geographies"))
+        except (SourceUnavailable, KeyError, ValueError):
+            county = state = fips = None
+        return Location(address, None, lat, lon, timezone_for(lat, lon), county, state, fips, "operator")
+
+    data = snap.fetch_json("census_address", f"{CENSUS}/geographies/onelineaddress",
+                           {**params, "address": address})
+    matches = data.get("result", {}).get("addressMatches") or []
+    if not matches:
+        raise AddressNotFound(
+            f"The Census Geocoder found no match for {address!r}. Check the address, or supply coordinates.")
+    m = matches[0]
+    mlat, mlon = float(m["coordinates"]["y"]), float(m["coordinates"]["x"])
+    county, state, fips = _county(m.get("geographies"))
+    return Location(address, m.get("matchedAddress"), mlat, mlon, timezone_for(mlat, mlon),
+                    county, state, fips, "census")

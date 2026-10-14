@@ -11,3 +11,16 @@ This repository was handed off from BuildCase. Open it in Cursor, Claude Code, R
 - `AGENTS.md` — how to work on it
 - `docs/build-plan.md` — the phases
 - `docs/materials/` — files gathered along the way, each with a text reading beside it
+## Running it
+
+```sh
+make setup                                   # create .venv and install
+make report ADDRESS="401 N College Ave, Bloomington, IN" DATE=2026-02-19
+make report ADDRESS="..." DATE=... LAT=39.1696 LON=-86.5386   # when the geocoder can't match the address
+make test
+make serve                                   # order page on http://localhost:8000
+```
+
+Reports are written to `reports/<report-id>.pdf`. Raw source responses are kept in `data/snapshots/` with
+retrieval times and SHA-256 hashes. Re-running the same request replays the stored snapshot and gives a
+byte-identical PDF. Use `.venv/bin/python -m wxreport.cli report ... --refresh` to re-retrieve everything.

@@ -1,0 +1,29 @@
+[project]
+name = "wxreport"
+version = "0.1.0"
+description = "Address-specific historical weather reports for insurance claims, built from free US government data."
+requires-python = ">=3.11"
+dependencies = [
+    "reportlab>=4.2",
+    "requests>=2.31",
+    "timezonefinder>=6.5",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27"]
+
+[project.scripts]
+wxreport = "wxreport.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["wxreport"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

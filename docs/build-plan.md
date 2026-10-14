@@ -39,11 +39,11 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 **Python 3.11 + ReportLab + requests + pandas**, run with one command (`make report ADDRESS=... DATE=...`). ReportLab has an `invariant` mode that gives byte-identical PDFs, and Python is the natural fit for parsing GHCNh files and gzip CSVs. Raw responses are cached on disk under `data/snapshots/<report-id>/` with a manifest. No database is needed in v1. Tests run under pytest using recorded real responses as fixtures.
 
 ## 2. Foundation
-- [ ] Python package `wxreport` with a CLI, `make setup` / `make report` / `make test`; FastAPI order-page skeleton (`make serve`).
-- [ ] Census geocoder → lat/lon, county, timezone; local-date window with DST (23/24/25-hour days).
-- [ ] Snapshot store: raw bytes + retrieval time + SHA-256 + manifest; canonical report ID.
-- [ ] A skeleton PDF (cover + sources page) generated deterministically.
-- Done when: `make report` produces an identical PDF twice from the same snapshot.
+- [x] Python package `wxreport` with a CLI, `make setup` / `make report` / `make test`; FastAPI order-page skeleton (`make serve`).
+- [x] Census geocoder → lat/lon, county, timezone; local-date window with DST (23/24/25-hour days).
+- [x] Snapshot store: raw bytes + retrieval time + SHA-256 + manifest; canonical report ID.
+- [x] A skeleton PDF (cover + sources page) generated deterministically.
+- Done when: `make report` produces an identical PDF twice from the same snapshot. ✅ (live Census calls untested: host blocked by the session network policy)
 
 ## 3. Core: the report
 - [ ] GHCNh: nearest stations with distance and bearing, hourly table from the nearest complete station, QC flags, ISD fallback.
@@ -68,3 +68,5 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Payments via creem.io (founder's choice): a minimal order page + webhook fulfilment; this is the order form, not a marketing site.
 - Nationwide coverage from v1 (founder's choice): all sources are national anyway; costs only station-inventory and timezone lookups.
 - Census Geocoder, with an operator coordinate override for addresses it can't match (rural routes, new builds); the PDF says when coordinates were supplied manually.
+- Report fingerprint covers retrieval times as well as content, so one ID always means one exact PDF. Failed retrievals are retried until the snapshot is frozen, then replayed as "unavailable".
+- Working product name "Loss-Site Weather Report", ID prefix `LWR-`; trivial to rename.
