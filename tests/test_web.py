@@ -172,11 +172,17 @@ def test_pin_only_order(env, monkeypatch):
     assert 'id="confirm-map"' in page and "map pin" in page
 
 
-def test_landing_has_form_and_map(env):
-    _, client, _ = env
+def test_landing_hook_and_order_page(env):
+    app, client, _ = env
     html = client.get("/").text
-    for needle in ['id="order-form"', 'role="combobox"', "/static/order.js", "/static/hero.js", 'id="hero-map"', 'id="compare"']:
+    for needle in ['href="/order"', "/static/hero.js", 'id="hero-map"', 'id="compare"', "Sample report · page 1"]:
         assert needle in html, needle
+    assert 'id="order-form"' not in html
+    order = client.get("/order?address=401+N+College+Ave").text
+    for needle in ['id="order-form"', 'role="combobox"', "/static/order.js", 'value="401 N College Ave"',
+                   "1 · Location and date"]:
+        assert needle in order, needle
+    assert app.state.store.stats(None)["counts"]["order_view"][0] == 1
 
 
 def test_geocode_and_reverse_endpoints(env, monkeypatch):

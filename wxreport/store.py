@@ -47,7 +47,8 @@ CREATE INDEX IF NOT EXISTS events_kind ON events(kind);
 CREATE TABLE IF NOT EXISTS webhook_events (id TEXT PRIMARY KEY, received_at TEXT NOT NULL);
 """
 
-FUNNEL = [("page_view", "Visited the order page"), ("form_submit", "Address and date accepted"),
+FUNNEL = [("page_view", "Visited the home page"), ("order_view", "Opened the order page"),
+          ("form_submit", "Address and date accepted"),
           ("checkout_click", "Went to payment"), ("paid", "Paid"), ("download", "Downloaded the report")]
 
 

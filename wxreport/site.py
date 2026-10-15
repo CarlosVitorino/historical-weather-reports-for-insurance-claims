@@ -99,45 +99,54 @@ section.alt{background:#fff;border-top:1px solid var(--rule);border-bottom:1px s
 .section-head.center{margin-left:auto;margin-right:auto;text-align:center;justify-items:center}
 @media (max-width:640px){section{padding:72px 0}.section-head{margin-bottom:32px}}
 
-/* hero */
-.hero{position:relative;color:#c9d5e3;padding:0;
-  background:radial-gradient(1100px 620px at 88% 0%,#1d3a5f 0%,rgba(29,58,95,0) 62%),var(--navy-900)}
-.hero .wrap{padding-top:64px;padding-bottom:88px}
-.hero-intro{max-width:46rem;margin-bottom:36px}
-.hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:28px;align-items:stretch}
-.hero-grid>.form-card{height:100%}
-.hero h1{color:#fff;margin:14px 0 18px}
+/* hero: one message, one action, one product visual */
+.hero{position:relative;color:#c9d5e3;padding:0;text-align:center;
+  background:radial-gradient(900px 520px at 50% -10%,#1f3d63 0%,rgba(31,61,99,0) 70%),var(--navy-900)}
+.hero .wrap{padding-top:96px;padding-bottom:0}
 .hero .eyebrow{color:var(--amber)}
-.hero .lede{color:#aebdcd}
-.figure{margin:0;display:flex}
-.mapcard{background:#fff;color:var(--body);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.28);
-  display:flex;flex-direction:column;flex:1;min-width:0}
-.mapcard .mc-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--rule)}
-.mapcard .mc-head svg{flex:none;border-radius:6px}
-.mapcard .mc-head b{display:block;color:var(--ink);font-size:.92rem;font-weight:600;letter-spacing:-.01em}
-.mapcard .mc-head span{display:block;color:var(--muted);font-size:.8rem}
-#hero-map{flex:1;min-height:240px;background:#eef1f4}
-.mc-foot{display:flex;justify-content:space-between;gap:12px;padding:11px 18px;font-size:.8rem;color:var(--muted);
-  background:var(--paper);border-top:1px solid var(--rule)}
-.mc-foot a{color:var(--navy-700);font-weight:550}
+.hero h1{color:#fff;margin:18px auto 20px;max-width:13em;font-size:clamp(2.5rem,5.6vw,4.2rem)}
+.hero .lede{color:#aebdcd;margin:0 auto;max-width:36rem;font-size:1.15rem}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:32px}
+.cta-row .btn{padding:16px 26px;font-size:1.02rem}
+.btn-ghost-dark{background:transparent;color:#e4ebf3;border:1px solid rgba(255,255,255,.25)}
+.btn-ghost-dark:hover{background:rgba(255,255,255,.06)}
+.assure{display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;margin:22px 0 0;padding:0;list-style:none;
+  font-size:.86rem;color:#8fa3b8}
+.assure li{display:flex;align-items:center;gap:7px}
+.assure li:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.preview{position:relative;z-index:2;max-width:1040px;margin:64px auto -140px;text-align:left}
+.hero+section{padding-top:240px}
+@media (max-width:760px){.hero .wrap{padding-top:56px}.preview{margin:44px auto -80px}.hero+section{padding-top:150px}
+  .cta-row .btn{flex:1 1 100%}}
+
+/* the report preview card (page 1 of the sample report) */
+.rp{background:#fff;color:var(--body);border-radius:18px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.06),0 40px 80px -20px rgba(0,0,0,.45),0 12px 30px rgba(0,0,0,.18);
+  display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.rp-map{position:relative;min-height:420px;display:flex;flex-direction:column;border-right:1px solid var(--rule)}
+#hero-map{flex:1;min-height:360px;background:#eef1f4}
 #hero-map .leaflet-tile-pane{filter:grayscale(1) contrast(.92) brightness(1.06)}
 #hero-map .leaflet-tooltip{font:600 .76rem/1.25 var(--sans);color:var(--ink);border-radius:6px;padding:4px 7px;
   border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,.12)}
-.mc-legend{display:flex;flex-wrap:wrap;gap:5px 14px;margin:0;padding:9px 18px;list-style:none;font-size:.76rem;flex:none;
-  color:var(--muted);border-bottom:1px solid var(--rule)}
+.mc-legend{display:flex;flex-wrap:wrap;gap:5px 14px;margin:0;padding:10px 16px;list-style:none;font-size:.76rem;
+  color:var(--muted);border-top:1px solid var(--rule);background:#fff}
 .mc-legend li{display:flex;align-items:center;gap:6px}
-.findings{display:grid;grid-template-columns:1fr 1fr;margin:0;flex:none}
-.findings div{padding:12px 18px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-.findings div:nth-child(2n){border-right:0}
-.findings div:nth-last-child(-n+2){border-bottom:0}
-.findings dt{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-.findings dd{margin:3px 0 0;color:var(--ink);font-size:.9rem;line-height:1.35}
-.findings dd b{display:block;font-weight:650;font-size:1.2rem;letter-spacing:-.025em}
-.findings dd span{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
-.figure figcaption{margin-top:14px;font-size:.85rem;color:#8fa3b8;line-height:1.5}
-.figure figcaption a{color:#cfd9e4}
-@media (max-width:480px){.findings{grid-template-columns:1fr}.findings div{border-right:0}
-  .findings div:nth-last-child(-n+2){border-bottom:1px solid var(--rule)}.findings div:last-child{border-bottom:0}}
+.rp-side{display:flex;flex-direction:column}
+.rp-head{display:flex;gap:10px;align-items:flex-start;padding:20px 22px 16px;border-bottom:1px solid var(--rule)}
+.rp-head svg{flex:none;border-radius:6px;margin-top:2px}
+.rp-head .k{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.rp-head b{display:block;color:var(--ink);font-size:1rem;font-weight:600;letter-spacing:-.015em;margin-top:2px}
+.rp-head span{display:block;color:var(--muted);font-size:.84rem}
+.facts{margin:0;flex:1;display:flex;flex-direction:column}
+.facts div{padding:14px 22px;border-bottom:1px solid var(--rule);flex:1}
+.facts dt{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.facts dd{margin:4px 0 0;color:var(--muted);font-size:.84rem;line-height:1.4}
+.facts dd b{display:block;color:var(--ink);font-weight:650;font-size:1.35rem;letter-spacing:-.03em;line-height:1.15}
+.rp-foot{padding:14px 22px;font-size:.84rem}
+.rp-foot a{color:var(--navy-700);font-weight:550;text-decoration:none}
+.rp-foot a:hover{text-decoration:underline}
+@media (max-width:860px){.rp{grid-template-columns:1fr}.rp-map{border-right:0}#hero-map{min-height:280px}
+  .facts{display:grid;grid-template-columns:1fr 1fr}.facts div:nth-child(odd){border-right:1px solid var(--rule)}}
 .lg{display:inline-block;flex:none}
 .lg-site{width:11px;height:11px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 2px var(--navy-900) inset}
 .lg-station{width:10px;height:10px;border-radius:2px;background:var(--navy-800)}
@@ -146,9 +155,18 @@ section.alt{background:#fff;border-top:1px solid var(--rule);border-bottom:1px s
 .lg-hail{width:11px;height:11px;border-radius:50%;background:rgba(61,127,194,.25);border:1px solid var(--sky)}
 .lg-report{width:8px;height:8px;background:var(--sky);transform:rotate(45deg);margin:0 2px}
 .lg-wind{width:9px;height:9px;border-radius:50%;background:#6b4fa0}
-.lg-tor{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid #d9442e}
-@media (max-width:980px){.hero .wrap{padding-top:44px;padding-bottom:64px}.hero-grid{grid-template-columns:1fr}
-  #hero-map{min-height:300px}}
+
+/* order page */
+.order-wrap{max-width:680px;margin:0 auto;padding:48px 24px 96px}
+.order-wrap h1{font-size:clamp(1.9rem,4vw,2.5rem);margin:0 0 8px}
+.order-wrap .lede{margin-bottom:24px;font-size:1rem}
+.stepper{display:flex;gap:8px;margin:0 0 28px;padding:0;list-style:none;font-size:.82rem;color:var(--faint)}
+.stepper li{flex:1;border-top:3px solid var(--rule);padding-top:8px}
+.stepper li.on{border-color:var(--amber);color:var(--ink);font-weight:550}
+.stepper li.done{border-color:var(--navy-700);color:var(--muted)}
+.order-wrap .form-card{box-shadow:var(--shadow);border:1px solid var(--rule)}
+.includes{display:flex;flex-wrap:wrap;gap:8px 18px;margin:20px 0 0;padding:0;list-style:none;font-size:.85rem;color:var(--muted)}
+.includes li:before{content:"✓ ";color:var(--green);font-weight:700}
 
 /* order form */
 .form-card{background:#fff;color:var(--body);border-radius:16px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.28);
@@ -189,11 +207,6 @@ form input:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px 
 .leaflet-container{font-family:var(--sans)}
 .pin{width:22px;height:22px;border-radius:50% 50% 50% 0;background:var(--amber);border:3px solid var(--navy-900);
   transform:rotate(-45deg);box-shadow:0 4px 10px rgba(0,0,0,.35)}
-
-/* sources strip */
-.sources{background:var(--navy-950);color:#7f93a8;font-size:.84rem}
-.sources .wrap{display:flex;flex-wrap:wrap;gap:8px 26px;align-items:center;justify-content:center;padding:16px 24px}
-.sources b{color:#cfd9e4;font-weight:500}
 
 /* questions */
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
@@ -334,26 +347,26 @@ def layout(title: str, body: str, refresh: int | None = None, description: str =
 <header class="top"><div class="wrap"><a class="brand" href="/">{LOGO}<span>{BRAND}</span></a>
 <nav><a class="hide-sm" href="/#report">What you get</a><a class="hide-sm" href="/#compare">Compare</a>
 <a class="hide-sm" href="/#sample">Sample report</a><a class="hide-sm" href="/#faq">FAQ</a>
-<a class="btn btn-amber" href="/#order">Order · {PRICE}</a></nav></div></header>
+<a class="btn btn-amber" href="/order">Order · {PRICE}</a></nav></div></header>
 <main>{body}</main>{FOOTER}</body></html>"""
 
 
 FOOTER = f"""<footer><div class="wrap"><div><a class="brand" href="/" style="margin-bottom:14px">{LOGO}<span>{BRAND}</span></a>
 <p>Not affiliated with NOAA, the National Weather Service or any government agency. Reports compile public records;
 they are not certified records or expert opinions.</p></div>
-<div><p class="links"><a href="/#sample">Sample report</a><a href="/#faq">FAQ</a><a href="/#order">Order</a></p>
+<div><p class="links"><a href="/#sample">Sample report</a><a href="/#faq">FAQ</a><a href="/order">Order</a></p>
 <p>{DOMAIN} · Payments processed by Creem</p></div></div></footer>"""
 
 
-def order_form(v: dict, error: str = "", ask_coords: bool = False, title: str = "Get the report") -> str:
+def order_form(v: dict, error: str = "", ask_coords: bool = False, title: str = "") -> str:
     g = lambda k: escape(str(v.get(k) or ""), quote=True)  # noqa: E731
     yesterday = (date.today() - timedelta(days=1)).isoformat()
     show_coords = ask_coords or bool(v.get("lat"))
     err = f'<p class="err" role="alert">{escape(error)}</p>' if error else ""
-    return f"""<div class="form-card" id="order"><h3>{escape(title)}</h3>
-<p class="sub">Any US address · dates of loss from {MIN_DATE.year} to yesterday</p>{err}
+    head = f"<h3>{escape(title)}</h3>" if title else ""
+    return f"""<div class="form-card" id="order">{head}{err}
 <form method="post" action="/order" id="order-form" novalidate>
-<label for="address">Property address</label>
+<label for="address" style="margin-top:0">Property address</label>
 <div class="ac"><input id="address" name="address" autocomplete="off" value="{g('address')}" role="combobox"
  aria-autocomplete="list" aria-expanded="false" aria-controls="ac-list" placeholder="Start typing an address">
 <ul id="ac-list" role="listbox" hidden></ul></div>
@@ -370,35 +383,38 @@ max="{yesterday}" value="{g('loss_date')}"></label>
 <label>Email for delivery<input type="email" name="email" required autocomplete="email" value="{g('email')}"
 placeholder="you@company.com"></label></div>
 <button class="btn btn-amber btn-block" type="submit">Continue</button>
-<p class="fine">Next you'll see the exact location on a map before paying {PRICE}.</p>
+<p class="fine">Any US address, dates of loss from {MIN_DATE.year} to yesterday. Next you'll see the exact location
+before paying {PRICE}.</p>
 </form></div>"""
 
 
-def landing(form: str) -> str:
+def landing() -> str:
     s = SAMPLE
-    facts = "".join(f'<div><dt>{escape(f["label"])}</dt><dd><b>{escape(f["value"])}</b><span>{escape(f["detail"])}'
-                    f'</span></dd></div>' for f in SAMPLE_PAGE1["facts"])
+    facts = "".join(f'<div><dt>{escape(f["label"])}</dt><dd><b>{escape(f["value"])}</b>{escape(f["detail"])}</dd></div>'
+                    for f in SAMPLE_PAGE1["facts"])
     hero = f"""<section class="hero"><div class="wrap">
-<div class="hero-intro"><p class="eyebrow">Weather records · any US address</p>
+<p class="eyebrow">Weather reports · any US address</p>
 <h1>What the weather did at the loss site.</h1>
-<p class="lede">A report of what was measured, warned and reported around one address on one date: gusts, rain,
-warnings, hail and tornadoes, each with its distance from the property. {PRICE}, delivered in about a minute.</p></div>
-<div class="hero-grid">{form}
-<figure class="figure"><div class="mapcard">
-<div class="mc-head">{mark_svg(24)}<div><b>{escape(_pretty(SAMPLE_PAGE1["address"]))}</b><span>Date of loss:
-{SAMPLE_PAGE1["date"]} · page 1 of the sample report</span></div></div>
-<div id="hero-map" data-src="/static/site-map.json" role="img" aria-label="Map of weather records around the property"></div>
+<p class="lede">Measured gusts, warnings, hail and tornado reports for one address and date of loss, each with its
+distance from the property.</p>
+<div class="cta-row"><a class="btn btn-amber" href="/order">Get a report — {PRICE}</a>
+<a class="btn btn-ghost-dark" href="#sample">View a sample report</a></div>
+<ul class="assure"><li>Built on NOAA &amp; NWS records</li><li>Delivered in about a minute</li>
+<li>No subscription</li></ul>
+<div class="preview"><div class="rp">
+<div class="rp-map"><div id="hero-map" data-src="/static/site-map.json" role="img"
+ aria-label="Map of weather records around the property"></div>
 <ul class="mc-legend"><li><i class="lg lg-site"></i>Property</li><li><i class="lg lg-station"></i>Weather station</li>
 <li><i class="lg lg-warn"></i>Warning area</li><li><i class="lg lg-path"></i>Tornado path</li>
 <li><i class="lg lg-hail"></i>Radar hail</li><li><i class="lg lg-report"></i>Hail report</li>
-<li><i class="lg lg-wind"></i>Wind report</li></ul>
-<dl class="findings">{facts}</dl>
-<div class="mc-foot"><span>Real records from a real report</span><a href="{s['pdf']}" target="_blank" rel="noopener">Open the
-full sample PDF →</a></div>
-</div></figure></div>
+<li><i class="lg lg-wind"></i>Wind report</li></ul></div>
+<div class="rp-side"><div class="rp-head">{mark_svg(26)}<div><div class="k">Sample report · page 1</div>
+<b>{escape(_pretty(SAMPLE_PAGE1["address"]))}</b><span>Date of loss: {SAMPLE_PAGE1["date"]}</span></div></div>
+<dl class="facts">{facts}</dl>
+<div class="rp-foot"><a href="{s['pdf']}" target="_blank" rel="noopener">Open the full {s['pages']}-page sample →</a></div>
+</div></div></div>
 </div></section>
-<div class="sources"><div class="wrap"><span>Built on public records from</span><b>NOAA</b><b>National Weather Service</b>
-<b>NEXRAD radar</b><b>US Census Bureau</b></div></div>"""
+"""
 
     questions = f"""<section id="report"><div class="wrap">
 <div class="section-head"><p class="eyebrow">What you get</p><h2>Answers to the three questions every weather claim asks.</h2></div>
@@ -489,8 +505,18 @@ email.</span></div></li></ol></div></section>"""
 <div class="faq">{faq}</div></div></section>"""
 
     cta = f"""<section class="cta"><div class="wrap"><h2>Get the weather record for your date of loss.</h2>
-<p>{PRICE} per report. Any US address.</p><a class="btn btn-amber" href="#order">Start your report</a></div></section>"""
+<p>{PRICE} per report. Any US address.</p><a class="btn btn-amber" href="/order">Start your report</a></div></section>"""
     return hero + questions + compare + sample + how + faq_html + cta
+
+
+def order_page(form: str) -> str:
+    return f"""<div class="order-wrap"><ol class="stepper"><li class="on">1 · Location and date</li>
+<li>2 · Confirm and pay</li><li>3 · Download</li></ol>
+<h1>Where and when was the loss?</h1>
+<p class="lede">Enter the property address or place a pin on the map, then the date of loss.</p>
+{form}
+<ul class="includes"><li>Station measurements</li><li>Warning-area check</li><li>Storm reports and hail</li>
+<li>PDF in about a minute</li></ul></div>"""
 
 
 def inner(body: str) -> str:

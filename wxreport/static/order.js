@@ -226,8 +226,6 @@
   }
 
   /* "Order" / "Start your report" buttons focus the address field */
-  Array.prototype.forEach.call(document.querySelectorAll('a[href$="#order"]'), function (a) {
-    a.addEventListener("click", function () { setTimeout(function () { input.focus({ preventScroll: true }); }, 400); });
-  });
+  if (!input.value) input.focus({ preventScroll: true });
   setTimeout(function () { map.invalidateSize(); }, 100);
 })();

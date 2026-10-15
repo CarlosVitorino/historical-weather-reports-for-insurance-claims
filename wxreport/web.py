@@ -89,9 +89,14 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
             if request.query_params.get(k):
                 detail[k] = request.query_params[k][:100]
         store.log("page_view", request.state.vid, **detail)
+        return page(f"{site.BRAND} — weather records for any US address and date of loss", site.landing(),
+                    map_assets=True)
+
+    @app.get("/order", response_class=HTMLResponse)
+    def order_page(request: Request):
+        store.log("order_view", request.state.vid)
         prefill = {k: request.query_params.get(k) for k in ("address", "loss_date", "email", "lat", "lon")}
-        return page(f"{site.BRAND} — weather records for any US address and date of loss",
-                    site.landing(site.order_form(prefill)), map_assets=True)
+        return page(f"Order a report — {site.BRAND}", site.order_page(site.order_form(prefill)), map_assets=True)
 
     @app.post("/order", response_class=HTMLResponse)
     def order(request: Request, address: str = Form(""), loss_date: str = Form(""), email: str = Form(""),
@@ -105,8 +110,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
                 store.delete(oid)
                 shutil.rmtree(order_dir(cfg, oid), ignore_errors=True)
             store.log("form_error", request.state.vid, reason=reason)
-            return page("Check your details", site.inner(site.order_form(v, msg, ask_coords, "Check your details")),
-                        map_assets=True)
+            return page("Check your details", site.order_page(site.order_form(v, msg, ask_coords)), map_assets=True)
 
         if not EMAIL.match(v["email"]):
             return fail("bad_email", "Enter a valid email address — the report is delivered there.")
@@ -158,7 +162,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
         if o["status"] not in ("draft", "checkout"):
             return RedirectResponse(f"/orders/{oid}/{token}", status_code=303)
         d = date.fromisoformat(o["loss_date"])
-        back = "/?" + urlencode({k: o[k] for k in ("address", "loss_date", "email") if o[k]} |
+        back = "/order?" + urlencode({k: o[k] for k in ("address", "loss_date", "email") if o[k]} |
                                 ({"lat": o["lat"], "lon": o["lon"]} if o["lat"] is not None else {}))
         how = (f"map pin at {o['lat']:.5f}, {o['lon']:.5f}" if o["lat"] is not None
                else "US Census Geocoder address match")
@@ -174,7 +178,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
 <dt>Price</dt><dd><b>{price}</b> · one report, no subscription</dd></dl>{unavailable}
 <div class="actions"><form method="post" action="/order/{oid}/{token}/checkout">
 <button class="btn btn-amber" type="submit">Pay {price} securely</button></form>
-<a class="btn btn-ghost" href="{escape(back, quote=True)}#order">Change details</a></div>
+<a class="btn btn-ghost" href="{escape(back, quote=True)}">Change details</a></div>
 <p class="fine">The report is centred on the location shown. If it isn't the property, choose Change details and
 place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow="Step 2 of 3", map_assets=True)
 
