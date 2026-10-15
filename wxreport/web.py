@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 import re
 import secrets
 import shutil
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from html import escape
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
@@ -15,8 +15,9 @@ from urllib.parse import urlencode, urlparse
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.staticfiles import StaticFiles
 
-from . import config, payments
+from . import config, payments, site
 from .fulfil import Fulfiller, order_dir
 from .geocode import AddressNotFound, locate
 from .report import MIN_DATE
@@ -27,62 +28,13 @@ from .timewin import local_day
 EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 VISITOR_COOKIE = "vid"
 
-CSS = """
-:root{--ink:#1b2430;--muted:#5b6675;--rule:#d9dee5;--accent:#1f4e79;--bg:#f7f9fb;--warn:#8a4b08;--ok:#1e6b3a}
-*{box-sizing:border-box}body{font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);
-background:var(--bg);margin:0}main{max-width:36rem;margin:0 auto;padding:2rem 1rem 4rem}
-h1{font-size:1.6rem;line-height:1.25;margin:.2rem 0 1rem}h2{font-size:1.1rem;margin:1.6rem 0 .5rem}
-.card{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:1.25rem;margin:1rem 0}
-label{display:block;margin-top:1rem;font-weight:600}label small{font-weight:400;color:var(--muted)}
-input{width:100%;padding:.6rem;font:inherit;border:1px solid #b9c2cd;border-radius:6px;margin-top:.3rem;background:#fff}
-button,.btn{display:inline-block;margin-top:1.25rem;padding:.7rem 1.3rem;font:inherit;font-weight:600;
-background:var(--accent);color:#fff;border:0;border-radius:6px;text-decoration:none;cursor:pointer}
-.btn.secondary{background:#fff;color:var(--accent);border:1px solid var(--accent);margin-left:.5rem}
-.note{color:var(--muted);font-size:.88rem}.err{background:#fdf0e6;border:1px solid #f0c9a4;color:var(--warn);
-padding:.75rem 1rem;border-radius:6px}.ok{color:var(--ok)}ul.feat{padding-left:1.1rem}ul.feat li{margin:.25rem 0}
-dl{display:grid;grid-template-columns:8rem 1fr;gap:.35rem .75rem;margin:0}dt{color:var(--muted)}dd{margin:0}
-.row{display:flex;gap:.75rem}.row>label{flex:1}
-"""
-
-
 def page(title: str, body: str, refresh: int | None = None) -> HTMLResponse:
-    meta = f'<meta http-equiv="refresh" content="{refresh}">' if refresh else ""
-    return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">{meta}<title>{escape(title)}</title>
-<style>{CSS}</style></head><body><main>{body}</main></body></html>""")
+    return HTMLResponse(site.layout(title, body, refresh))
 
 
-INTRO = """<h1>Loss-Site Weather Report</h1>
-<p>One PDF of the US government weather records for one address and one past date — $9.99.</p>
-<ul class="feat">
-<li>Wind gusts, rain and temperature <b>measured at named NOAA stations</b>, each with its distance and direction
-from the address. Nothing is blended or estimated.</li>
-<li>NWS warnings, with a check of <b>whether the address was inside each warning polygon</b>.</li>
-<li>NWS storm reports, the NCEI Storm Events database, NEXRAD radar hail and lightning counts.</li>
-<li>Source retrieval times and hashes, so the report can be reproduced and verified.</li>
-</ul>"""
-
-DISCLAIMER = """<p class="note">Compiles public records; it is not a certified government record or expert opinion,
-and records near the address do not by themselves establish conditions at the property.</p>"""
-
-
-def form_html(v: dict, error: str = "", ask_coords: bool = False) -> str:
-    g = lambda k: escape(str(v.get(k) or ""), quote=True)  # noqa: E731
-    yesterday = (date.today() - timedelta(days=1)).isoformat()
-    coords = ""
-    if ask_coords or v.get("lat"):
-        coords = f"""<div class="row"><label>Latitude<input name="lat" inputmode="decimal" value="{g('lat')}"
-placeholder="39.16955"></label><label>Longitude<input name="lon" inputmode="decimal" value="{g('lon')}"
-placeholder="-86.53493"></label></div><p class="note">Rural routes, PO boxes and new builds often aren't in the
-Census address file. Right-click the property in Google Maps and copy the coordinates shown.</p>"""
-    err = f'<p class="err">{escape(error)}</p>' if error else ""
-    return f"""{INTRO}<div class="card"><form method="post" action="/order">{err}
-<label>Loss address<input name="address" required autocomplete="street-address" value="{g('address')}"
-placeholder="401 N College Ave, Bloomington, IN 47404"></label>
-<label>Loss date <small>(a completed past day, local time at the address)</small>
-<input type="date" name="loss_date" required min="{MIN_DATE.isoformat()}" max="{yesterday}" value="{g('loss_date')}"></label>
-<label>Email for delivery<input type="email" name="email" required autocomplete="email" value="{g('email')}"></label>
-{coords}<button type="submit">Check address</button></form></div>{DISCLAIMER}"""
+def inner_page(title: str, heading: str, body: str, refresh: int | None = None, eyebrow: str = "") -> HTMLResponse:
+    eb = f'<p class="eyebrow">{escape(eyebrow)}</p>' if eyebrow else ""
+    return page(title, site.inner(f"{eb}<h1>{escape(heading)}</h1>{body}"), refresh)
 
 
 def _float(s: str | None) -> float | None:
@@ -104,6 +56,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
     app = FastAPI(title="Loss-Site Weather Report", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
     app.state.cfg, app.state.store, app.state.fulfiller = cfg, store, fulfiller
     security = HTTPBasic(realm="admin")
+    app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
 
     @app.middleware("http")
@@ -135,7 +88,8 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
                 detail[k] = request.query_params[k][:100]
         store.log("page_view", request.state.vid, **detail)
         prefill = {k: request.query_params.get(k) for k in ("address", "loss_date", "email", "lat", "lon")}
-        return page("Loss-Site Weather Report", form_html(prefill))
+        return page(f"{site.BRAND} — historical weather evidence for any US address",
+                    site.landing(site.order_form(prefill)))
 
     @app.post("/order", response_class=HTMLResponse)
     def order(request: Request, address: str = Form(""), loss_date: str = Form(""), email: str = Form(""),
@@ -149,7 +103,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
                 store.delete(oid)
                 shutil.rmtree(order_dir(cfg, oid), ignore_errors=True)
             store.log("form_error", request.state.vid, reason=reason)
-            return page("Check your details", form_html(v, msg, ask_coords))
+            return page("Check your details", site.inner(site.order_form(v, msg, ask_coords, "Check your details")))
 
         if not v["address"]:
             return fail("no_address", "Enter the address of the loss.")
@@ -205,15 +159,16 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
         how = "coordinates you entered" if o["lat"] is not None else "US Census Geocoder match"
         unavailable = "" if (cfg.payments_ready or cfg.fake_payments) else \
             '<p class="err">Payments are not configured on this server yet.</p>'
-        return page("Confirm your report", f"""<h1>Confirm your report</h1><div class="card"><dl>
-<dt>Location</dt><dd><b>{escape(o['matched_address'])}</b><br><span class="note">{escape(o['county'] or '')} · {how}</span></dd>
-<dt>Loss date</dt><dd>{d:%B} {d.day}, {d.year}</dd><dt>Deliver to</dt><dd>{escape(o['email'])}</dd>
-<dt>Price</dt><dd>${cfg.price_cents / 100:.2f}</dd></dl>{unavailable}
-<form method="post" action="/order/{oid}/{token}/checkout" style="display:inline">
-<button type="submit">Pay ${cfg.price_cents / 100:.2f}</button></form>
-<a class="btn secondary" href="{escape(back, quote=True)}">Change</a></div>
-<p class="note">If the location isn't the property, go back and enter its coordinates instead. The report is built
-from the location above.</p>{DISCLAIMER}""")
+        price = f"${cfg.price_cents / 100:.2f}"
+        return inner_page("Confirm your report", "Confirm your report", f"""<div class="panel"><dl>
+<dt>Location</dt><dd><b>{escape(o['matched_address'])}</b><br><span class="fine">{escape(o['county'] or '')} · {how}</span></dd>
+<dt>Date of loss</dt><dd>{d:%B} {d.day}, {d.year}</dd><dt>Deliver to</dt><dd>{escape(o['email'])}</dd>
+<dt>Price</dt><dd><b>{price}</b> · one report, no subscription</dd></dl>{unavailable}
+<div class="actions"><form method="post" action="/order/{oid}/{token}/checkout">
+<button class="btn btn-amber" type="submit">Pay {price} securely</button></form>
+<a class="btn btn-ghost" href="{escape(back, quote=True)}#order">Change details</a></div>
+<p class="fine">If this isn't the property, change the details and enter its coordinates instead. The report is built
+for the location above. Checkout is handled by Creem.</p></div>""", eyebrow="Step 2 of 3")
 
     @app.post("/order/{oid}/{token}/checkout")
     def checkout(request: Request, oid: str, token: str):
@@ -233,9 +188,9 @@ from the location above.</p>{DISCLAIMER}""")
             co = payments.create_checkout(cfg, o)
         except payments.PaymentError as e:
             store.log("checkout_error", request.state.vid, oid, error=str(e)[:300])
-            return page("Payment unavailable", f"""<h1>Payment is temporarily unavailable</h1>
+            return inner_page("Payment unavailable", "Payment is temporarily unavailable", f"""<div class="panel">
 <p class="err">We couldn't open the payment page. Nothing was charged. Please try again in a minute.</p>
-<a class="btn" href="/order/{oid}/{token}">Try again</a>""")
+<div class="actions"><a class="btn btn-navy" href="/order/{oid}/{token}">Try again</a></div></div>""")
         store.update(oid, status="checkout", checkout_id=co.get("id"))
         return RedirectResponse(co["checkout_url"], status_code=303)
 
@@ -243,25 +198,32 @@ from the location above.</p>{DISCLAIMER}""")
     def status(oid: str, token: str):
         o = order_or_404(oid, token)
         s = o["status"]
-        head = f"""<h1>Your weather report</h1><p>{escape(o['matched_address'] or o['address'])} · {o['loss_date']}</p>"""
+        where = f'<p class="lede" style="margin:-6px 0 22px">{escape(o["matched_address"] or o["address"])} · {o["loss_date"]}</p>'
+
+        def show(title, kind, head, text, refresh=None):
+            return inner_page(title, "Your weather report", where + f'<div class="panel">'
+                              f'{site.status_block(kind, head, text)}</div>', refresh, eyebrow="Step 3 of 3")
+
         if s in ("draft", "checkout"):
-            return page("Waiting for payment", head + """<div class="card"><p><b>Waiting for payment confirmation…</b>
-</p><p class="note">This page refreshes by itself. If you closed the payment page before paying, nothing was
-charged.</p></div>""", refresh=5)
+            return show("Waiting for payment", "wait", "Waiting for payment confirmation…",
+                        '<p class="fine">This page refreshes by itself. If you closed the payment page before paying, '
+                        'nothing was charged.</p>', refresh=5)
         if s in ("paid", "generating"):
-            return page("Building your report", head + f"""<div class="card"><p class="ok"><b>Payment received.</b></p>
-<p>Building your report from the government archives — usually under a minute. This page refreshes by itself, and
-we'll email it to {escape(o['email'])}.</p></div>""", refresh=5)
+            return show("Building your report", "wait", "Payment received — building your report",
+                        f"<p>Pulling station records, warnings, storm reports, radar hail and lightning from the "
+                        f"government archives. Usually under a minute.</p><p class=\"fine\">This page refreshes by "
+                        f"itself, and we'll email the report to {escape(o['email'])}.</p>", refresh=5)
         if s == "ready":
             sent = {"sent": f" A copy was emailed to {escape(o['email'])}.", None: " We're emailing a copy to "
                     f"{escape(o['email'])}."}.get(o["email_status"], "")
-            return page("Your report is ready", head + f"""<div class="card"><p class="ok"><b>Your report is ready.</b></p>
-<p>Report ID <b>{o['report_id']}</b></p><a class="btn" href="/orders/{oid}/{token}/report.pdf">Download PDF</a>
-<p class="note">Bookmark this page to download again.{sent}</p></div>""")
+            return show("Your report is ready", "ok", "Your report is ready",
+                        f'<p>Report ID <span class="rid">{o["report_id"]}</span></p>'
+                        f'<div class="actions"><a class="btn btn-amber" href="/orders/{oid}/{token}/report.pdf">'
+                        f'Download PDF</a></div><p class="fine">Bookmark this page to download again.{sent}</p>')
         if s == "refunded":
-            return page("Refunded", head + '<div class="card"><p>This order was refunded.</p></div>')
-        return page("We're on it", head + f"""<div class="card"><p><b>Your payment is safe, but the report hit a
-problem.</b></p><p>We've been notified and will email {escape(o['email'])} with the report or a refund.</p></div>""")
+            return show("Refunded", "bad", "This order was refunded", "")
+        return show("We're on it", "bad", "Your payment is safe, but the report hit a problem",
+                    f"<p>We've been notified and will email {escape(o['email'])} with the report or a refund.</p>")
 
     @app.get("/orders/{oid}/{token}/report.pdf")
     def download(request: Request, oid: str, token: str):

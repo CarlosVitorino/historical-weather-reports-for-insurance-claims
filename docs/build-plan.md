@@ -83,3 +83,4 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Payment truth comes only from the signed creem webhook (HMAC-SHA256 of the raw body), deduplicated by event ID; the success redirect only shows status.
 - Report generation runs in an in-process thread pool (one server process, SQLite). Orders interrupted by a restart are resumed at startup. Failures show on /admin with a Retry button.
 - Visitor analytics use an anonymous first-party cookie; no IPs stored.
+- Landing page (founder's request, 2026-10-15): the brief's "no marketing site" rule is read as "no site beyond the order page". The order page now sells visually, using the real sample report (`wxreport/static/`) as the hero image and as proof. It doesn't name competitors (legal point L3) and makes no certification claims.
