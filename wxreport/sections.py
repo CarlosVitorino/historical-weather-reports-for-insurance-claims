@@ -157,7 +157,7 @@ def cover(ctx: ReportContext) -> list:
     place = loc.matched_address or loc.input_address
     gen = _t(ctx, datetime.fromisoformat(ctx.snap.frozen_at), True)
     zones = ", ".join(ctx.zones) or "not determined"
-    return [P(pdf.PRODUCT, "title"),
+    return [pdf.Lockup(pdf.PRODUCT), Spacer(1, 8),
             P(f"Report ID <b>{ctx.report_id}</b> · Data retrieved {esc(gen)}", "small"),
             Spacer(1, 10),
             P(esc(place), "big"),

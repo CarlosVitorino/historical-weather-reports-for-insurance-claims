@@ -11,13 +11,14 @@ from html import escape
 from .report import MIN_DATE
 
 from . import BRAND, DOMAIN
+from .brand import FAVICON, mark_svg
 PRICE = "$9.99"
 SAMPLE = {
     "place": "Bloomington, IN",
     "date": "February 19, 2026",
     "pages": 25,
     "pdf": "/static/sample-report.pdf",
-    "id": "WE-2026-02-19-8F0B0A49121B",
+    "id": "WE-2026-02-19-C37C7155922C",
 }
 
 # Self-hosted (SIL OFL, see /static/fonts/OFL.txt): no third-party requests from buyers' browsers.
@@ -61,8 +62,9 @@ h3{font-size:1.04rem;font-weight:600;letter-spacing:-.01em}
 .top{position:sticky;top:0;z-index:20;background:rgba(11,26,46,.92);backdrop-filter:saturate(1.4) blur(10px);
   border-bottom:1px solid rgba(255,255,255,.06)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
-.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:650;letter-spacing:-.01em;
-  white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:650;font-size:1.08rem;
+  letter-spacing:-.025em;white-space:nowrap}
+.brand svg{border-radius:7px}
 @media (max-width:420px){.top .brand span{font-size:.92rem}.top .wrap{padding:0 16px}}
 .brand svg{flex:none}
 .top nav{display:flex;align-items:center;gap:22px}
@@ -233,14 +235,7 @@ footer p{margin:0 0 10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
 """
 
-LOGO = """<svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7"
-fill="#f2a93b"/><path d="M8 21.5c3.2-5.4 6.4-5.4 9.6 0M11.2 21.5c1.9-2.9 3.8-2.9 5.7 0" stroke="#0b1a2e" stroke-width="2.4"
-fill="none" stroke-linecap="round"/><path d="M19.5 9.5l-3.2 6h3.6l-2.4 5.5" stroke="#0b1a2e" stroke-width="2.2"
-fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
-
-FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' "
-           "height='32' rx='7' fill='%23f2a93b'/%3E%3Cpath d='M19.5 9.5l-3.2 6h3.6l-2.4 5.5' stroke='%230b1a2e' "
-           "stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+LOGO = mark_svg(28)
 
 CHECK = ('<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="{bg}"/>'
          '<path d="M4.5 8.2l2.3 2.3 4.7-4.9" stroke="{fg}" stroke-width="1.8" fill="none" stroke-linecap="round" '
@@ -281,7 +276,7 @@ def layout(title: str, body: str, refresh: int | None = None, description: str =
 <title>{escape(title)}</title><meta name="description" content="{desc}">
 <meta property="og:title" content="{escape(title, quote=True)}"><meta property="og:description" content="{desc}">
 <meta property="og:image" content="/static/sample-p1.webp"><meta name="theme-color" content="#0b1a2e">
-<link rel="icon" href="{FAVICON}">{FONTS}<style>{CSS}</style></head><body>
+<link rel="icon" href="{FAVICON}"><link rel="apple-touch-icon" href="/static/apple-touch-icon.png">{FONTS}<style>{CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="brand" href="/">{LOGO}<span>{BRAND}</span></a>
 <nav><a class="hide-sm" href="/#sample">Sample report</a><a class="hide-sm" href="/#how">How it works</a>
 <a class="hide-sm" href="/#faq">FAQ</a><a class="btn btn-amber" href="/#order">Order · {PRICE}</a></nav></div></header>

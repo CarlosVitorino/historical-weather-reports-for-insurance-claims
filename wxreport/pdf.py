@@ -9,9 +9,10 @@ from reportlab.lib.pagesizes import LETTER
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas as rl_canvas
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Flowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from . import DOMAIN, PRODUCT
+from .brand import draw_mark
 
 rl_config.invariant = 1
 
@@ -81,11 +82,30 @@ def _numbered_canvas(report_id: str):
                 self.__dict__.update(state)
                 self.setFont("Helvetica", 7)
                 self.setFillColor(MUTED)
-                self.drawString(0.75 * inch, 0.5 * inch,
+                draw_mark(self, 0.75 * inch, 0.5 * inch - 2.2, 9)
+                self.drawString(0.75 * inch + 13, 0.5 * inch,
                                 f"{PRODUCT} · {DOMAIN} — Page {self._pageNumber} of {total} — ID: {report_id}")
                 super().showPage()
             super().save()
     return NumberedCanvas
+
+
+class Lockup(Flowable):
+    """The cover's logo lockup: the mark beside the report title."""
+
+    def __init__(self, title: str, size: float = 30):
+        super().__init__()
+        self.title, self.size = title, size
+
+    def wrap(self, aw, ah):
+        return aw, self.size
+
+    def draw(self):
+        c = self.canv
+        draw_mark(c, 0, 0, self.size)
+        c.setFillColor(INK)
+        c.setFont("Helvetica-Bold", 19)
+        c.drawString(self.size + 10, self.size / 2 - 6.5, self.title)
 
 
 def render(flowables: list, report_id: str, title: str) -> bytes:
