@@ -35,6 +35,8 @@ revenue, where visitors came from, why order forms were rejected, and every orde
 Configuration lives in environment variables; see `.env.example`. For a local dry run without creem, set
 `ENVIRONMENT=development` and orders are marked paid at checkout, even if creem keys are set.
 
+Search: set `BASE_URL` to the public origin (`https://weatherevidence.com`); canonical links, the sitemap and robots.txt are built from it. Redirect `www.` and `http://` to it at the web server, then submit `/sitemap.xml` in Google Search Console.
+
 On your server:
 
 1. Copy the repo to `/opt/wxreport`, then run `make setup`.

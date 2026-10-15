@@ -83,6 +83,8 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
         for d in st["daily"]) or '<tr><td colspan="8" class="muted">No activity yet.</td></tr>'
     refs = "".join(f"<tr><td>{escape(str(r['src']))}</td><td>{r['visitors']}</td><td>{r['views']}</td></tr>"
                    for r in st["referrers"]) or '<tr><td colspan="3" class="muted">No visits yet.</td></tr>'
+    pages = "".join(f"<tr><td>{escape(str(r['path']))}</td><td>{r['visitors']}</td><td>{r['views']}</td></tr>"
+                    for r in st["pages"]) or '<tr><td colspan="3" class="muted">No visits yet.</td></tr>'
     errs = "".join(f"<tr><td>{escape(str(r['reason']))}</td><td>{r['n']}</td></tr>"
                    for r in st["form_errors"]) or '<tr><td colspan="2" class="muted">None.</td></tr>'
 
@@ -117,6 +119,7 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
 <th>To payment</th><th>Paid</th><th>Revenue</th><th>Downloads</th></tr>{daily}</table></div>
 <h2>Where visitors came from</h2><div class="wrap"><table><tr><th>Source (utm_source or referrer)</th><th>Visitors</th>
 <th>Views</th></tr>{refs}</table></div>
+<h2>Pages viewed</h2><div class="wrap"><table><tr><th>Page</th><th>Visitors</th><th>Views</th></tr>{pages}</table></div>
 <h2>Why order forms were rejected</h2><div class="wrap"><table><tr><th>Reason</th><th>Count</th></tr>{errs}</table></div>
 <h2 id="orders">Orders <span class="muted" style="font-weight:400;font-size:.9rem">({escape(by_status)})</span></h2>
 <div class="wrap"><table><tr><th>Created (UTC)</th><th>Status</th><th>Location</th><th>Loss date</th><th>Email</th>

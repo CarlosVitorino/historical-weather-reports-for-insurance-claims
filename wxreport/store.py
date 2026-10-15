@@ -47,7 +47,7 @@ CREATE INDEX IF NOT EXISTS events_kind ON events(kind);
 CREATE TABLE IF NOT EXISTS webhook_events (id TEXT PRIMARY KEY, received_at TEXT NOT NULL);
 """
 
-FUNNEL = [("page_view", "Visited the home page"), ("order_view", "Opened the order page"),
+FUNNEL = [("page_view", "Visited the site"), ("order_view", "Opened the order page"),
           ("form_submit", "Address and date accepted"),
           ("checkout_click", "Went to payment"), ("paid", "Paid"), ("download", "Downloaded the report")]
 
@@ -169,10 +169,15 @@ class Store:
                           COUNT(*) views, COUNT(DISTINCT visitor) visitors
                    FROM events WHERE ts>=? AND kind='page_view' GROUP BY 1 ORDER BY visitors DESC LIMIT 15""",
                 (since,))]
+            landing = [dict(r) for r in c.execute(
+                """SELECT COALESCE(json_extract(detail,'$.path'), '/') path, COUNT(*) views,
+                          COUNT(DISTINCT visitor) visitors
+                   FROM events WHERE ts>=? AND kind='page_view' GROUP BY 1 ORDER BY visitors DESC LIMIT 20""",
+                (since,))]
             by_status = {r[0]: r[1] for r in c.execute(
                 "SELECT status, COUNT(*) FROM orders WHERE created_at>=? GROUP BY 1", (since,))}
         for d in daily:
             d["revenue_cents"] = revenue_by_day.get(d["day"], 0)
         return {"counts": counts, "visitors": visitors, "paid_orders": rev[0], "revenue_cents": rev[1],
-                "refunds": refunds, "daily": daily, "form_errors": errors, "referrers": referrers,
+                "refunds": refunds, "daily": daily, "form_errors": errors, "referrers": referrers, "pages": landing,
                 "orders_by_status": by_status}

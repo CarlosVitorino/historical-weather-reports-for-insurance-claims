@@ -319,6 +319,32 @@ footer .links{display:flex;gap:18px;flex-wrap:wrap}
 .status p{margin:0 0 8px}
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(242,169,59,0)}100%{box-shadow:0 0 0 0 rgba(242,169,59,0)}}
 .rid{font:500 .92rem var(--mono);color:var(--ink);word-break:break-all}
+/* articles: methodology, certified records, guides */
+.article{max-width:720px;margin:0 auto;padding:48px 24px 96px}
+.crumbs{font-size:.85rem;color:var(--muted);margin:0 0 22px}.crumbs a{color:var(--muted)}
+.article h1{font-size:clamp(1.9rem,4vw,2.5rem);line-height:1.15;letter-spacing:-.03em;margin:10px 0 18px}
+.article .lede{margin:0 0 8px}
+.article .updated{font-size:.82rem;color:var(--faint);margin:0 0 18px}
+.article h2{font-size:1.25rem;letter-spacing:-.02em;margin:34px 0 10px}
+.article p,.article li{line-height:1.7;color:var(--body)}
+.article p{margin:0 0 14px}.article ul{padding-left:1.2rem;margin:0 0 14px}.article li{margin:0 0 6px}
+.article .fine{font-size:.88rem;color:var(--muted)}
+.ctable{width:100%;border-collapse:collapse;margin:20px 0 14px;font-size:.92rem}
+.ctable th,.ctable td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.ctable th{color:var(--ink);font-weight:600}.ctable td:first-child{color:var(--muted)}
+@media (max-width:620px){.ctable{display:block;overflow-x:auto}}
+.cta-box{display:flex;gap:18px 24px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:40px 0 0;
+  padding:22px 24px;background:#fff;border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow)}
+.cta-box b{display:block;color:var(--ink);margin:0 0 4px}.cta-box span{color:var(--muted);font-size:.92rem;line-height:1.5}
+.cta-box div{flex:1 1 300px}
+.glist,.article .glist{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:14px}
+.glist a{display:block;padding:20px 22px;background:#fff;border:1px solid var(--rule);border-radius:14px;
+  text-decoration:none;color:var(--body)}
+.glist a:hover{border-color:#c6d0db}
+.glist b{display:block;color:var(--ink);font-size:1.08rem;margin:0 0 6px;letter-spacing:-.015em}
+.glist span{font-size:.92rem;line-height:1.55}
+.more{margin:48px 0 0;padding:28px 0 0;border-top:1px solid var(--rule)}
+.more h2{margin-top:0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
 """
 
@@ -339,8 +365,19 @@ WARNING_VIS = """<svg viewBox="0 0 300 150" role="img" aria-label="A property in
 </svg>"""
 
 
-def layout(title: str, body: str, refresh: int | None = None, description: str = "", map_assets: bool = False) -> str:
+def layout(title: str, body: str, refresh: int | None = None, description: str = "", map_assets: bool = False,
+           url: str = "", index: bool = False, jsonld: list | None = None) -> str:
+    """url: the page's canonical absolute URL (public pages only). index=False marks the page noindex, which is the
+    default so personal pages (orders, status) never reach a search index."""
     meta = f'<meta http-equiv="refresh" content="{refresh}">' if refresh else ""
+    if url:
+        origin = url[:url.index("/", url.index("//") + 2)] if url.count("/") > 2 else url
+        meta += (f'<link rel="canonical" href="{escape(url, quote=True)}"><meta property="og:url" '
+                 f'content="{escape(url, quote=True)}"><meta property="og:image" content="{origin}/static/sample-p1.webp">')
+    meta += '<meta name="robots" content="index,follow">' if index else '<meta name="robots" content="noindex">'
+    for block in jsonld or ():
+        meta += ('<script type="application/ld+json">' + json.dumps(block, separators=(",", ":")).replace("</", "<\\/")
+                 + "</script>")
     desc = escape(description or "Historical weather report for one US address and date of loss: measured wind and "
                   "rain from named stations, NWS warnings, storm reports, hail and lightning, each with its distance "
                   f"from the property. {PRICE} PDF.", quote=True)
@@ -348,12 +385,13 @@ def layout(title: str, body: str, refresh: int | None = None, description: str =
 <meta name="viewport" content="width=device-width,initial-scale=1">{meta}
 <title>{escape(title)}</title><meta name="description" content="{desc}">
 <meta property="og:title" content="{escape(title, quote=True)}"><meta property="og:description" content="{desc}">
-<meta property="og:image" content="/static/sample-p1.webp"><meta name="theme-color" content="#0b1a2e">
+<meta property="og:type" content="website"><meta property="og:site_name" content="{BRAND}">
+<meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0b1a2e">
 <link rel="icon" href="{FAVICON}"><link rel="apple-touch-icon" href="/static/apple-touch-icon.png">{FONTS}
 {MAP_ASSETS if map_assets else ""}<style>{CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="brand" href="/">{LOGO}<span>{BRAND}</span></a>
 <nav><a class="hide-sm" href="/#report">What you get</a><a class="hide-sm" href="/#compare">Compare</a>
-<a class="hide-sm" href="/#sample">Sample report</a><a class="hide-sm" href="/#faq">FAQ</a>
+<a class="hide-sm" href="/#sample">Sample report</a><a class="hide-sm" href="/guides">Guides</a>
 <a class="btn btn-amber" href="/order">Order · {PRICE}</a></nav></div></header>
 <main>{body}</main>{FOOTER}</body></html>"""
 
@@ -361,7 +399,9 @@ def layout(title: str, body: str, refresh: int | None = None, description: str =
 FOOTER = f"""<footer><div class="wrap"><div><a class="brand" href="/" style="margin-bottom:14px">{LOGO}<span>{BRAND}</span></a>
 <p>Not affiliated with NOAA, the National Weather Service or any government agency. Reports compile public records;
 they are not certified records or expert opinions.</p></div>
-<div><p class="links"><a href="/#sample">Sample report</a><a href="/#faq">FAQ</a><a href="/order">Order</a></p>
+<div><p class="links"><a href="/#sample">Sample report</a><a href="/methodology">How it's built</a>
+<a href="/certified-weather-records">Certified records</a><a href="/guides">Guides</a><a href="/#faq">FAQ</a>
+<a href="/order">Order</a></p>
 <p>{DOMAIN} · Payments processed by Creem</p></div></div></footer>"""
 
 
@@ -494,7 +534,8 @@ email.</span></div></li></ol></div></section>"""
     faq_items = [
         ("Is this a certified weather report?",
          "No. It compiles public records from NOAA, the National Weather Service and the US Census Bureau and shows "
-         "where each one came from. It is not a certified government record or an expert opinion."),
+         "where each one came from. It is not a certified government record or an expert opinion. "
+         '<a href="/certified-weather-records">When you need a certified record</a>.'),
         ("How close is the weather data to the property?",
          "That depends on where the nearest stations are. The report names every station and gives its distance and "
          "direction, so you can judge how representative it is."),
@@ -506,7 +547,7 @@ email.</span></div></li></ol></div></section>"""
         ("What if the report can't be built?",
          "We're notified automatically and will deliver the report or refund you."),
     ]
-    faq = "".join(f"<details><summary>{escape(q)}</summary><p>{escape(a)}</p></details>" for q, a in faq_items)
+    faq = "".join(f"<details><summary>{escape(q)}</summary><p>{a}</p></details>" for q, a in faq_items)  # trusted HTML
     faq_html = f"""<section id="faq"><div class="wrap">
 <div class="section-head center"><p class="eyebrow">FAQ</p><h2>Common questions.</h2></div>
 <div class="faq">{faq}</div></div></section>"""
@@ -533,3 +574,27 @@ def inner(body: str) -> str:
 def status_block(kind: str, title: str, text: str) -> str:
     dot = {"wait": "", "ok": " ok", "bad": " bad"}[kind]
     return f'<div class="status"><span class="dot{dot}"></span><div><p><b>{title}</b></p>{text}</div></div>'
+
+
+def article(page, related: list) -> str:
+    """A content page: breadcrumbs, heading, body, then links to the other guides."""
+    crumbs = '<a href="/">Home</a> / '
+    if page.guide:
+        crumbs += '<a href="/guides">Guides</a> / '
+    more = ""
+    if related:
+        items = "".join(f'<li><a href="{r.path}"><b>{escape(r.h1)}</b><span>{escape(r.description)}</span></a></li>'
+                        for r in related)
+        more = f'<div class="more"><h2>Related</h2><ul class="glist">{items}</ul></div>'
+    return f"""<article class="article"><nav class="crumbs" aria-label="Breadcrumb">{crumbs}{escape(page.h1)}</nav>
+<p class="eyebrow">{escape(page.eyebrow)}</p><h1>{escape(page.h1)}</h1>
+<p class="updated">Updated {page.updated:%B} {page.updated.day}, {page.updated.year}</p>{page.body}{more}</article>"""
+
+
+def guides_index(pages: list) -> str:
+    items = "".join(f'<li><a href="{p.path}"><b>{escape(p.h1)}</b><span>{escape(p.description)}</span></a></li>'
+                    for p in pages)
+    return f"""<div class="article"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Guides</nav>
+<p class="eyebrow">Guides</p><h1>Weather records for insurance claims</h1>
+<p class="lede">Plain-language guides to finding and reading public weather records for a property and a date of
+loss.</p><ul class="glist">{items}</ul></div>"""

@@ -13,11 +13,11 @@ from pathlib import Path
 from urllib.parse import urlencode, urlparse
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, payments, site
+from . import config, content, payments, seo, site
 from .fulfil import Fulfiller, order_dir
 from .geocode import AddressNotFound, find, locate, where
 from .suggest import reverse, suggest
@@ -26,11 +26,14 @@ from .snapshot import Snapshot, SourceUnavailable
 from .store import Store, now
 from .timewin import local_day
 
+PRIVATE_PATHS = ("/order/", "/orders/", "/admin", "/api/", "/webhooks/")   # never indexed
 EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 VISITOR_COOKIE = "vid"
 
-def page(title: str, body: str, refresh: int | None = None, map_assets: bool = False) -> HTMLResponse:
-    return HTMLResponse(site.layout(title, body, refresh, map_assets=map_assets))
+def page(title: str, body: str, refresh: int | None = None, map_assets: bool = False, url: str = "",
+         index: bool = False, jsonld: list | None = None, description: str = "") -> HTMLResponse:
+    return HTMLResponse(site.layout(title, body, refresh, description=description, map_assets=map_assets, url=url,
+                                    index=index, jsonld=jsonld))
 
 
 def inner_page(title: str, heading: str, body: str, refresh: int | None = None, eyebrow: str = "",
@@ -62,6 +65,17 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
 
 
     @app.middleware("http")
+    async def seo_headers(request: Request, call_next):
+        path = request.url.path
+        if path != "/" and path.endswith("/") and not path.startswith(("/static", "/api", "/webhooks")):
+            q = f"?{request.url.query}" if request.url.query else ""
+            return RedirectResponse(path.rstrip("/") + q, status_code=301)   # one URL per page
+        resp = await call_next(request)
+        if path.startswith(PRIVATE_PATHS):
+            resp.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return resp
+
+    @app.middleware("http")
     async def visitor(request: Request, call_next):
         vid = request.cookies.get(VISITOR_COOKIE)
         request.state.new_visitor = vid is None
@@ -77,9 +91,8 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
             raise HTTPException(404)
         return o
 
-    # -- public pages -----------------------------------------------------------------------
-    @app.get("/", response_class=HTMLResponse)
-    def index(request: Request):
+    def log_view(request: Request, kind: str = "page_view") -> None:
+        """A visit, with where it came from: referrer host, utm_* tags, and the landing path for content pages."""
         ref = request.headers.get("referer") or ""
         host = urlparse(ref).hostname or ""
         detail = {}
@@ -88,15 +101,58 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
         for k in ("utm_source", "utm_medium", "utm_campaign"):
             if request.query_params.get(k):
                 detail[k] = request.query_params[k][:100]
-        store.log("page_view", request.state.vid, **detail)
-        return page(f"{site.BRAND} — weather records for any US address and date of loss", site.landing(),
-                    map_assets=True)
+        if request.url.path != "/":
+            detail["path"] = request.url.path
+        store.log(kind, request.state.vid, **detail)
+
+    base = cfg.base_url
+
+    # -- public pages -----------------------------------------------------------------------
+    @app.get("/", response_class=HTMLResponse)
+    def index(request: Request):
+        log_view(request)
+        return page(f"Weather report by address and date of loss — {site.BRAND}", site.landing(), map_assets=True,
+                    url=f"{base}/", index=True, jsonld=[seo.organization(base), seo.website(base),
+                                                        seo.product(base, cfg.price_cents)],
+                    description="Hail, wind and storm records for one US address and date of loss: measured gusts "
+                                "at named stations, NWS warnings, storm reports, radar hail and lightning, each with "
+                                f"its distance from the property. {site.PRICE} PDF in about a minute.")
 
     @app.get("/order", response_class=HTMLResponse)
     def order_page(request: Request):
-        store.log("order_view", request.state.vid)
+        log_view(request, "order_view")
         prefill = {k: request.query_params.get(k) for k in ("address", "loss_date", "email", "lat", "lon")}
-        return page(f"Order a report — {site.BRAND}", site.order_page(site.order_form(prefill)), map_assets=True)
+        return page(f"Order a weather report for an address — {site.BRAND}",
+                    site.order_page(site.order_form(prefill)), map_assets=True, url=f"{base}/order", index=True,
+                    description=f"Enter the property address and date of loss. See the exact location before paying "
+                                f"{site.PRICE}; the PDF is ready in about a minute.")
+
+    @app.get("/guides", response_class=HTMLResponse)
+    def guides(request: Request):
+        log_view(request)
+        return page(f"Guides: weather records for insurance claims — {site.BRAND}",
+                    site.guides_index(content.GUIDES), url=f"{base}/guides", index=True,
+                    jsonld=[seo.breadcrumbs(base, [("Home", "/"), ("Guides", "/guides")])],
+                    description="How to find and read public weather records for a property and a date of loss: "
+                                "NOAA data, wind speed, warnings and the date of loss.")
+
+    def content_page(request: Request):
+        cp = content.PAGES[request.url.path]
+        log_view(request)
+        related = [g for g in content.GUIDES if g.path != cp.path][:3]
+        return page(cp.title, site.article(cp, related), url=f"{base}{cp.path}", index=True,
+                    jsonld=seo.article(base, cp), description=cp.description)
+
+    for path in content.PAGES:
+        app.add_api_route(path, content_page, methods=["GET"], response_class=HTMLResponse)
+
+    @app.get("/robots.txt", response_class=PlainTextResponse)
+    def robots():
+        return seo.robots(base)
+
+    @app.get("/sitemap.xml")
+    def sitemap():
+        return Response(seo.sitemap(base), media_type="application/xml")
 
     @app.post("/order", response_class=HTMLResponse)
     def order(request: Request, address: str = Form(""), loss_date: str = Form(""), email: str = Form(""),
