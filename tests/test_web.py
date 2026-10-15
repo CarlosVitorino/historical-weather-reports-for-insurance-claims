@@ -151,3 +151,29 @@ def test_fake_payments_for_local_testing(env):
     assert r.headers["location"] == f"/orders/{oid}/{token}"
     app2.state.fulfiller.pool.shutdown(wait=True)
     assert app2.state.store.get(oid)["status"] == "ready"
+
+
+def test_pin_only_order(env, monkeypatch):
+    app, client, _ = env
+    seen = {}
+
+    def fake_locate(snap, address, lat=None, lon=None):
+        seen.update(address=address, lat=lat, lon=lon)
+        return Location(address, None, lat, lon, "America/Indiana/Indianapolis", "Monroe County", "IN", "18105",
+                        "operator")
+    monkeypatch.setattr(web, "locate", fake_locate)
+    r = client.post("/order", data={"address": "", "lat": "39.17", "lon": "-86.53", "loss_date": DAY,
+                                    "email": "a@b.co"}, follow_redirects=False)
+    assert r.status_code == 303 and seen["lat"] == 39.17
+    oid = r.headers["location"].split("/")[2]
+    o = app.state.store.get(oid)
+    assert o["address"].startswith("Map pin at 39.17") and o["site_lat"] == 39.17
+    page = client.get(r.headers["location"]).text
+    assert 'id="confirm-map"' in page and "map pin" in page
+
+
+def test_landing_has_form_and_map(env):
+    _, client, _ = env
+    html = client.get("/").text
+    for needle in ['id="order-form"', 'role="combobox"', "/static/order.js", "One address, one day", 'id="compare"']:
+        assert needle in html, needle

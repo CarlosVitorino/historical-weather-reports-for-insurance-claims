@@ -62,6 +62,10 @@ class Store:
         self._lock = threading.Lock()
         with self._conn() as c:
             c.executescript(SCHEMA)
+            cols = {r[1] for r in c.execute("PRAGMA table_info(orders)")}
+            for col in ("site_lat REAL", "site_lon REAL"):      # added after v1: where the report is centred
+                if col.split()[0] not in cols:
+                    c.execute(f"ALTER TABLE orders ADD COLUMN {col}")
 
     @contextmanager
     def _conn(self):

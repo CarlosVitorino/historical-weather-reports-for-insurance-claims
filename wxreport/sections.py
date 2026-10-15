@@ -168,7 +168,7 @@ def cover(ctx: ReportContext) -> list:
                     f"{loc.county + ', ' + loc.state if loc.county else 'Not determined'} · {zones} · "
                     f"{ctx.wfo or 'not determined'}"],
                    ["Location method", "US Census Geocoder address match" if loc.method == "census"
-                    else "Coordinates supplied by the requester; the address was not geocoded"],
+                    else "Map pin placed by the requester (the address text was not geocoded)"],
                    ["Address as entered", loc.input_address],
                    ["Local day", f"{_t(ctx, day.start_utc, True)} to {_t(ctx, day.end_utc, True)} "
                                  f"({day.start_utc:%Y-%m-%d %H:%M}Z–{day.end_utc:%Y-%m-%d %H:%M}Z)"]],

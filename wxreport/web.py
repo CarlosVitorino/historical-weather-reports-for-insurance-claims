@@ -19,7 +19,8 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config, payments, site
 from .fulfil import Fulfiller, order_dir
-from .geocode import AddressNotFound, locate
+from .geocode import AddressNotFound, locate, where
+from .suggest import suggest
 from .report import MIN_DATE
 from .snapshot import Snapshot, SourceUnavailable
 from .store import Store, now
@@ -28,13 +29,14 @@ from .timewin import local_day
 EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 VISITOR_COOKIE = "vid"
 
-def page(title: str, body: str, refresh: int | None = None) -> HTMLResponse:
-    return HTMLResponse(site.layout(title, body, refresh))
+def page(title: str, body: str, refresh: int | None = None, map_assets: bool = False) -> HTMLResponse:
+    return HTMLResponse(site.layout(title, body, refresh, map_assets=map_assets))
 
 
-def inner_page(title: str, heading: str, body: str, refresh: int | None = None, eyebrow: str = "") -> HTMLResponse:
+def inner_page(title: str, heading: str, body: str, refresh: int | None = None, eyebrow: str = "",
+               map_assets: bool = False) -> HTMLResponse:
     eb = f'<p class="eyebrow">{escape(eyebrow)}</p>' if eyebrow else ""
-    return page(title, site.inner(f"{eb}<h1>{escape(heading)}</h1>{body}"), refresh)
+    return page(title, site.inner(f"{eb}<h1>{escape(heading)}</h1>{body}"), refresh, map_assets)
 
 
 def _float(s: str | None) -> float | None:
@@ -89,7 +91,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
         store.log("page_view", request.state.vid, **detail)
         prefill = {k: request.query_params.get(k) for k in ("address", "loss_date", "email", "lat", "lon")}
         return page(f"{site.BRAND} — weather records for any US address and date of loss",
-                    site.landing(site.order_form(prefill)))
+                    site.landing(site.order_form(prefill)), map_assets=True)
 
     @app.post("/order", response_class=HTMLResponse)
     def order(request: Request, address: str = Form(""), loss_date: str = Form(""), email: str = Form(""),
@@ -103,10 +105,9 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
                 store.delete(oid)
                 shutil.rmtree(order_dir(cfg, oid), ignore_errors=True)
             store.log("form_error", request.state.vid, reason=reason)
-            return page("Check your details", site.inner(site.order_form(v, msg, ask_coords, "Check your details")))
+            return page("Check your details", site.inner(site.order_form(v, msg, ask_coords, "Check your details")),
+                        map_assets=True)
 
-        if not v["address"]:
-            return fail("no_address", "Enter the address of the loss.")
         if not EMAIL.match(v["email"]):
             return fail("bad_email", "Enter a valid email address — the report is delivered there.")
         try:
@@ -121,6 +122,10 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
             return fail("bad_coords", str(e), True)
         if (flat is None) != (flon is None):
             return fail("bad_coords", "Enter both latitude and longitude, or neither.", True)
+        if not v["address"]:
+            if flat is None:
+                return fail("no_address", "Enter the address of the loss, or drop a pin on the map.")
+            v["address"] = f"Map pin at {flat:.5f}, {flon:.5f}"
 
         o = store.create_order(visitor=request.state.vid, email=v["email"], address=v["address"],
                                loss_date=day.isoformat(), lat=flat, lon=flon)
@@ -143,8 +148,8 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
             return fail("date_not_over", "That date hasn't ended yet at that address. Reports cover completed "
                         "past days only.")
         store.update(o["id"], lat=loc.lat if flat is not None else None, lon=loc.lon if flon is not None else None,
-                     matched_address=loc.matched_address or f"{loc.lat:.5f}, {loc.lon:.5f}",
-                     county=f"{loc.county}, {loc.state}")
+                     matched_address=loc.matched_address or v["address"],
+                     county=f"{loc.county}, {loc.state}", site_lat=loc.lat, site_lon=loc.lon)
         store.log("form_submit", request.state.vid, o["id"], method=loc.method)
         return RedirectResponse(f"/order/{o['id']}/{o['token']}", status_code=303)
 
@@ -156,19 +161,23 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
         d = date.fromisoformat(o["loss_date"])
         back = "/?" + urlencode({k: o[k] for k in ("address", "loss_date", "email") if o[k]} |
                                 ({"lat": o["lat"], "lon": o["lon"]} if o["lat"] is not None else {}))
-        how = "coordinates you entered" if o["lat"] is not None else "US Census Geocoder match"
+        how = (f"map pin at {o['lat']:.5f}, {o['lon']:.5f}" if o["lat"] is not None
+               else "US Census Geocoder address match")
         unavailable = "" if (cfg.payments_ready or cfg.fake_payments) else \
             '<p class="err">Payments are not configured on this server yet.</p>'
         price = f"${cfg.price_cents / 100:.2f}"
-        return inner_page("Confirm your report", "Confirm your report", f"""<div class="panel"><dl>
+        lat, lon = o.get("site_lat"), o.get("site_lon")
+        cmap = (f'<div id="confirm-map" data-lat="{lat}" data-lon="{lon}" role="img" '
+                f'aria-label="Map of the report location"></div>') if lat is not None else ""
+        return inner_page("Confirm your report", "Confirm your report", f"""<div class="panel">{cmap}<dl>
 <dt>Location</dt><dd><b>{escape(o['matched_address'])}</b><br><span class="fine">{escape(o['county'] or '')} · {how}</span></dd>
 <dt>Date of loss</dt><dd>{d:%B} {d.day}, {d.year}</dd><dt>Deliver to</dt><dd>{escape(o['email'])}</dd>
 <dt>Price</dt><dd><b>{price}</b> · one report, no subscription</dd></dl>{unavailable}
 <div class="actions"><form method="post" action="/order/{oid}/{token}/checkout">
 <button class="btn btn-amber" type="submit">Pay {price} securely</button></form>
 <a class="btn btn-ghost" href="{escape(back, quote=True)}#order">Change details</a></div>
-<p class="fine">If this isn't the property, change the details and enter its coordinates instead. The report is built
-for the location above. Checkout is handled by Creem.</p></div>""", eyebrow="Step 2 of 3")
+<p class="fine">The report is centred on the location shown. If it isn't the property, choose Change details and
+place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow="Step 2 of 3", map_assets=True)
 
     @app.post("/order/{oid}/{token}/checkout")
     def checkout(request: Request, oid: str, token: str):
@@ -263,6 +272,17 @@ for the location above. Checkout is handled by Creem.</p></div>""", eyebrow="Ste
             store.update(oid, status="refunded")
             store.log("refund", order_id=oid)
         return {"ok": True}
+
+    @app.get("/api/suggest")
+    def api_suggest(q: str = ""):
+        return {"results": suggest(q)}
+
+    @app.get("/api/where")
+    def api_where(lat: float, lon: float):
+        """County for a dropped pin (US Census), so the buyer sees where the pin landed."""
+        if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+            raise HTTPException(400)
+        return where(lat, lon)
 
     @app.get("/healthz")
     def healthz():

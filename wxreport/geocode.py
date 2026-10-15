@@ -66,3 +66,17 @@ def locate(snap: Snapshot, address: str, lat: float | None = None, lon: float | 
     county, state, fips = _county(m.get("geographies"))
     return Location(address, m.get("matchedAddress"), mlat, mlon, timezone_for(mlat, mlon),
                     county, state, fips, "census")
+
+
+def where(lat: float, lon: float) -> dict:
+    """County and state for a point, straight from the Census service (no snapshot: used by the order form)."""
+    import requests
+    try:
+        r = requests.get(f"{CENSUS}/geographies/coordinates", timeout=8,
+                         params={"benchmark": BENCHMARK, "vintage": VINTAGE, "layers": "Counties", "format": "json",
+                                 "x": f"{lon:.6f}", "y": f"{lat:.6f}"})
+        r.raise_for_status()
+        county, state, _ = _county(r.json()["result"].get("geographies"))
+    except (requests.RequestException, ValueError, KeyError):
+        return {"ok": False}
+    return {"ok": True, "in_us": county is not None, "county": county, "state": state}
