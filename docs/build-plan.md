@@ -72,7 +72,7 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Nationwide coverage from v1 (founder's choice): all sources are national anyway; costs only station-inventory and timezone lookups.
 - Census Geocoder, with an operator coordinate override for addresses it can't match (rural routes, new builds); the PDF says when coordinates were supplied manually.
 - Report fingerprint covers retrieval times as well as content, so one ID always means one exact PDF. Failed retrievals are retried until the snapshot is frozen, then replayed as "unavailable".
-- Brand: **Weather Evidence** (weatherevidence.com), chosen by the founder 2026-10-15; reports titled "Weather Evidence Report", IDs `WE-<date>-<hash>`. Set in `wxreport/__init__.py`. Domain availability not yet verified from this environment.
+- Brand: **Weather Evidence** (weatherevidence.com), chosen by the founder 2026-10-15; reports titled "Weather Evidence Report", IDs `WE-<date>-<hash>`. Set in `wxreport/__init__.py`. Domain availability confirmed by the founder on 2026-10-15.
 - Station logs come from GHCNh per-station per-year PSV files (~1 MB gzipped each), not the legacy NCEI token API: GHCNh carries the raw METAR text (peak-wind remarks, lightning, maintenance flags) and is updated daily. ISD fallback was not needed: GHCNh already merges ISD.
 - Lightning: NLDN strike points are restricted to NOAA staff (SWDI says so), so the report uses NCEI's public daily 0.1° tile counts, stated as such.
 - Warnings are matched to the site by testing each bulletin's LAT...LON polygon, not just the county.
