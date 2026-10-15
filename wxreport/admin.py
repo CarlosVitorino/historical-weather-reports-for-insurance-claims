@@ -4,11 +4,12 @@ from html import escape
 
 from . import BRAND
 from .config import Settings
+from .site import FONT_FACES
 from .store import FUNNEL, Store
 
 CSS = """
 :root{--ink:#1b2430;--muted:#5b6675;--rule:#e1e6ec;--accent:#1f4e79;--bg:#f7f9fb;--bad:#a33a2b;--good:#1e6b3a}
-*{box-sizing:border-box}body{font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);
+*{box-sizing:border-box}body{font:14px/1.5 Geist,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);
 background:var(--bg);margin:0}main{max-width:72rem;margin:0 auto;padding:1.5rem 1rem 4rem}
 h1{font-size:1.4rem;margin:0}h2{font-size:1.05rem;margin:2rem 0 .6rem}header{display:flex;flex-wrap:wrap;
 gap:1rem;align-items:baseline;justify-content:space-between}nav a{margin-left:.6rem;color:var(--accent)}
@@ -105,7 +106,7 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
 
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>Admin · {BRAND}</title><style>{CSS}</style></head><body><main>
+<title>Admin · {BRAND}</title><style>{FONT_FACES}{CSS}</style></head><body><main>
 <header><h1>Sales and traffic <span class="muted" style="font-weight:400">· {label}</span></h1><nav>{nav}</nav></header>
 {warn_html}<div class="kpis">{kpi_html}</div>
 <h2>Funnel (unique visitors per step)</h2><div class="wrap"><table><tr><th>Step</th><th>Visitors</th>
