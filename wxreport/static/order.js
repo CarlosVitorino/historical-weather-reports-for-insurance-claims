@@ -13,6 +13,33 @@
     return { Map: street, Satellite: sat };
   }
 
+  /* Map | Satellite toggle (a plain two-button control, styled by the page). */
+  function viewToggle(map, ls) {
+    var Ctl = L.Control.extend({
+      options: { position: "topright" },
+      onAdd: function () {
+        var box = L.DomUtil.create("div", "mapview");
+        box.setAttribute("role", "group"); box.setAttribute("aria-label", "Map view");
+        Object.keys(ls).forEach(function (name) {
+          var b = L.DomUtil.create("button", "", box);
+          b.type = "button"; b.textContent = name;
+          b.setAttribute("aria-pressed", map.hasLayer(ls[name]) ? "true" : "false");
+          L.DomEvent.on(b, "click", function (e) {
+            L.DomEvent.stop(e);
+            Object.keys(ls).forEach(function (n) { map.removeLayer(ls[n]); });
+            map.addLayer(ls[name]);
+            Array.prototype.forEach.call(box.children, function (x) {
+              x.setAttribute("aria-pressed", x === b ? "true" : "false");
+            });
+          });
+        });
+        L.DomEvent.disableClickPropagation(box);
+        return box;
+      }
+    });
+    new Ctl().addTo(map);
+  }
+
   function pinIcon() {
     return L.divIcon({ className: "", html: '<div class="pin"></div>', iconSize: [22, 22], iconAnchor: [11, 26] });
   }
@@ -23,7 +50,7 @@
     var c = [parseFloat(cm.dataset.lat), parseFloat(cm.dataset.lon)];
     var ls = layers();
     var m0 = L.map(cm, { scrollWheelZoom: false, layers: [ls.Map] }).setView(c, 17);
-    L.control.layers(ls, null, { collapsed: false }).addTo(m0);
+    viewToggle(m0, ls);
     L.marker(c, { icon: pinIcon(), interactive: false }).addTo(m0);
   }
 
@@ -68,7 +95,7 @@
     if (!map) {
       var ls = layers();
       map = L.map("map", { layers: [ls.Map] }).setView(center, zoom);
-      L.control.layers(ls, null, { collapsed: false }).addTo(map);
+      viewToggle(map, ls);
       map.on("click", function (e) { place(e.latlng, "pin"); });
     } else {
       map.setView(center, zoom);

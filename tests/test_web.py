@@ -121,7 +121,7 @@ def test_form_errors_are_logged_and_leave_no_order(env, monkeypatch):
         raise AddressNotFound("no")
     monkeypatch.setattr(web, "locate", not_found)
     r = client.post("/order", data={"address": "PO Box 1, Bettles, AK", "loss_date": DAY, "email": "a@b.co"})
-    assert "find that address" in r.text and 'name="lat"' in r.text
+    assert "match that address" in r.text and 'name="lat"' in r.text
     assert app.state.store.orders(10) == []
     reasons = {e["reason"]: e["n"] for e in app.state.store.stats(None)["form_errors"]}
     assert reasons == {"bad_email": 1, "address_not_found": 1}
@@ -175,5 +175,5 @@ def test_pin_only_order(env, monkeypatch):
 def test_landing_has_form_and_map(env):
     _, client, _ = env
     html = client.get("/").text
-    for needle in ['id="order-form"', 'role="combobox"', "/static/order.js", "One address, one day", 'id="compare"']:
+    for needle in ['id="order-form"', 'role="combobox"', "/static/order.js", "/static/hero.js", 'id="hero-map"', 'id="compare"']:
         assert needle in html, needle

@@ -21,7 +21,6 @@ SAMPLE = {
     "pdf": "/static/sample-report.pdf",
     "id": "WE-2026-02-19-C37C7155922C",
 }
-SITE_MAP = (STATIC / "site-map.svg").read_text()      # inline, so it can use the page's fonts
 WIND_CHART = (STATIC / "wind-chart.svg").read_text()
 
 # Self-hosted (SIL OFL, see /static/fonts/OFL.txt): no third-party requests from buyers' browsers.
@@ -34,7 +33,7 @@ FONT_FACES = """
 FONTS = '<link rel="preload" href="/static/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>'
 MAP_ASSETS = ('<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">'
               '<script defer src="/static/vendor/leaflet/leaflet.js"></script>'
-              '<script defer src="/static/order.js"></script>')
+              '<script defer src="/static/order.js"></script><script defer src="/static/hero.js"></script>')
 
 CSS = FONT_FACES + """
 :root{
@@ -106,19 +105,36 @@ section.alt{background:#fff;border-top:1px solid var(--rule);border-bottom:1px s
 .hero .eyebrow{color:var(--amber)}
 .hero .lede{color:#aebdcd;margin-bottom:28px}
 .figure{margin:0}
-.figure .mapbox{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:14px}
-.figure svg{width:100%;height:auto;display:block}
-.figure figcaption{margin-top:16px;font-size:.88rem;color:#8fa3b8;line-height:1.5}
-.figure figcaption b{color:#dbe4ee;font-weight:550}
-.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:12px 0 0;padding:0;list-style:none;font-size:.82rem;color:#aebdcd}
-.legend li{display:flex;align-items:center;gap:7px}
+.mapcard{background:#fff;color:var(--body);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.mapcard .mc-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--rule)}
+.mapcard .mc-head svg{flex:none;border-radius:6px}
+.mapcard .mc-head b{display:block;color:var(--ink);font-size:.92rem;font-weight:600;letter-spacing:-.01em}
+.mapcard .mc-head span{display:block;color:var(--muted);font-size:.8rem}
+#hero-map{height:330px;background:#e9edf1}
+#hero-map .leaflet-tile-pane{filter:grayscale(1) contrast(.92) brightness(1.06)}
+#hero-map .leaflet-tooltip{font:600 .76rem/1.25 var(--sans);color:var(--ink);border-radius:6px;padding:4px 7px;
+  border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.mc-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0;padding:10px 18px;list-style:none;font-size:.78rem;
+  color:var(--muted);border-bottom:1px solid var(--rule)}
+.mc-legend li{display:flex;align-items:center;gap:6px}
+.findings{display:grid;grid-template-columns:1fr 1fr;margin:0}
+.findings div{padding:12px 18px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.findings div:nth-child(2n){border-right:0}
+.findings div:nth-last-child(-n+2){border-bottom:0}
+.findings dt{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.findings dd{margin:3px 0 0;color:var(--ink);font-size:.9rem;line-height:1.35}
+.findings dd b{font-weight:650;font-size:1.05rem;letter-spacing:-.02em}
+.figure figcaption{margin-top:14px;font-size:.85rem;color:#8fa3b8;line-height:1.5}
+.figure figcaption a{color:#cfd9e4}
+@media (max-width:480px){.findings{grid-template-columns:1fr}.findings div{border-right:0}
+  .findings div:nth-last-child(-n+2){border-bottom:1px solid var(--rule)}.findings div:last-child{border-bottom:0}}
 .lg{display:inline-block;flex:none}
 .lg-site{width:11px;height:11px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 2px var(--navy-900) inset}
-.lg-station{width:10px;height:10px;border-radius:2px;background:#fff}
-.lg-path{width:18px;height:4px;border-radius:2px;background:#ff7a66}
-.lg-warn{width:16px;height:11px;border:1.4px dashed var(--amber);background:rgba(242,169,59,.12)}
-.lg-hail{width:11px;height:11px;border-radius:50%;background:rgba(143,200,255,.3);border:1px solid #8fc8ff}
-.lg-report{width:8px;height:8px;background:#8fc8ff;transform:rotate(45deg);margin:0 2px}
+.lg-station{width:10px;height:10px;border-radius:2px;background:var(--navy-800)}
+.lg-path{width:18px;height:4px;border-radius:2px;background:#d9442e}
+.lg-warn{width:16px;height:11px;border:1.4px dashed #d68f1f;background:rgba(242,169,59,.15)}
+.lg-hail{width:11px;height:11px;border-radius:50%;background:rgba(61,127,194,.25);border:1px solid var(--sky)}
+.lg-report{width:8px;height:8px;background:var(--sky);transform:rotate(45deg);margin:0 2px}
 @media (max-width:980px){.hero .wrap{grid-template-columns:1fr;gap:48px;padding-top:48px;padding-bottom:64px}}
 
 /* order form */
@@ -127,10 +143,15 @@ section.alt{background:#fff;border-top:1px solid var(--rule);border-bottom:1px s
 .inner .form-card{box-shadow:var(--shadow);border:1px solid var(--rule)}
 .form-card h3{font-size:1.3rem;letter-spacing:-.025em;margin-bottom:4px}
 .form-card .sub{color:var(--muted);margin:0;font-size:.92rem}
-label{display:block;margin-top:16px;font-weight:550;color:var(--ink);font-size:.92rem}
-input{width:100%;padding:12px 14px;font:inherit;font-size:1rem;color:var(--ink);border:1px solid #c3ccd7;border-radius:9px;
-  margin-top:6px;background:#fff;transition:border-color .15s,box-shadow .15s}
-input:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(28,53,84,.14)}
+form label{display:block;margin-top:16px;font-weight:550;color:var(--ink);font-size:.92rem}
+form input{width:100%;padding:12px 14px;font:inherit;font-size:1rem;color:var(--ink);border:1px solid #c3ccd7;
+  border-radius:9px;margin-top:6px;background:#fff;transition:border-color .15s,box-shadow .15s}
+form input:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(28,53,84,.14)}
+/* map view toggle (replaces Leaflet's layer control) */
+.mapview{display:inline-flex;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.25);overflow:hidden}
+.mapview button{border:0;background:#fff;font:500 .78rem var(--sans);color:var(--ink);padding:7px 11px;cursor:pointer}
+.mapview button+button{border-left:1px solid var(--rule)}
+.mapview button[aria-pressed=true]{background:var(--navy-800);color:#fff}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:600px){.row2{grid-template-columns:1fr;gap:0}}
 .form-card .btn{margin-top:22px}
@@ -162,8 +183,9 @@ input:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 @media (max-width:960px){.grid3{grid-template-columns:1fr}}
 .q{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px}
-.q .vis{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:14px;min-height:170px;
-  display:flex;flex-direction:column;justify-content:center}
+.q .vis{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:14px;height:228px;
+  display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+@media (max-width:960px){.q .vis{height:auto;min-height:0}}
 .q .vis svg{width:100%;height:auto;display:block}
 .q p{margin:0;color:var(--muted);font-size:.95rem}
 .vis-cap{font:500 .72rem/1.3 var(--mono);color:var(--faint);letter-spacing:.02em;margin-top:8px}
@@ -343,12 +365,21 @@ def landing(form: str) -> str:
 <p class="lede">A report of what was measured, warned and reported around one address on one date: gusts, rain,
 warnings, hail and tornadoes, each with its distance from the property. {PRICE}, delivered in about a minute.</p>
 {form}</div>
-<figure class="figure"><div class="mapbox">{SITE_MAP}</div>
-<figcaption><b>One address, one day, every record nearby.</b> Real data from a report for {s['place']},
-{s['date']}. Rings mark 3, 6 and 9 miles.</figcaption>
-<ul class="legend"><li><i class="lg lg-site"></i>Property</li><li><i class="lg lg-station"></i>Weather station</li>
-<li><i class="lg lg-path"></i>Tornado path</li><li><i class="lg lg-warn"></i>Warning area</li>
-<li><i class="lg lg-hail"></i>Radar hail</li><li><i class="lg lg-report"></i>Hail report</li></ul></figure>
+<figure class="figure"><div class="mapcard">
+<div class="mc-head">{mark_svg(24)}<div><b>Sample report: 401 N College Ave, {s['place']}</b><span>Date of loss:
+{s['date']} · records within 9 miles</span></div></div>
+<div id="hero-map" data-src="/static/site-map.json" role="img" aria-label="Map of weather records around the property"></div>
+<ul class="mc-legend"><li><i class="lg lg-site"></i>Property</li><li><i class="lg lg-station"></i>Weather station</li>
+<li><i class="lg lg-warn"></i>Tornado warning area</li><li><i class="lg lg-path"></i>Tornado path</li>
+<li><i class="lg lg-hail"></i>Radar hail</li><li><i class="lg lg-report"></i>Hail report</li></ul>
+<dl class="findings">
+<div><dt>Peak wind gust</dt><dd><b>70 mph</b> at 7:01 PM<br>Airport station, 4.7 mi WSW</dd></div>
+<div><dt>Tornado warning</dt><dd><b>Inside</b> the warning area<br>6:39 – 7:30 PM</dd></div>
+<div><dt>Tornado</dt><dd><b>EF2</b>, path 2.0 mi WSW<br>at its closest</dd></div>
+<div><dt>Largest hail nearby</dt><dd><b>1.5 in</b> reported<br>1.9 mi SE, 7:05 PM</dd></div>
+</dl></div>
+<figcaption>Real records from a real report. <a href="{s['pdf']}" target="_blank" rel="noopener">Open the full sample
+PDF</a></figcaption></figure>
 </div></section>
 <div class="sources"><div class="wrap"><span>Built on public records from</span><b>NOAA</b><b>National Weather Service</b>
 <b>NEXRAD radar</b><b>US Census Bureau</b></div></div>"""

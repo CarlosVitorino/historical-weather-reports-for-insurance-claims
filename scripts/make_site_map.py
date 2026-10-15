@@ -1,108 +1,48 @@
-"""Draw the landing page's hero map from the real sample report data (the trimmed Bloomington fixture).
+"""Build the landing page's data graphics from the real sample report (the trimmed Bloomington fixture).
 
-    .venv/bin/python scripts/make_site_map.py   →  wxreport/static/site-map.svg
+    .venv/bin/python scripts/make_site_map.py
+      → wxreport/static/site-map.json   records for the live hero map (static/hero.js)
+      → wxreport/static/wind-chart.svg  the day's measured wind at the report's station
 
-Everything plotted is a real record from that report: the address, the airport station that measured the
-peak gust, the NWS tornado-warning polygons, the Storm Events tornado path, radar hail detections and
-ground hail reports. Positions are true to scale (miles from the address).
+Everything shown is a real record from that report: the address, the station that measured the peak gust,
+the NWS tornado-warning polygons, the Storm Events tornado path, radar hail detections and hail reports.
 """
 import sys
-from math import cos, radians
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from wxreport.report import gather  # noqa: E402
 
-R_MI, SIZE = 9.0, 560
-PX = (SIZE / 2 - 22) / R_MI
-C = SIZE / 2
-AMBER, RED, SKY, INK = "#f2a93b", "#ff7a66", "#8fc8ff", "#e6edf5"
-
 
 def main():
     ctx = gather("401 N College Ave, Bloomington, IN", "2026-02-19",
                  root=ROOT / "tests/fixtures/snapshots", offline=True)
-    lat0, lon0 = ctx.loc.lat, ctx.loc.lon
-    kx = 69.172 * cos(radians(lat0))
-
-    def xy(lat, lon):
-        return C + (lon - lon0) * kx * PX, C - (lat - lat0) * 69.0 * PX
-
-    def inside(lat, lon, r=R_MI):
-        x, y = xy(lat, lon)
-        return ((x - C) ** 2 + (y - C) ** 2) ** .5 <= r * PX
-
-    out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}" role="img" '
-           f'aria-label="Map of weather records around one address on one day">',
-           '<defs><clipPath id="disc"><circle cx="280" cy="280" r="{:.1f}"/></clipPath>'.format(R_MI * PX),
-           f'<radialGradient id="bg"><stop offset="0" stop-color="#16304f"/><stop offset="1" stop-color="#0d1f35"/></radialGradient></defs>',
-           f'<circle cx="{C}" cy="{C}" r="{R_MI * PX:.1f}" fill="url(#bg)" stroke="rgba(255,255,255,.14)"/>',
-           '<g clip-path="url(#disc)">']
-    # warning polygons
-    for w in ctx.warnings:
-        if not w.polygon_based:
-            continue
-        poly = w.bulletins[0].polygon
-        pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in (xy(a, b) for a, b in poly))
-        out.append(f'<polygon points="{pts}" fill="rgba(242,169,59,.09)" stroke="{AMBER}" stroke-opacity=".7" '
-                   f'stroke-width="1.4" stroke-dasharray="5 4"/>')
-    # rings
-    for r in (3, 6):
-        out.append(f'<circle cx="{C}" cy="{C}" r="{r * PX:.1f}" fill="none" stroke="rgba(255,255,255,.13)"/>')
-    for r in (3, 6, 9):
-        out.append(f'<text x="{C + 4}" y="{C - r * PX + 13:.1f}" fill="rgba(230,237,245,.45)" font-size="10.5" '
-                   f'font-family="Geist Mono,monospace">{r} mi</text>')
-    # radar hail
-    for h in ctx.hail:
-        if h.max_size_in and inside(h.lat, h.lon):
-            x, y = xy(h.lat, h.lon)
-            out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{2.2 + 2.2 * h.max_size_in:.1f}" fill="{SKY}" '
-                       f'fill-opacity=".28" stroke="{SKY}" stroke-opacity=".8" stroke-width="1"/>')
-    # ground hail reports
-    for r in ctx.lsrs:
-        if r.type == "Hail" and inside(r.lat, r.lon):
-            x, y = xy(r.lat, r.lon)
-            out.append(f'<rect x="{x - 3.6:.1f}" y="{y - 3.6:.1f}" width="7.2" height="7.2" fill="{SKY}" '
-                       f'transform="rotate(45 {x:.1f} {y:.1f})"/>')
-    # tornado path
-    tor = next(e for e in ctx.storm_events.events if e.event_type == "Tornado")
-    (x1, y1), (x2, y2) = xy(*tor.begin_latlon), xy(*tor.end_latlon)
-    out.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{RED}" stroke-width="7" '
-               f'stroke-linecap="round" stroke-opacity=".9"/>')
-    out.append('</g>')
-    # station
-    st = ctx.primary.station
-    sx, sy = xy(st.lat, st.lon)
-    out.append(f'<rect x="{sx - 6:.1f}" y="{sy - 6:.1f}" width="12" height="12" rx="2" fill="#fff"/>')
-    # site pin
-    out.append(f'<circle cx="{C}" cy="{C}" r="15" fill="{AMBER}" fill-opacity=".18"/>'
-               f'<circle cx="{C}" cy="{C}" r="7" fill="{AMBER}" stroke="#0b1a2e" stroke-width="2.5"/>')
-    # north arrow
-    out.append(f'<g transform="translate({SIZE - 40},40)" fill="rgba(230,237,245,.6)" font-family="Geist,sans-serif" '
-               f'font-size="11" text-anchor="middle"><path d="M0 -14 6 4 0 0 -6 4z"/><text y="18">N</text></g>')
-
-    def label(x, y, lx, ly, title, sub, anchor="start"):
-        tx = lx + (8 if anchor == "start" else -8)
-        out.append(f'<line x1="{x:.1f}" y1="{y:.1f}" x2="{lx:.1f}" y2="{ly:.1f}" stroke="rgba(255,255,255,.5)"/>'
-                   f'<circle cx="{lx:.1f}" cy="{ly:.1f}" r="2" fill="#fff"/>'
-                   f'<text x="{tx:.1f}" y="{ly - 3:.1f}" fill="#fff" font-family="Geist,sans-serif" font-size="13.5" '
-                   f'font-weight="600" text-anchor="{anchor}">{title}</text>'
-                   f'<text x="{tx:.1f}" y="{ly + 13:.1f}" fill="{INK}" fill-opacity=".72" font-family="Geist,sans-serif" '
-                   f'font-size="12" text-anchor="{anchor}">{sub}</text>')
-
-    label(C + 9, C + 4, C + 52, C + 58, "The address", "401 N College Ave")
-    label(sx - 4, sy + 6, sx - 8, sy + 92, "70 mph gust measured", f"Airport station, {st.proximity}")
-    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
-    label(mx - 14, my - 2, 74, my - 78, "EF2 tornado path", f"{tor.proximity.split()[0]} mi from the address")
-    near = min((h for h in ctx.hail if h.max_size_in), key=lambda h: h.distance_mi)
-    hx, hy = xy(near.lat, near.lon)
-    label(hx + 4, hy - 6, SIZE - 70, hy - 92, "Radar-detected hail", f"{near.max_size_in:.2f} in, {near.proximity}", "end")
-    out.append('</svg>')
-    path = ROOT / "wxreport/static/site-map.svg"
-    path.write_text("\n".join(out))
-    print(path)
     wind_chart(ctx)
+    map_data(ctx)
+
+
+def map_data(ctx):
+    """The same records as JSON for the live hero map (Leaflet on real map tiles)."""
+    import json
+    from wxreport import units
+    sd = ctx.primary
+    tor = next(e for e in ctx.storm_events.events if e.event_type == "Tornado")
+    r6 = lambda v: round(v, 5)  # noqa: E731
+    pg = sd.peak_gust()
+    data = {
+        "site": [r6(ctx.loc.lat), r6(ctx.loc.lon)],
+        "station": {"at": [r6(sd.station.lat), r6(sd.station.lon)], "name": sd.station.icao,
+                    "gust_mph": round(units.mph(pg[1])), "proximity": sd.station.proximity},
+        "warnings": [[[r6(a), r6(b)] for a, b in w.bulletins[0].polygon] for w in ctx.warnings if w.polygon_based],
+        "tornado": {"path": [list(map(r6, tor.begin_latlon)), list(map(r6, tor.end_latlon))],
+                    "scale": tor.tor_scale, "proximity": tor.proximity},
+        "radar_hail": [[r6(h.lat), r6(h.lon), h.max_size_in] for h in ctx.hail if h.max_size_in and h.distance_mi <= 9],
+        "hail_reports": [[r6(r.lat), r6(r.lon)] for r in ctx.lsrs if r.type == "Hail" and r.distance_mi <= 9],
+    }
+    path = ROOT / "wxreport/static/site-map.json"
+    path.write_text(json.dumps(data, separators=(",", ":")))
+    print(path)
 
 
 def wind_chart(ctx):

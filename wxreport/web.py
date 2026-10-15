@@ -135,9 +135,8 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
         try:
             loc = locate(snap, v["address"], flat, flon)
         except AddressNotFound:
-            return fail("address_not_found", "We couldn't find that address in the US Census address file. Check "
-                        "the street, city and state (adding the ZIP code helps), or enter the property's "
-                        "coordinates below.", True)
+            return fail("address_not_found", "We couldn't match that address in the US Census address file. Pick "
+                        "it from the suggestions, add the city, state and ZIP code, or place a pin on the map.", True)
         except SourceUnavailable:
             return fail("geocoder_down", "The US Census address service didn't respond. Please try again in a "
                         "minute, or enter the property's coordinates below.", True)
