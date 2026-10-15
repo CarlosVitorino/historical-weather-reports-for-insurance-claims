@@ -188,7 +188,7 @@ place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow
         if o["status"] not in ("draft", "checkout"):
             return RedirectResponse(f"/orders/{oid}/{token}", status_code=303)
         store.log("checkout_click", request.state.vid, oid)
-        if cfg.fake_payments and not cfg.payments_ready:
+        if cfg.fake_payments:
             if store.transition(oid, ("draft", "checkout"), "paid", paid_at=now(), amount_cents=cfg.price_cents,
                                 currency="USD", creem_order_id="fake"):
                 store.log("paid", o["visitor"], oid, amount_cents=cfg.price_cents, fake=True)

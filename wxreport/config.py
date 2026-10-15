@@ -1,5 +1,6 @@
 """Settings from the environment (or a local .env file). Nothing secret is ever committed."""
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -11,7 +12,12 @@ def _load_dotenv(path: Path = Path(".env")) -> None:
         line = line.strip()
         if line and not line.startswith("#") and "=" in line:
             k, v = line.split("=", 1)
-            os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+            v = v.strip()
+            if v and v[0] in "\"'" and v.find(v[0], 1) > 0:
+                v = v[1:v.find(v[0], 1)]  # quoted: keep what's inside, drop any trailing comment
+            else:
+                v = re.split(r"\s+#", v, maxsplit=1)[0]  # unquoted: " # ..." is a comment
+            os.environ.setdefault(k.strip(), v)
 
 
 @dataclass(frozen=True)
@@ -39,6 +45,9 @@ class Settings:
 
 def load() -> Settings:
     _load_dotenv()
+    environment = os.environ.get("ENVIRONMENT", "production").strip().lower()
+    if environment not in ("production", "development"):
+        raise ValueError(f"ENVIRONMENT must be 'production' or 'development', not {environment!r}")
     key = os.environ.get("CREEM_API_KEY", "")
     default_base = "https://test-api.creem.io" if key.startswith("creem_test_") else "https://api.creem.io"
     return Settings(
@@ -52,5 +61,5 @@ def load() -> Settings:
         resend_api_key=os.environ.get("RESEND_API_KEY", ""),
         resend_from=os.environ.get("RESEND_FROM", ""),
         admin_password=os.environ.get("ADMIN_PASSWORD", ""),
-        fake_payments=os.environ.get("DEV_FAKE_PAYMENTS", "") == "1",
+        fake_payments=environment == "development",
     )

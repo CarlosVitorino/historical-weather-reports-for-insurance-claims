@@ -33,7 +33,7 @@ emailed through Resend. `/admin` (HTTP Basic auth, password `ADMIN_PASSWORD`) sh
 revenue, where visitors came from, why order forms were rejected, and every order, with retry and re-send buttons.
 
 Configuration lives in environment variables; see `.env.example`. For a local dry run without creem, set
-`DEV_FAKE_PAYMENTS=1` and orders are marked paid at checkout.
+`ENVIRONMENT=development` and orders are marked paid at checkout, even if creem keys are set.
 
 On your server:
 

@@ -202,3 +202,17 @@ def test_geocode_and_reverse_endpoints(env, monkeypatch):
     monkeypatch.setattr(web, "reverse", lambda lat, lon: "5299 DTC Boulevard, Greenwood Village, CO 80111")
     assert client.get("/api/reverse", params={"lat": 39.6198, "lon": -104.8904}).json()["label"].startswith("5299")
     assert client.get("/api/reverse", params={"lat": 200, "lon": 0}).status_code == 400
+
+
+def test_development_skips_creem_even_when_configured(env, monkeypatch):
+    app, _, _ = env
+    cfg = replace(app.state.cfg, fake_payments=True)
+    assert cfg.payments_ready
+    monkeypatch.setattr(web.payments, "create_checkout", lambda *a: pytest.fail("creem was called"))
+    app2 = web.create_app(cfg, app.state.store)
+    client = TestClient(app2)
+    oid, token = place_order(client)
+    r = client.post(f"/order/{oid}/{token}/checkout", follow_redirects=False)
+    assert r.headers["location"] == f"/orders/{oid}/{token}"
+    app2.state.fulfiller.pool.shutdown(wait=True)
+    assert app2.state.store.get(oid)["creem_order_id"] == "fake"

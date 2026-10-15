@@ -51,9 +51,10 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
     nav = "".join(f'<a href="/admin?days={d}" class="{"on" if d == days else ""}">{t}</a>'
                   for d, t in ((1, "24h"), (7, "7d"), (30, "30d"), (90, "90d"), (0, "All")))
     warn = []
-    if not cfg.payments_ready:
-        warn.append("creem is not configured (CREEM_API_KEY, CREEM_PRODUCT_ID, CREEM_WEBHOOK_SECRET)"
-                     + (" — DEV_FAKE_PAYMENTS is on" if cfg.fake_payments else ""))
+    if cfg.fake_payments:
+        warn.append("ENVIRONMENT=development: creem is skipped and every order is marked paid at checkout")
+    elif not cfg.payments_ready:
+        warn.append("creem is not configured (CREEM_API_KEY, CREEM_PRODUCT_ID, CREEM_WEBHOOK_SECRET)")
     if not cfg.email_ready:
         warn.append("Resend is not configured (RESEND_API_KEY, RESEND_FROM): reports are not emailed")
     warn_html = "".join(f'<div class="warn">{escape(w)}</div>' for w in warn)
