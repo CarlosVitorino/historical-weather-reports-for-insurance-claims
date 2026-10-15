@@ -2,7 +2,7 @@
 
 Same site and date as the StormRecord sample: Bloomington, IN, February 19, 2026
 (`401 N College Ave`, geocoded to 39.16955, -86.53493).
-Our report: [`docs/samples/WE-2026-02-19-C37C7155922C.pdf`](samples/WE-2026-02-19-C37C7155922C.pdf), built entirely from live public data.
+Our report: [`docs/samples/WE-2026-02-19-4486E5C490DC.pdf`](samples/WE-2026-02-19-4486E5C490DC.pdf), built entirely from live public data.
 
 | What the adjuster needs | StormRecord sample ($) | Our report ($9.99) |
 |---|---|---|

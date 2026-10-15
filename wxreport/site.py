@@ -4,12 +4,14 @@ Audience: adjusters, public adjusters, roofing contractors, attorneys and policy
 Principles: say each thing once, in plain words; show the product with real data (the hero map and the wind
 chart are drawn from the sample report by scripts/make_site_map.py); put the order form where people land.
 """
+import json
 from datetime import date, timedelta
 from html import escape
 from pathlib import Path
 
 from . import BRAND, DOMAIN
 from .brand import FAVICON, mark_svg
+from .geocode import _pretty
 from .report import MIN_DATE
 
 PRICE = "$9.99"
@@ -17,11 +19,12 @@ STATIC = Path(__file__).parent / "static"
 SAMPLE = {
     "place": "Bloomington, IN",
     "date": "February 19, 2026",
-    "pages": 25,
+    "pages": 26,
     "pdf": "/static/sample-report.pdf",
-    "id": "WE-2026-02-19-C37C7155922C",
+    "id": "WE-2026-02-19-4486E5C490DC",
 }
 WIND_CHART = (STATIC / "wind-chart.svg").read_text()
+SAMPLE_PAGE1 = json.loads((STATIC / "site-map.json").read_text())   # built from the sample report's page 1
 
 # Self-hosted (SIL OFL, see /static/fonts/OFL.txt): no third-party requests from buyers' browsers.
 FONT_FACES = """
@@ -99,31 +102,38 @@ section.alt{background:#fff;border-top:1px solid var(--rule);border-bottom:1px s
 /* hero */
 .hero{position:relative;color:#c9d5e3;padding:0;
   background:radial-gradient(1100px 620px at 88% 0%,#1d3a5f 0%,rgba(29,58,95,0) 62%),var(--navy-900)}
-.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:start;
-  padding-top:72px;padding-bottom:88px}
+.hero .wrap{padding-top:64px;padding-bottom:88px}
+.hero-intro{max-width:46rem;margin-bottom:36px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:28px;align-items:stretch}
+.hero-grid>.form-card{height:100%}
 .hero h1{color:#fff;margin:14px 0 18px}
 .hero .eyebrow{color:var(--amber)}
-.hero .lede{color:#aebdcd;margin-bottom:28px}
-.figure{margin:0}
-.mapcard{background:#fff;color:var(--body);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.hero .lede{color:#aebdcd}
+.figure{margin:0;display:flex}
+.mapcard{background:#fff;color:var(--body);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;flex:1;min-width:0}
 .mapcard .mc-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--rule)}
 .mapcard .mc-head svg{flex:none;border-radius:6px}
 .mapcard .mc-head b{display:block;color:var(--ink);font-size:.92rem;font-weight:600;letter-spacing:-.01em}
 .mapcard .mc-head span{display:block;color:var(--muted);font-size:.8rem}
-#hero-map{height:330px;background:#e9edf1}
+#hero-map{flex:1;min-height:240px;background:#eef1f4}
+.mc-foot{display:flex;justify-content:space-between;gap:12px;padding:11px 18px;font-size:.8rem;color:var(--muted);
+  background:var(--paper);border-top:1px solid var(--rule)}
+.mc-foot a{color:var(--navy-700);font-weight:550}
 #hero-map .leaflet-tile-pane{filter:grayscale(1) contrast(.92) brightness(1.06)}
 #hero-map .leaflet-tooltip{font:600 .76rem/1.25 var(--sans);color:var(--ink);border-radius:6px;padding:4px 7px;
   border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,.12)}
-.mc-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0;padding:10px 18px;list-style:none;font-size:.78rem;
+.mc-legend{display:flex;flex-wrap:wrap;gap:5px 14px;margin:0;padding:9px 18px;list-style:none;font-size:.76rem;flex:none;
   color:var(--muted);border-bottom:1px solid var(--rule)}
 .mc-legend li{display:flex;align-items:center;gap:6px}
-.findings{display:grid;grid-template-columns:1fr 1fr;margin:0}
+.findings{display:grid;grid-template-columns:1fr 1fr;margin:0;flex:none}
 .findings div{padding:12px 18px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
 .findings div:nth-child(2n){border-right:0}
 .findings div:nth-last-child(-n+2){border-bottom:0}
 .findings dt{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .findings dd{margin:3px 0 0;color:var(--ink);font-size:.9rem;line-height:1.35}
-.findings dd b{font-weight:650;font-size:1.05rem;letter-spacing:-.02em}
+.findings dd b{display:block;font-weight:650;font-size:1.2rem;letter-spacing:-.025em}
+.findings dd span{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
 .figure figcaption{margin-top:14px;font-size:.85rem;color:#8fa3b8;line-height:1.5}
 .figure figcaption a{color:#cfd9e4}
 @media (max-width:480px){.findings{grid-template-columns:1fr}.findings div{border-right:0}
@@ -135,7 +145,10 @@ section.alt{background:#fff;border-top:1px solid var(--rule);border-bottom:1px s
 .lg-warn{width:16px;height:11px;border:1.4px dashed #d68f1f;background:rgba(242,169,59,.15)}
 .lg-hail{width:11px;height:11px;border-radius:50%;background:rgba(61,127,194,.25);border:1px solid var(--sky)}
 .lg-report{width:8px;height:8px;background:var(--sky);transform:rotate(45deg);margin:0 2px}
-@media (max-width:980px){.hero .wrap{grid-template-columns:1fr;gap:48px;padding-top:48px;padding-bottom:64px}}
+.lg-wind{width:9px;height:9px;border-radius:50%;background:#6b4fa0}
+.lg-tor{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid #d9442e}
+@media (max-width:980px){.hero .wrap{padding-top:44px;padding-bottom:64px}.hero-grid{grid-template-columns:1fr}
+  #hero-map{min-height:300px}}
 
 /* order form */
 .form-card{background:#fff;color:var(--body);border-radius:16px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.28);
@@ -363,27 +376,26 @@ placeholder="you@company.com"></label></div>
 
 def landing(form: str) -> str:
     s = SAMPLE
+    facts = "".join(f'<div><dt>{escape(f["label"])}</dt><dd><b>{escape(f["value"])}</b><span>{escape(f["detail"])}'
+                    f'</span></dd></div>' for f in SAMPLE_PAGE1["facts"])
     hero = f"""<section class="hero"><div class="wrap">
-<div><p class="eyebrow">Weather records · any US address</p>
+<div class="hero-intro"><p class="eyebrow">Weather records · any US address</p>
 <h1>What the weather did at the loss site.</h1>
 <p class="lede">A report of what was measured, warned and reported around one address on one date: gusts, rain,
-warnings, hail and tornadoes, each with its distance from the property. {PRICE}, delivered in about a minute.</p>
-{form}</div>
+warnings, hail and tornadoes, each with its distance from the property. {PRICE}, delivered in about a minute.</p></div>
+<div class="hero-grid">{form}
 <figure class="figure"><div class="mapcard">
-<div class="mc-head">{mark_svg(24)}<div><b>Sample report: 401 N College Ave, {s['place']}</b><span>Date of loss:
-{s['date']} · records within 9 miles</span></div></div>
+<div class="mc-head">{mark_svg(24)}<div><b>{escape(_pretty(SAMPLE_PAGE1["address"]))}</b><span>Date of loss:
+{SAMPLE_PAGE1["date"]} · page 1 of the sample report</span></div></div>
 <div id="hero-map" data-src="/static/site-map.json" role="img" aria-label="Map of weather records around the property"></div>
 <ul class="mc-legend"><li><i class="lg lg-site"></i>Property</li><li><i class="lg lg-station"></i>Weather station</li>
-<li><i class="lg lg-warn"></i>Tornado warning area</li><li><i class="lg lg-path"></i>Tornado path</li>
-<li><i class="lg lg-hail"></i>Radar hail</li><li><i class="lg lg-report"></i>Hail report</li></ul>
-<dl class="findings">
-<div><dt>Peak wind gust</dt><dd><b>70 mph</b> at 7:01 PM<br>Airport station, 4.7 mi WSW</dd></div>
-<div><dt>Tornado warning</dt><dd><b>Inside</b> the warning area<br>6:39 – 7:30 PM</dd></div>
-<div><dt>Tornado</dt><dd><b>EF2</b>, path 2.0 mi WSW<br>at its closest</dd></div>
-<div><dt>Largest hail nearby</dt><dd><b>1.5 in</b> reported<br>1.9 mi SE, 7:05 PM</dd></div>
-</dl></div>
-<figcaption>Real records from a real report. <a href="{s['pdf']}" target="_blank" rel="noopener">Open the full sample
-PDF</a></figcaption></figure>
+<li><i class="lg lg-warn"></i>Warning area</li><li><i class="lg lg-path"></i>Tornado path</li>
+<li><i class="lg lg-hail"></i>Radar hail</li><li><i class="lg lg-report"></i>Hail report</li>
+<li><i class="lg lg-wind"></i>Wind report</li></ul>
+<dl class="findings">{facts}</dl>
+<div class="mc-foot"><span>Real records from a real report</span><a href="{s['pdf']}" target="_blank" rel="noopener">Open the
+full sample PDF →</a></div>
+</div></figure></div>
 </div></section>
 <div class="sources"><div class="wrap"><span>Built on public records from</span><b>NOAA</b><b>National Weather Service</b>
 <b>NEXRAD radar</b><b>US Census Bureau</b></div></div>"""
@@ -434,8 +446,8 @@ gives them every source to start from.</p></div>
 <th>Forensic meteorologist</th></tr></thead><tbody>{body}</tbody></table></div>
 </div></section>"""
 
-    pages = [("1", "Key findings"), ("2", "Station measurements"), ("4", "Warnings & storm reports"),
-             ("6", "Storm Events"), ("7", "Hail & lightning")]
+    pages = [("1", "Map & key facts"), ("3", "Station measurements"), ("5", "Warnings & storm reports"),
+             ("7", "Storm Events"), ("8", "Hail & lightning")]
     thumbs = "".join(f'<a href="{s["pdf"]}#page={p}" target="_blank" rel="noopener"><div class="thumb">'
                      f'<img loading="lazy" src="/static/sample-p{p}.webp" alt="Sample report page {p}: {t}" '
                      f'width="935" height="1210"></div><span>{t}</span>Page {p}</a>' for p, t in pages)

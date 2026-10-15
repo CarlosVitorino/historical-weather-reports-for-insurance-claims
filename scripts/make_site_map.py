@@ -23,22 +23,26 @@ def main():
 
 
 def map_data(ctx):
-    """The same records as JSON for the live hero map (Leaflet on real map tiles)."""
+    """The report's page-1 content as JSON for the landing page: same extent, records and key facts."""
     import json
-    from wxreport import units
-    sd = ctx.primary
-    tor = next(e for e in ctx.storm_events.events if e.event_type == "Tornado")
+    from wxreport.summary import key_facts
     r6 = lambda v: round(v, 5)  # noqa: E731
-    pg = sd.peak_gust()
+    ext = ctx.area
+    ev = ctx.storm_events.events if ctx.storm_events else []
     data = {
-        "site": [r6(ctx.loc.lat), r6(ctx.loc.lon)],
-        "station": {"at": [r6(sd.station.lat), r6(sd.station.lon)], "name": sd.station.icao,
-                    "gust_mph": round(units.mph(pg[1])), "proximity": sd.station.proximity},
+        "address": ctx.loc.matched_address, "date": f"{ctx.day.day:%B} {ctx.day.day.day}, {ctx.day.day.year}",
+        "report_id": ctx.report_id,
+        "site": [r6(ctx.loc.lat), r6(ctx.loc.lon)], "radius_mi": ext.radius_mi, "ring_step": ext.ring_step,
+        "stations": [{"at": [r6(s.station.lat), r6(s.station.lon)], "name": s.station.icao or s.station.id}
+                     for s in ctx.stations if s.station.distance_mi <= ext.radius_mi * 1.6],
         "warnings": [[[r6(a), r6(b)] for a, b in w.bulletins[0].polygon] for w in ctx.warnings if w.polygon_based],
-        "tornado": {"path": [list(map(r6, tor.begin_latlon)), list(map(r6, tor.end_latlon))],
-                    "scale": tor.tor_scale, "proximity": tor.proximity},
-        "radar_hail": [[r6(h.lat), r6(h.lon), h.max_size_in] for h in ctx.hail if h.max_size_in and h.distance_mi <= 9],
-        "hail_reports": [[r6(r.lat), r6(r.lon)] for r in ctx.lsrs if r.type == "Hail" and r.distance_mi <= 9],
+        "tornado_paths": [[list(map(r6, e.begin_latlon)), list(map(r6, e.end_latlon or e.begin_latlon))]
+                          for e in ev if e.event_type == "Tornado" and e.begin_latlon],
+        "radar_hail": [[r6(h.lat), r6(h.lon), h.max_size_in] for h in ctx.hail if h.max_size_in],
+        "reports": [[r6(r.lat), r6(r.lon), "hail" if r.type == "Hail" else "tornado" if r.type == "Tornado"
+                     else "wind" if "wind" in r.type.lower() else "other"] for r in ctx.lsrs
+                    if r.distance_mi <= ext.radius_mi * 1.6],
+        "facts": [{"label": a, "value": b, "detail": c} for a, b, c in key_facts(ctx)],
     }
     path = ROOT / "wxreport/static/site-map.json"
     path.write_text(json.dumps(data, separators=(",", ":")))

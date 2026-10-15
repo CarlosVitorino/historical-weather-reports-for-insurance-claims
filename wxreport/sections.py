@@ -123,12 +123,7 @@ def findings(ctx: ReportContext) -> list:
                      f"{', '.join(_ymd(x.utc_day) for x in site_tiles) or 'covering the date'})"])
     if se and se.status != "ok":
         rows.append(["NCEI Storm Events", se.note])
-    down = [label for label, note in (("station measurements", ctx.stations_note), ("NWS warnings", ctx.warnings_note),
-                                      ("Local Storm Reports", ctx.lsrs_note), ("radar hail", ctx.hail_note))
-            if note and "unavailable" in note]
-    down += [f"station {s.station.icao or s.station.id}" for s in ctx.stations if s.status == "unavailable"]
-    if se and se.status == "unavailable":
-        down.append("Storm Events")
+    down = unavailable_sources(ctx)
     if down:
         rows.append([P("<b>Sources unavailable when this report was made</b>", "cell"),
                      P(f"<b>{esc(', '.join(down))}</b>. Their absence here is not evidence that nothing happened.",
@@ -138,6 +133,17 @@ def findings(ctx: ReportContext) -> list:
             Spacer(1, 4),
             _note("Each finding names the record it comes from. Records near the site do not by themselves "
                   "establish conditions at the property. Detailed records and their limitations follow.")]
+
+
+def unavailable_sources(ctx: ReportContext) -> list[str]:
+    se = ctx.storm_events
+    down = [label for label, note in (("station measurements", ctx.stations_note), ("NWS warnings", ctx.warnings_note),
+                                      ("Local Storm Reports", ctx.lsrs_note), ("radar hail", ctx.hail_note))
+            if note and "unavailable" in note]
+    down += [f"station {s.station.icao or s.station.id}" for s in ctx.stations if s.status == "unavailable"]
+    if se and se.status == "unavailable":
+        down.append("Storm Events")
+    return down
 
 
 def _size(mag: str) -> float:
@@ -153,27 +159,44 @@ def _ymd(s: str) -> str:
 
 # -- cover -------------------------------------------------------------------------------------
 def cover(ctx: ReportContext) -> list:
+    """Page 1: who/where/when, the area map and four key facts. Page 2: location details and the summary table."""
+    from .summary import AreaMap, Legend, facts_table
     loc, day = ctx.loc, ctx.day
     place = loc.matched_address or loc.input_address
     gen = _t(ctx, datetime.fromisoformat(ctx.snap.frozen_at), True)
     zones = ", ".join(ctx.zones) or "not determined"
-    return [pdf.Lockup(pdf.PRODUCT), Spacer(1, 8),
-            P(f"Report ID <b>{ctx.report_id}</b> · Data retrieved {esc(gen)}", "small"),
-            Spacer(1, 10),
-            P(esc(place), "big"),
-            P(f"<b>{_day_label(ctx)}</b> · local weather date ({day.hours} hours) · {esc(loc.tz)}", "body"),
-            Spacer(1, 6),
-            table([["Coordinates", f"{loc.lat:.5f}, {loc.lon:.5f}"],
-                   ["County · NWS zones · office",
-                    f"{loc.county + ', ' + loc.state if loc.county else 'Not determined'} · {zones} · "
-                    f"{ctx.wfo or 'not determined'}"],
-                   ["Location method", "US Census Geocoder address match" if loc.method == "census"
-                    else "Map pin placed by the requester (the address text was not geocoded)"],
-                   ["Address as entered", loc.input_address],
-                   ["Local day", f"{_t(ctx, day.start_utc, True)} to {_t(ctx, day.end_utc, True)} "
-                                 f"({day.start_utc:%Y-%m-%d %H:%M}Z–{day.end_utc:%Y-%m-%d %H:%M}Z)"]],
-                  col_widths=[1.9 * inch, 5.1 * inch], header=False, zebra=False),
-            Spacer(1, 10)] + findings(ctx)
+    page1 = [pdf.Lockup(pdf.PRODUCT), Spacer(1, 6),
+             P(f"Report ID <b>{ctx.report_id}</b> · Data retrieved {esc(gen)}", "small"),
+             Spacer(1, 12),
+             P(esc(place), "big"),
+             P(f"Date of loss <b>{_day_label(ctx)}</b> · local day in {esc(loc.tz)}", "body"),
+             Spacer(1, 10)]
+    if ctx.area:
+        page1 += [AreaMap(ctx), Spacer(1, 5), Legend(), Spacer(1, 8)]
+        if ctx.area.note:
+            page1 += [_note(ctx.area.note), Spacer(1, 4)]
+    down = unavailable_sources(ctx)
+    if down:
+        page1 += [table([[P(f"<b>Sources unavailable when this report was made:</b> {esc(', '.join(down))}. Their "
+                            "absence here is not evidence that nothing happened.", "cell")]],
+                        col_widths=[pdf.inch * 7], header=False, zebra=False), Spacer(1, 6)]
+        page1[-2].hAlign = "LEFT"
+    page1 += [facts_table(ctx), Spacer(1, 8),
+              _note("Each fact names the record it comes from; details and limitations follow. Records near the "
+                    "property do not by themselves establish conditions at it.")]
+    page2 = [PageBreak(), P("Location", "h1"),
+             table([["Coordinates", f"{loc.lat:.5f}, {loc.lon:.5f}"],
+                    ["County · NWS zones · office",
+                     f"{loc.county + ', ' + loc.state if loc.county else 'Not determined'} · {zones} · "
+                     f"{ctx.wfo or 'not determined'}"],
+                    ["Location method", "US Census Geocoder address match" if loc.method == "census"
+                     else "Map pin placed by the requester (the address text was not geocoded)"],
+                    ["Address as entered", loc.input_address],
+                    ["Local day", f"{_t(ctx, day.start_utc, True)} to {_t(ctx, day.end_utc, True)} "
+                                  f"({day.start_utc:%Y-%m-%d %H:%M}Z–{day.end_utc:%Y-%m-%d %H:%M}Z)"]],
+                   col_widths=[1.9 * inch, 5.1 * inch], header=False, zebra=False),
+             Spacer(1, 14)]
+    return page1 + page2 + findings(ctx)
 
 
 # -- stations ----------------------------------------------------------------------------------
@@ -485,10 +508,18 @@ STATUS = {"ok": "retrieved", "error": "unavailable", "absent": "not published"}
 
 def sources(ctx: ReportContext) -> list:
     rows = [["Source record", "Retrieved (UTC)", "Status", "SHA-256 (first 16)"]]
+    tiles = []
     for name in sorted(ctx.snap.sources):
         s = ctx.snap.sources[name]
+        if name.startswith("basemap_"):
+            tiles.append(s)
+            continue
         rows.append([name, s["retrieved_at"].replace("+00:00", "Z"), STATUS.get(s["status"], s["status"]),
                      (s.get("sha256") or "")[:16]])
+    if tiles:
+        ok = sum(1 for t in tiles if t["status"] == "ok")
+        last = max(t["retrieved_at"] for t in tiles).replace("+00:00", "Z")
+        rows.append([f"basemap tiles (USGS, {len(tiles)})", last, f"{ok} retrieved", "listed in manifest"])
     gen = _t(ctx, datetime.fromisoformat(ctx.snap.frozen_at), True)
     out = [PageBreak(), P("Sources and limitations", "h1"),
            P("Data sources", "h2"),
@@ -505,6 +536,8 @@ def sources(ctx: ReportContext) -> list:
            P("<b>Hail and lightning:</b> NOAA NCEI Severe Weather Data Inventory (NEXRAD Level-III hail) and NCEI "
              "daily NLDN lightning tile counts.", "body"),
            P("<b>Location:</b> US Census Bureau Geocoder; timezone from coordinates (IANA tz database).", "body"),
+           P("<b>Area map:</b> USGS The National Map topographic basemap (public domain), shown muted; records are "
+             "drawn at their published coordinates. Storm report positions are often approximate.", "body"),
            P("Distances and bearings", "h2"),
            P("Distances are great-circle miles from the site's coordinates; bearings are the direction from the site "
              "to the record (e.g. '4.6 mi WSW' means the record lies west-southwest of the site). A record's own "

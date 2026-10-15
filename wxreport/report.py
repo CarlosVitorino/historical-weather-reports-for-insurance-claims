@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path
 
-from . import RENDER_VERSION
+from . import RENDER_VERSION, areamap
 from .geocode import Location, locate
 from .snapshot import DEFAULT_ROOT, Snapshot, report_id
 from .sources import ghcnh, nws, stormevents, swdi
@@ -38,6 +38,7 @@ class ReportContext:
     hail_note: str | None = None
     lightning: list[swdi.LightningTile] = field(default_factory=list)
     lightning_note: str | None = None
+    area: "areamap.Extent | None" = None
 
     @property
     def primary(self) -> ghcnh.StationDay | None:
@@ -84,6 +85,8 @@ def gather(address: str, day_str: str, lat: float | None = None, lon: float | No
     ctx.storm_events = stormevents.collect(snap, loc.lat, loc.lon, window, loc.county_fips, ctx.zones)
     ctx.hail, ctx.hail_note = swdi.collect_hail(snap, loc.lat, loc.lon, window)
     ctx.lightning, ctx.lightning_note = swdi.collect_lightning(snap, loc.lat, loc.lon, window)
+    near = ctx.primary.station.distance_mi if ctx.primary else None
+    ctx.area = areamap.collect(snap, areamap.plan(loc.lat, loc.lon, near))
     snap.freeze()
     ctx.report_id = report_id(day.isoformat(), snap, RENDER_VERSION)
     return ctx

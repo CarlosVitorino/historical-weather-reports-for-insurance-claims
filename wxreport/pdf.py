@@ -110,7 +110,9 @@ class Lockup(Flowable):
 
 def render(flowables: list, report_id: str, title: str) -> bytes:
     buf = BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=LETTER, leftMargin=0.75 * inch, rightMargin=0.75 * inch,
+    # The frame pads its content by 6 pt; margins net that out so all content spans exactly 7 in from 0.75 in,
+    # the same edge as the page footer.
+    doc = SimpleDocTemplate(buf, pagesize=LETTER, leftMargin=0.75 * inch - 6, rightMargin=0.75 * inch - 6,
                             topMargin=0.7 * inch, bottomMargin=0.8 * inch, title=title,
                             author=PRODUCT, subject=report_id, creator="wxreport", producer="wxreport")
     doc.build(list(flowables), canvasmaker=_numbered_canvas(report_id))

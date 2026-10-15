@@ -1,4 +1,4 @@
-/* Landing page map: the real records from the sample report, on a muted street map. */
+/* Landing page: page 1 of the sample report as a live map (same records, extent and rings as the PDF). */
 (function () {
   "use strict";
   var el = document.getElementById("hero-map");
@@ -11,41 +11,57 @@
     maxZoom: 19, attribution: "&copy; OpenStreetMap contributors"
   }).addTo(map);
 
-  function square(color) {
-    return L.divIcon({ className: "", iconSize: [14, 14], iconAnchor: [7, 7],
-      html: '<div style="width:14px;height:14px;border-radius:3px;background:' + color +
-            ';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>' });
+  function icon(html, size) {
+    return L.divIcon({ className: "", iconSize: [size, size], iconAnchor: [size / 2, size / 2], html: html });
   }
-  function diamond() {
-    return L.divIcon({ className: "", iconSize: [10, 10], iconAnchor: [5, 5],
-      html: '<div style="width:9px;height:9px;background:#3d7fc2;transform:rotate(45deg);border:1px solid #fff"></div>' });
-  }
-  function pin() {
-    return L.divIcon({ className: "", iconSize: [22, 22], iconAnchor: [11, 26], html: '<div class="pin"></div>' });
-  }
+  var MARK = {
+    hail: '<div style="width:9px;height:9px;background:#3d7fc2;transform:rotate(45deg);border:1px solid #fff"></div>',
+    wind: '<div style="width:9px;height:9px;border-radius:50%;background:#6b4fa0;border:1px solid #fff"></div>',
+    tornado: '<div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;' +
+             'border-bottom:10px solid #d9442e"></div>'
+  };
+  var MILE = 1609.344;
 
   fetch(el.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
     var site = L.latLng(d.site[0], d.site[1]);
-    var miles = 6.5, dLat = miles / 69, dLon = miles / (69.17 * Math.cos(site.lat * Math.PI / 180));
-    map.fitBounds([[site.lat - dLat, site.lng - dLon], [site.lat + dLat, site.lng + dLon]]);
+    function fit() {
+      var r = d.radius_mi * MILE;
+      map.fitBounds(L.latLng(site).toBounds(2 * r), { padding: [6, 6] });
+    }
+    fit();
+    new ResizeObserver(function () { map.invalidateSize(); fit(); }).observe(el);
 
     d.warnings.forEach(function (poly) {
-      L.polygon(poly, { color: "#d68f1f", weight: 2, dashArray: "6 5", fillColor: "#f2a93b", fillOpacity: 0.12,
+      L.polygon(poly, { color: "#c9821a", weight: 1.6, dashArray: "6 5", fillColor: "#f2a93b", fillOpacity: 0.13,
                         interactive: false }).addTo(map);
     });
+    for (var r = d.ring_step; r <= d.radius_mi + 1e-6; r += d.ring_step) {
+      L.circle(site, { radius: r * MILE, color: "#4b5868", weight: 0.8, opacity: 0.55, fill: false, interactive: false })
+        .addTo(map);
+      var at = L.latLng(site.lat + (r / 69) * Math.sin(Math.PI / 3),
+                        site.lng + (r / (69.17 * Math.cos(site.lat * Math.PI / 180))) * Math.cos(Math.PI / 3));
+      L.marker(at, { interactive: false, icon: L.divIcon({ className: "", iconSize: [34, 14], iconAnchor: [0, 7],
+        html: '<span style="font:500 10px Geist,sans-serif;color:#5d6b7c;background:rgba(255,255,255,.85);' +
+              'padding:0 3px;border-radius:3px">' + r + ' mi</span>' }) }).addTo(map);
+    }
     d.radar_hail.forEach(function (h) {
-      L.circleMarker([h[0], h[1]], { radius: 3 + 2.4 * h[2], color: "#3d7fc2", weight: 1, fillColor: "#3d7fc2",
+      L.circleMarker([h[0], h[1]], { radius: 3 + 2.2 * h[2], color: "#3d7fc2", weight: 1, fillColor: "#3d7fc2",
                                      fillOpacity: 0.22, interactive: false }).addTo(map);
     });
-    d.hail_reports.forEach(function (h) { L.marker(h, { icon: diamond(), interactive: false }).addTo(map); });
-
-    L.polyline(d.tornado.path, { color: "#d9442e", weight: 6, opacity: 0.9, lineCap: "round", interactive: false })
-      .addTo(map)
-      .bindTooltip(d.tornado.scale + " tornado path", { permanent: true, direction: "left", offset: [-10, 0] });
-    L.marker(d.station.at, { icon: square("#12263f") }).addTo(map)
-      .bindTooltip(d.station.gust_mph + " mph gust · " + d.station.name, { permanent: true, direction: "bottom",
-        offset: [0, 10] });
-    L.marker(site, { icon: pin(), zIndexOffset: 1000 }).addTo(map)
-      .bindTooltip("The property", { permanent: true, direction: "right", offset: [12, -12] });
-  }).catch(function () { /* the findings below the map still tell the story */ });
+    d.tornado_paths.forEach(function (p) {
+      L.polyline(p, { color: "#d9442e", weight: 5, opacity: 0.95, lineCap: "round", interactive: false }).addTo(map);
+    });
+    d.reports.forEach(function (rep) {
+      if (MARK[rep[2]]) L.marker([rep[0], rep[1]], { icon: icon(MARK[rep[2]], 12), interactive: false }).addTo(map);
+    });
+    d.stations.forEach(function (s) {
+      L.marker(s.at, { icon: icon('<div style="width:11px;height:11px;border-radius:2px;background:#12263f;' +
+                                  'border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35)"></div>', 15) })
+        .addTo(map).bindTooltip(s.name, { permanent: true, direction: "right", offset: [8, 0], className: "st" });
+    });
+    L.marker(site, { zIndexOffset: 1000, icon: icon(
+      '<div style="width:13px;height:13px;border-radius:50%;background:#f2a93b;border:3px solid #0b1a2e;' +
+      'box-shadow:0 0 0 7px rgba(242,169,59,.3)"></div>', 19) })
+      .addTo(map).bindTooltip("Property", { permanent: true, direction: "right", offset: [12, -8] });
+  }).catch(function () { /* the key facts below the map still tell the story */ });
 })();
