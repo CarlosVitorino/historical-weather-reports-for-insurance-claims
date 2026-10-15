@@ -99,54 +99,61 @@ section.alt{background:#fff;border-top:1px solid var(--rule);border-bottom:1px s
 .section-head.center{margin-left:auto;margin-right:auto;text-align:center;justify-items:center}
 @media (max-width:640px){section{padding:72px 0}.section-head{margin-bottom:32px}}
 
-/* hero: one message, one action, one product visual */
-.hero{position:relative;color:#c9d5e3;padding:0;text-align:center;
-  background:radial-gradient(900px 520px at 50% -10%,#1f3d63 0%,rgba(31,61,99,0) 70%),var(--navy-900)}
-.hero .wrap{padding-top:96px;padding-bottom:0}
+/* hero: one message, one action, one product visual; always fits the window on desktop */
+.hero{--pad:clamp(20px,4.5vh,56px);--strip:52px;display:flex;flex-direction:column;
+  min-height:calc(100svh - 62px);color:#c9d5e3;padding:0;
+  background:radial-gradient(1000px 600px at 80% 10%,#1f3d63 0%,rgba(31,61,99,0) 65%),var(--navy-900)}
+.hero-main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,460px);gap:clamp(32px,5vw,72px);
+  align-items:center;padding-top:var(--pad);padding-bottom:var(--pad)}
 .hero .eyebrow{color:var(--amber)}
-.hero h1{color:#fff;margin:18px auto 20px;max-width:13em;font-size:clamp(2.5rem,5.6vw,4.2rem)}
-.hero .lede{color:#aebdcd;margin:0 auto;max-width:36rem;font-size:1.15rem}
-.cta-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:32px}
-.cta-row .btn{padding:16px 26px;font-size:1.02rem}
+.hero h1{color:#fff;margin:16px 0 18px;font-size:clamp(2.3rem,min(5.2vw,8vh),4.1rem)}
+.hero .lede{color:#aebdcd;max-width:32rem;font-size:clamp(1rem,1.1vw + .4rem,1.15rem)}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(20px,4vh,32px)}
+.cta-row .btn{padding:15px 24px;font-size:1rem}
 .btn-ghost-dark{background:transparent;color:#e4ebf3;border:1px solid rgba(255,255,255,.25)}
 .btn-ghost-dark:hover{background:rgba(255,255,255,.06)}
-.assure{display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;margin:22px 0 0;padding:0;list-style:none;
-  font-size:.86rem;color:#8fa3b8}
+.assure{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;padding:0;list-style:none;font-size:.86rem;color:#8fa3b8}
 .assure li{display:flex;align-items:center;gap:7px}
 .assure li:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber)}
-.preview{position:relative;z-index:2;max-width:1040px;margin:64px auto -140px;text-align:left}
-.hero+section{padding-top:240px}
-@media (max-width:760px){.hero .wrap{padding-top:56px}.preview{margin:44px auto -80px}.hero+section{padding-top:150px}
-  .cta-row .btn{flex:1 1 100%}}
+.hero-strip{flex:none;height:var(--strip);border-top:1px solid rgba(255,255,255,.07);background:rgba(7,17,31,.55)}
+.hero-strip .wrap{height:100%;display:flex;flex-wrap:wrap;gap:6px 26px;align-items:center;justify-content:center;
+  font-size:.84rem;color:#7f93a8}
+.hero-strip b{color:#cfd9e4;font-weight:500}
 
-/* the report preview card (page 1 of the sample report) */
-.rp{background:#fff;color:var(--body);border-radius:18px;overflow:hidden;
-  box-shadow:0 1px 0 rgba(255,255,255,.06),0 40px 80px -20px rgba(0,0,0,.45),0 12px 30px rgba(0,0,0,.18);
-  display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
-.rp-map{position:relative;min-height:420px;display:flex;flex-direction:column;border-right:1px solid var(--rule)}
-#hero-map{flex:1;min-height:360px;background:#eef1f4}
+/* the report card (page 1 of the sample report), sized to the space the hero leaves */
+.rp{background:#fff;color:var(--body);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;
+  height:clamp(430px,calc(100svh - 62px - var(--strip) - 2 * var(--pad)),700px);
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.5),0 10px 24px rgba(0,0,0,.18)}
+.rp-head{flex:none;display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rule)}
+.rp-head svg{flex:none;border-radius:6px}
+.rp-head .k{font:500 .64rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.rp-head b{display:block;color:var(--ink);font-size:.9rem;font-weight:600;letter-spacing:-.015em}
+.rp-head span{color:var(--muted);font-size:.8rem}
+#hero-map{flex:1;min-height:120px;background:#eef1f4}
 #hero-map .leaflet-tile-pane{filter:grayscale(1) contrast(.92) brightness(1.06)}
-#hero-map .leaflet-tooltip{font:600 .76rem/1.25 var(--sans);color:var(--ink);border-radius:6px;padding:4px 7px;
+#hero-map .leaflet-tooltip{font:600 .72rem/1.25 var(--sans);color:var(--ink);border-radius:6px;padding:3px 6px;
   border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,.12)}
-.mc-legend{display:flex;flex-wrap:wrap;gap:5px 14px;margin:0;padding:10px 16px;list-style:none;font-size:.76rem;
-  color:var(--muted);border-top:1px solid var(--rule);background:#fff}
-.mc-legend li{display:flex;align-items:center;gap:6px}
-.rp-side{display:flex;flex-direction:column}
-.rp-head{display:flex;gap:10px;align-items:flex-start;padding:20px 22px 16px;border-bottom:1px solid var(--rule)}
-.rp-head svg{flex:none;border-radius:6px;margin-top:2px}
-.rp-head .k{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-.rp-head b{display:block;color:var(--ink);font-size:1rem;font-weight:600;letter-spacing:-.015em;margin-top:2px}
-.rp-head span{display:block;color:var(--muted);font-size:.84rem}
-.facts{margin:0;flex:1;display:flex;flex-direction:column}
-.facts div{padding:14px 22px;border-bottom:1px solid var(--rule);flex:1}
-.facts dt{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-.facts dd{margin:4px 0 0;color:var(--muted);font-size:.84rem;line-height:1.4}
-.facts dd b{display:block;color:var(--ink);font-weight:650;font-size:1.35rem;letter-spacing:-.03em;line-height:1.15}
-.rp-foot{padding:14px 22px;font-size:.84rem}
+.mc-legend{flex:none;display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;padding:8px 16px;list-style:none;font-size:.72rem;
+  color:var(--muted);border-top:1px solid var(--rule)}
+.mc-legend li{display:flex;align-items:center;gap:5px}
+.facts{flex:none;display:grid;grid-template-columns:1fr 1fr;margin:0;border-top:1px solid var(--rule)}
+.facts div{padding:10px 16px;border-bottom:1px solid var(--rule)}
+.facts div:nth-child(odd){border-right:1px solid var(--rule)}
+.facts dt{font:500 .62rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.facts dd{margin:2px 0 0;color:var(--muted);font-size:.76rem;line-height:1.35}
+.facts dd b{display:block;color:var(--ink);font-weight:650;font-size:1.15rem;letter-spacing:-.03em;line-height:1.2}
+.rp-foot{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;font-size:.8rem;
+  color:var(--muted);background:var(--paper)}
 .rp-foot a{color:var(--navy-700);font-weight:550;text-decoration:none}
 .rp-foot a:hover{text-decoration:underline}
-@media (max-width:860px){.rp{grid-template-columns:1fr}.rp-map{border-right:0}#hero-map{min-height:280px}
-  .facts{display:grid;grid-template-columns:1fr 1fr}.facts div:nth-child(odd){border-right:1px solid var(--rule)}}
+@media (max-height:700px) and (min-width:961px){.mc-legend{display:none}.rp-head{padding:9px 14px}}
+@media (max-width:960px){
+  .hero{min-height:0}
+  .hero-main{grid-template-columns:1fr;padding-top:48px;padding-bottom:48px}
+  .rp{height:auto}#hero-map{flex:none;height:300px}
+  .hero-strip{height:auto}.hero-strip .wrap{padding:14px 24px}
+}
+@media (max-width:520px){.cta-row .btn{flex:1 1 100%}.hero h1{font-size:2.35rem}}
 .lg{display:inline-block;flex:none}
 .lg-site{width:11px;height:11px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 2px var(--navy-900) inset}
 .lg-station{width:10px;height:10px;border-radius:2px;background:var(--navy-800)}
@@ -392,28 +399,28 @@ def landing() -> str:
     s = SAMPLE
     facts = "".join(f'<div><dt>{escape(f["label"])}</dt><dd><b>{escape(f["value"])}</b>{escape(f["detail"])}</dd></div>'
                     for f in SAMPLE_PAGE1["facts"])
-    hero = f"""<section class="hero"><div class="wrap">
-<p class="eyebrow">Weather reports · any US address</p>
+    hero = f"""<section class="hero"><div class="wrap hero-main">
+<div><p class="eyebrow">Weather reports · any US address</p>
 <h1>What the weather did at the loss site.</h1>
 <p class="lede">Measured gusts, warnings, hail and tornado reports for one address and date of loss, each with its
 distance from the property.</p>
 <div class="cta-row"><a class="btn btn-amber" href="/order">Get a report — {PRICE}</a>
 <a class="btn btn-ghost-dark" href="#sample">View a sample report</a></div>
-<ul class="assure"><li>Built on NOAA &amp; NWS records</li><li>Delivered in about a minute</li>
-<li>No subscription</li></ul>
-<div class="preview"><div class="rp">
-<div class="rp-map"><div id="hero-map" data-src="/static/site-map.json" role="img"
- aria-label="Map of weather records around the property"></div>
-<ul class="mc-legend"><li><i class="lg lg-site"></i>Property</li><li><i class="lg lg-station"></i>Weather station</li>
-<li><i class="lg lg-warn"></i>Warning area</li><li><i class="lg lg-path"></i>Tornado path</li>
-<li><i class="lg lg-hail"></i>Radar hail</li><li><i class="lg lg-report"></i>Hail report</li>
-<li><i class="lg lg-wind"></i>Wind report</li></ul></div>
-<div class="rp-side"><div class="rp-head">{mark_svg(26)}<div><div class="k">Sample report · page 1</div>
+<ul class="assure"><li>Any US address</li><li>Delivered in about a minute</li><li>No subscription</li></ul></div>
+<div class="rp">
+<div class="rp-head">{mark_svg(24)}<div><div class="k">Sample report · page 1</div>
 <b>{escape(_pretty(SAMPLE_PAGE1["address"]))}</b><span>Date of loss: {SAMPLE_PAGE1["date"]}</span></div></div>
+<div id="hero-map" data-src="/static/site-map.json" role="img" aria-label="Map of weather records around the property"></div>
+<ul class="mc-legend"><li><i class="lg lg-site"></i>Property</li><li><i class="lg lg-station"></i>Station</li>
+<li><i class="lg lg-warn"></i>Warning area</li><li><i class="lg lg-path"></i>Tornado path</li>
+<li><i class="lg lg-hail"></i>Radar hail</li><li><i class="lg lg-report"></i>Hail report</li></ul>
 <dl class="facts">{facts}</dl>
-<div class="rp-foot"><a href="{s['pdf']}" target="_blank" rel="noopener">Open the full {s['pages']}-page sample →</a></div>
-</div></div></div>
-</div></section>
+<div class="rp-foot"><span>Real records, real report</span><a href="{s['pdf']}" target="_blank" rel="noopener">Open the
+full sample →</a></div>
+</div></div>
+<div class="hero-strip"><div class="wrap"><span>Built on public records from</span><b>NOAA</b><b>National Weather
+Service</b><b>NEXRAD radar</b><b>US Census Bureau</b></div></div>
+</section>
 """
 
     questions = f"""<section id="report"><div class="wrap">
