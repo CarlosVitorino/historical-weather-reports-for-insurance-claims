@@ -80,3 +80,31 @@ def where(lat: float, lon: float) -> dict:
     except (requests.RequestException, ValueError, KeyError):
         return {"ok": False}
     return {"ok": True, "in_us": county is not None, "county": county, "state": state}
+
+
+def _pretty(matched: str) -> str:
+    """'5299 DTC BLVD, GREENWOOD VILLAGE, CO, 80111' → '5299 Dtc Blvd, Greenwood Village, CO 80111'."""
+    parts = [p.strip() for p in matched.split(",")]
+    if len(parts) >= 4:
+        return f"{', '.join(p.title() for p in parts[:-2])}, {parts[-2].upper()} {parts[-1]}"
+    return matched.title()
+
+
+def find(q: str) -> dict | None:
+    """Best Census match for free text (used live by the order form), or None."""
+    import requests
+    q = " ".join(q.split())[:200]
+    if len(q) < 6:
+        return None
+    try:
+        r = requests.get(f"{CENSUS}/locations/onelineaddress", timeout=8,
+                         params={"address": q, "benchmark": BENCHMARK, "format": "json"})
+        r.raise_for_status()
+        m = (r.json().get("result") or {}).get("addressMatches") or []
+    except (requests.RequestException, ValueError):
+        return None
+    if not m:
+        return None
+    c = m[0]["coordinates"]
+    return {"label": _pretty(m[0]["matchedAddress"]), "lat": round(float(c["y"]), 6),
+            "lon": round(float(c["x"]), 6), "source": "census"}

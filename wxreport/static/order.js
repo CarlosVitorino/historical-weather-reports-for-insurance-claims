@@ -1,4 +1,10 @@
-/* Order form: address autocomplete and map pin. The form still works without this script. */
+/* Order form: address field and map pin, kept in sync both ways. The form still works without this script.
+
+   Address → pin: picking a suggestion, or pausing / pressing Enter / leaving the field after typing a full
+   address, looks it up (US Census first) and moves the pin.
+   Pin → address: clicking the map or dragging the pin fills the address field with the nearest address
+   (or "Map pin in <county>, <state>" when no street address is known).
+   The hidden lat/lon fields always hold the pin, which is what the report is built for. */
 (function () {
   "use strict";
   var US = [39.8, -98.6];
@@ -43,90 +49,93 @@
   function pinIcon() {
     return L.divIcon({ className: "", html: '<div class="pin"></div>', iconSize: [22, 22], iconAnchor: [11, 26] });
   }
+  function getJSON(url) { return fetch(url).then(function (r) { return r.json(); }); }
 
   /* ---------- confirm page: show where the report will be centred ---------- */
   var cm = document.getElementById("confirm-map");
   if (cm && window.L) {
     var c = [parseFloat(cm.dataset.lat), parseFloat(cm.dataset.lon)];
-    var ls = layers();
-    var m0 = L.map(cm, { scrollWheelZoom: false, layers: [ls.Map] }).setView(c, 17);
-    viewToggle(m0, ls);
+    var cls = layers();
+    var m0 = L.map(cm, { scrollWheelZoom: false, layers: [cls.Map] }).setView(c, 17);
+    viewToggle(m0, cls);
     L.marker(c, { icon: pinIcon(), interactive: false }).addTo(m0);
   }
 
   /* ---------- order form ---------- */
   var form = document.getElementById("order-form");
-  if (!form) return;
+  if (!form || !window.L) return;               // no map library: keep the plain fields
   var input = document.getElementById("address");
   var list = document.getElementById("ac-list");
+  var hint = document.getElementById("addr-hint");
   var lat = document.getElementById("lat"), lon = document.getElementById("lon");
-  var coords = document.getElementById("coords");
-  var toggle = document.getElementById("pin-toggle");
   var wrap = document.getElementById("map-wrap");
   var note = document.getElementById("map-note");
   var pinned = document.getElementById("pinned");
-  var map = null, marker = null, source = null, items = [], active = -1, timer = null, seq = 0;
+  var map, marker, items = [], active = -1, suggestTimer = null, geoTimer = null, seq = 0, geoSeq = 0;
+  var synced = false;                            // does the pin match the text in the address field?
 
-  if (!window.L) return;                         // no map library: keep the plain fields
-  toggle.hidden = false;
-  var hadCoords = lat.value && lon.value;
-  coords.hidden = true;                          // the map replaces the raw latitude/longitude fields
+  document.getElementById("coords").hidden = true;   // the map replaces the raw latitude/longitude fields
+  wrap.hidden = false;
 
-  function setCoords(ll) {
-    lat.value = ll.lat.toFixed(6); lon.value = ll.lng.toFixed(6);
-    pinned.classList.add("on");
-  }
-  function clearCoords() {
-    lat.value = ""; lon.value = ""; pinned.classList.remove("on");
-  }
-  function describe(ll) {
-    note.textContent = "Checking the location…";
-    fetch("/api/where?lat=" + ll.lat.toFixed(6) + "&lon=" + ll.lng.toFixed(6))
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (!d.ok) note.textContent = "Pin placed. Drag it onto the exact building if needed.";
-        else if (!d.in_us) note.textContent = "That point isn't inside a US county. Reports cover US locations only.";
-        else note.textContent = "Pin in " + d.county + ", " + d.state + ". Drag it onto the exact building if needed.";
-      })
-      .catch(function () { note.textContent = "Pin placed. Drag it onto the exact building if needed."; });
-  }
-  function ensureMap(center, zoom) {
-    wrap.hidden = false;
-    if (!map) {
-      var ls = layers();
-      map = L.map("map", { layers: [ls.Map] }).setView(center, zoom);
-      viewToggle(map, ls);
-      map.on("click", function (e) { place(e.latlng, "pin"); });
-    } else {
-      map.setView(center, zoom);
-    }
-    setTimeout(function () { map.invalidateSize(); }, 50);
-  }
-  function place(ll, why) {
-    source = why;
+  var ls = layers();
+  map = L.map("map", { layers: [ls.Map], scrollWheelZoom: false }).setView(US, 4);
+  viewToggle(map, ls);
+  map.on("click", function (e) { movePin(e.latlng, true); });
+
+  function say(el, text, kind) { el.textContent = text || ""; el.className = "fine" + (kind ? " " + kind : ""); }
+
+  /* pin → hidden fields (and optionally → address text) */
+  function movePin(ll, fromMap, zoom) {
     if (!marker) {
       marker = L.marker(ll, { draggable: true, icon: pinIcon(), autoPan: true }).addTo(map);
-      marker.on("dragend", function () { source = "pin"; setCoords(marker.getLatLng()); describe(marker.getLatLng()); });
+      marker.on("dragend", function () { movePin(marker.getLatLng(), true); });
     } else {
       marker.setLatLng(ll);
     }
-    setCoords(ll);
-    if (why === "pin") describe(ll);
+    if (zoom) map.setView(ll, zoom); else if (!map.getBounds().contains(ll)) map.panTo(ll);
+    lat.value = ll.lat.toFixed(6); lon.value = ll.lng.toFixed(6);
+    pinned.classList.add("on");
+    if (fromMap) fillFromPin(ll);
+  }
+  function fillFromPin(ll) {
+    var mine = ++geoSeq;
+    say(note, "Finding the address at the pin…");
+    getJSON("/api/reverse?lat=" + ll.lat.toFixed(6) + "&lon=" + ll.lng.toFixed(6)).then(function (d) {
+      if (mine !== geoSeq) return;
+      input.value = d.label;
+      synced = true; say(hint, "");
+      if (d.ok && !d.in_us) say(note, "That point isn't inside a US county. Reports cover US locations only.", "warn");
+      else say(note, "Pin " + (d.county ? "in " + d.county + ", " + d.state : "placed") +
+                     ". Drag it onto the exact building if needed.");
+    }).catch(function () {
+      if (mine !== geoSeq) return;
+      input.value = "Map pin at " + ll.lat.toFixed(5) + ", " + ll.lng.toFixed(5);
+      synced = true; say(note, "Pin placed. Drag it onto the exact building if needed.");
+    });
   }
 
-  toggle.addEventListener("click", function () {
-    if (!wrap.hidden && map) { map.invalidateSize(); return; }
-    if (lat.value && lon.value) {
-      var ll = L.latLng(parseFloat(lat.value), parseFloat(lon.value));
-      ensureMap(ll, 17); place(ll, "pin");
-    } else {
-      ensureMap(US, 4);
-      note.textContent = "Zoom in and click the property to place the pin.";
-    }
-  });
-  if (hadCoords) toggle.click();
+  /* address text → pin */
+  function locateText(thenSubmit) {
+    var q = input.value.trim();
+    if (q.length < 6) return Promise.resolve(false);
+    var mine = ++geoSeq;
+    say(hint, "Looking up the address…");
+    return getJSON("/api/geocode?q=" + encodeURIComponent(q)).then(function (d) {
+      if (mine !== geoSeq) return false;
+      if (!d.ok) {
+        say(hint, "No match yet. Include the city and state (e.g. 5299 DTC Blvd, Greenwood Village, CO), " +
+                  "pick a suggestion, or click the map.", "warn");
+        return false;
+      }
+      synced = true;
+      say(hint, "Found: " + d.label, "ok");
+      movePin(L.latLng(d.lat, d.lon), false, 18);
+      say(note, "Check the pin is on the property. Drag it onto the exact building if needed.");
+      return true;
+    }).catch(function () { if (mine === geoSeq) say(hint, "Address lookup is unavailable. Click the map instead.", "warn"); return false; });
+  }
 
-  /* autocomplete */
+  /* suggestions */
   function close() { list.hidden = true; input.setAttribute("aria-expanded", "false"); active = -1; }
   function render() {
     list.innerHTML = "";
@@ -156,48 +165,69 @@
   }
   function choose(i) {
     var it = items[i];
+    ++geoSeq;
     input.value = it.label;
     close();
-    var ll = L.latLng(it.lat, it.lon);
-    ensureMap(ll, it.exact ? 18 : 16);
-    place(ll, "suggest");
-    note.textContent = it.exact ? "Check the pin is on the property. Drag it onto the exact building if needed."
-                                : "Drag the pin onto the property, or click the map to move it.";
+    synced = true;
+    say(hint, "");
+    movePin(L.latLng(it.lat, it.lon), false, it.exact ? 18 : 16);
+    say(note, it.exact ? "Check the pin is on the property. Drag it onto the exact building if needed."
+                       : "Drag the pin onto the property, or click the map to move it.");
   }
+
   input.addEventListener("input", function () {
-    if (source === "suggest") { clearCoords(); source = null; }
-    clearTimeout(timer);
+    synced = false;
+    clearTimeout(suggestTimer); clearTimeout(geoTimer);
     var q = input.value.trim();
-    if (q.length < 3) { items = []; close(); return; }
-    timer = setTimeout(function () {
+    if (q.length < 3) { items = []; close(); say(hint, ""); return; }
+    suggestTimer = setTimeout(function () {
       var mine = ++seq;
-      fetch("/api/suggest?q=" + encodeURIComponent(q))
-        .then(function (r) { return r.json(); })
-        .then(function (d) { if (mine === seq) { items = d.results || []; render(); highlight(-1); } })
-        .catch(function () { items = []; close(); });
-    }, 220);
+      getJSON("/api/suggest?q=" + encodeURIComponent(q)).then(function (d) {
+        if (mine !== seq) return;
+        items = d.results || []; render(); highlight(-1);
+        if (d.ok === false) say(hint, "Suggestions are unavailable right now. Type the full address with city " +
+                                      "and state, or click the map.", "warn");
+      }).catch(function () { items = []; close(); });
+    }, 200);
+    // Once typing pauses on something address-like, move the pin to it.
+    if (/\d/.test(q) && q.length >= 10) geoTimer = setTimeout(function () { if (!synced) locateText(); }, 1100);
   });
   input.addEventListener("keydown", function (e) {
-    if (list.hidden || !items.length) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); highlight(Math.min(active + 1, items.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); highlight(Math.max(active - 1, 0)); }
-    else if (e.key === "Enter" && active >= 0) { e.preventDefault(); choose(active); }
+    if (e.key === "ArrowDown" && items.length) { e.preventDefault(); highlight(Math.min(active + 1, items.length - 1)); }
+    else if (e.key === "ArrowUp" && items.length) { e.preventDefault(); highlight(Math.max(active - 1, 0)); }
     else if (e.key === "Escape") { close(); }
-  });
-  input.addEventListener("blur", function () { setTimeout(close, 120); });
-
-  form.addEventListener("submit", function (e) {
-    if (!input.value.trim() && !(lat.value && lon.value)) {
+    else if (e.key === "Enter") {
       e.preventDefault();
-      input.focus();
-      input.setCustomValidity("Enter the property address, or place a pin on the map.");
-      input.reportValidity();
-      setTimeout(function () { input.setCustomValidity(""); }, 2000);
+      if (!list.hidden && active >= 0) choose(active);
+      else { close(); clearTimeout(geoTimer); locateText(); }
     }
   });
+  input.addEventListener("blur", function () {
+    setTimeout(close, 120);
+    clearTimeout(geoTimer);
+    if (!synced && input.value.trim().length >= 6) setTimeout(function () { if (!synced) locateText(); }, 150);
+  });
 
-  /* "Start your report" / "Order" buttons focus the address field */
+  /* On submit the pin must match the address: resolve the text first if it changed since the last pin. */
+  form.addEventListener("submit", function (e) {
+    if (synced && lat.value) return;
+    e.preventDefault();
+    if (!input.value.trim()) {
+      say(hint, "Enter the property address, or click the map to place a pin.", "warn");
+      input.focus();
+      return;
+    }
+    locateText().then(function (ok) { if (ok) form.submit(); else input.focus(); });
+  });
+
+  if (lat.value && lon.value) {                  // returning with an error: restore the pin
+    movePin(L.latLng(parseFloat(lat.value), parseFloat(lon.value)), false, 17);
+    synced = true;
+  }
+
+  /* "Order" / "Start your report" buttons focus the address field */
   Array.prototype.forEach.call(document.querySelectorAll('a[href$="#order"]'), function (a) {
     a.addEventListener("click", function () { setTimeout(function () { input.focus({ preventScroll: true }); }, 400); });
   });
+  setTimeout(function () { map.invalidateSize(); }, 100);
 })();

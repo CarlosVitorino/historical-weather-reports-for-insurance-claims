@@ -77,13 +77,39 @@ def _cached(q: str, prov: str, bucket: int) -> tuple:
     return tuple(out)
 
 
-def suggest(q: str) -> list[dict]:
+def suggest(q: str) -> tuple[list[dict], bool]:
+    """(suggestions, ok). ok is False when the provider could not be reached, so the form can say so."""
     q = " ".join(q.split())[:120]
     if len(q) < 3:
-        return []
+        return [], True
     prov = provider()
     try:
-        return list(_cached(q.lower(), prov, int(time.time() // _TTL)))
+        return list(_cached(q.lower(), prov, int(time.time() // _TTL))), True
     except (requests.RequestException, ValueError, KeyError) as e:
         log.warning("address suggestions failed (%s): %s", prov, e)
-        return []
+        return [], False
+
+
+def reverse(lat: float, lon: float) -> str | None:
+    """Nearest street address for a map pin, from the configured provider; None if unavailable."""
+    prov = provider()
+    try:
+        if prov == "geoapify":
+            r = requests.get("https://api.geoapify.com/v1/geocode/reverse", timeout=4,
+                             params={"lat": lat, "lon": lon, "format": "json", "lang": "en",
+                                     "apiKey": os.environ["GEOAPIFY_API_KEY"]}, headers={"User-Agent": USER_AGENT})
+            r.raise_for_status()
+            p = (r.json().get("results") or [{}])[0]
+            if (p.get("country_code") or "").lower() != "us":
+                return None
+            line2 = (p.get("address_line2") or "").replace(", United States of America", "")
+            return ", ".join(x for x in (p.get("address_line1"), line2) if x) or None
+        r = requests.get("https://photon.komoot.io/reverse", params={"lat": lat, "lon": lon, "lang": "en"},
+                         headers={"User-Agent": USER_AGENT}, timeout=4)
+        r.raise_for_status()
+        feats = r.json().get("features") or []
+        if feats and feats[0]["properties"].get("countrycode", "").upper() == "US":
+            return _photon_label(feats[0]["properties"])
+    except (requests.RequestException, ValueError, KeyError, IndexError) as e:
+        log.warning("reverse lookup failed (%s): %s", prov, e)
+    return None

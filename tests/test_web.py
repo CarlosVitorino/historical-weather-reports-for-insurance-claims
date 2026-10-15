@@ -177,3 +177,22 @@ def test_landing_has_form_and_map(env):
     html = client.get("/").text
     for needle in ['id="order-form"', 'role="combobox"', "/static/order.js", "/static/hero.js", 'id="hero-map"', 'id="compare"']:
         assert needle in html, needle
+
+
+def test_geocode_and_reverse_endpoints(env, monkeypatch):
+    _, client, _ = env
+    monkeypatch.setattr(web, "find", lambda q: {"label": "5299 Dtc Blvd, Greenwood Village, CO 80111",
+                                                "lat": 39.619946, "lon": -104.8899, "source": "census"}
+                        if "Greenwood" in q else None)
+    monkeypatch.setattr(web, "suggest", lambda q: ([], False))
+    assert client.get("/api/geocode", params={"q": "5299 DTC Blvd, Greenwood Village, CO"}).json()["lat"] == 39.619946
+    assert client.get("/api/geocode", params={"q": "5299 Dtc Blvd, Ste 550"}).json() == {"ok": False}
+
+    monkeypatch.setattr(web, "where", lambda lat, lon: {"ok": True, "in_us": True, "county": "Arapahoe County",
+                                                        "state": "CO"})
+    monkeypatch.setattr(web, "reverse", lambda lat, lon: None)
+    d = client.get("/api/reverse", params={"lat": 39.6198, "lon": -104.8904}).json()
+    assert d["label"] == "Map pin in Arapahoe County, CO (39.61980, -104.89040)" and d["in_us"]
+    monkeypatch.setattr(web, "reverse", lambda lat, lon: "5299 DTC Boulevard, Greenwood Village, CO 80111")
+    assert client.get("/api/reverse", params={"lat": 39.6198, "lon": -104.8904}).json()["label"].startswith("5299")
+    assert client.get("/api/reverse", params={"lat": 200, "lon": 0}).status_code == 400

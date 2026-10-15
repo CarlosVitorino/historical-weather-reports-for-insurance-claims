@@ -19,8 +19,8 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config, payments, site
 from .fulfil import Fulfiller, order_dir
-from .geocode import AddressNotFound, locate, where
-from .suggest import suggest
+from .geocode import AddressNotFound, find, locate, where
+from .suggest import reverse, suggest
 from .report import MIN_DATE
 from .snapshot import Snapshot, SourceUnavailable
 from .store import Store, now
@@ -274,14 +274,30 @@ place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow
 
     @app.get("/api/suggest")
     def api_suggest(q: str = ""):
-        return {"results": suggest(q)}
+        results, ok = suggest(q)
+        return {"results": results, "ok": ok}
 
-    @app.get("/api/where")
-    def api_where(lat: float, lon: float):
-        """County for a dropped pin (US Census), so the buyer sees where the pin landed."""
+    @app.get("/api/geocode")
+    def api_geocode(q: str = ""):
+        """Typed address → point (US Census first, then the suggestion provider's best exact match)."""
+        hit = find(q)
+        if hit is None:
+            results, _ = suggest(q)
+            exact = [r for r in results if r["exact"]]
+            if exact:
+                hit = {**exact[0], "source": "suggest"}
+        return {"ok": hit is not None, **(hit or {})}
+
+    @app.get("/api/reverse")
+    def api_reverse(lat: float, lon: float):
+        """Map pin → address text for the form, plus the county so the buyer sees where the pin is."""
         if not (-90 <= lat <= 90 and -180 <= lon <= 180):
             raise HTTPException(400)
-        return where(lat, lon)
+        w = where(lat, lon)
+        label = reverse(lat, lon)
+        if not label and w.get("county"):
+            label = f"Map pin in {w['county']}, {w['state']} ({lat:.5f}, {lon:.5f})"
+        return {**w, "label": label or f"Map pin at {lat:.5f}, {lon:.5f}"}
 
     @app.get("/healthz")
     def healthz():

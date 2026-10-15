@@ -156,6 +156,9 @@ form input:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px 
 @media (max-width:600px){.row2{grid-template-columns:1fr;gap:0}}
 .form-card .btn{margin-top:22px}
 .fine{font-size:.82rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.fine.warn{color:var(--amber-ink)}.fine.ok{color:var(--green)}
+#addr-hint:empty{display:none}
+#addr-hint{margin-top:6px}
 .err{background:var(--amber-50);border:1px solid #f0cf9c;color:var(--amber-ink);padding:12px 14px;border-radius:9px;margin:14px 0 0}
 .ac{position:relative}
 .ac ul{position:absolute;z-index:1100;left:0;right:0;top:calc(100% + 4px);margin:0;padding:6px;list-style:none;background:#fff;
@@ -165,10 +168,10 @@ form input:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px 
 .ac li[aria-selected=true],.ac li:hover{background:var(--navy-100)}
 .ac li.attr{cursor:default;font-size:.7rem;color:var(--faint);padding:6px 10px 2px}
 .ac li.attr:hover{background:none}
-.locate{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+.locate{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 8px;flex-wrap:wrap}
 .pinned{font-size:.82rem;color:var(--green);display:none;align-items:center;gap:6px}
 .pinned.on{display:inline-flex}
-#map-wrap{margin-top:12px}
+#map-wrap{margin-top:4px}
 #map{height:260px;border-radius:10px;border:1px solid var(--rule);background:#e8eef5}
 .leaflet-container{font-family:var(--sans)}
 .pin{width:22px;height:22px;border-radius:50% 50% 50% 0;background:var(--amber);border:3px solid var(--navy-900);
@@ -341,10 +344,11 @@ def order_form(v: dict, error: str = "", ask_coords: bool = False, title: str = 
 <div class="ac"><input id="address" name="address" autocomplete="off" value="{g('address')}" role="combobox"
  aria-autocomplete="list" aria-expanded="false" aria-controls="ac-list" placeholder="Start typing an address">
 <ul id="ac-list" role="listbox" hidden></ul></div>
-<div class="locate"><button type="button" class="linkbtn" id="pin-toggle" hidden>{PIN_ICON}<span>Place a pin on the map
-instead</span></button><span class="pinned" id="pinned">{PIN_ICON}<span>Pinned</span></span></div>
-<div id="map-wrap" hidden><div id="map"></div><p class="fine" id="map-note">Drag the pin onto the exact building, or
-click the map to move it.</p></div>
+<p class="fine" id="addr-hint" aria-live="polite"></p>
+<div id="map-wrap" hidden><div class="locate"><span class="fine" style="margin:0">Or click the map. The address and
+the pin stay in sync.</span><span class="pinned" id="pinned">{PIN_ICON}<span>Pinned</span></span></div>
+<div id="map"></div><p class="fine" id="map-note" aria-live="polite">Type the address above or click the property on
+the map.</p></div>
 <div id="coords" class="row2" {"" if show_coords else "hidden"}><label>Latitude<input name="lat" id="lat" inputmode="decimal"
  value="{g('lat')}" placeholder="39.16955"></label><label>Longitude<input name="lon" id="lon" inputmode="decimal"
  value="{g('lon')}" placeholder="-86.53493"></label></div>

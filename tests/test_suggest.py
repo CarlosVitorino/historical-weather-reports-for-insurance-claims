@@ -28,7 +28,8 @@ def test_us_only_labels_and_exactness(monkeypatch):
     ]}
     monkeypatch.setattr(requests, "get", lambda *a, **k: R(data))
     suggest._cached.cache_clear()
-    out = suggest.suggest("401 college bloomington")
+    out, ok = suggest.suggest("401 college bloomington")
+    assert ok
     assert [o["label"] for o in out] == ["401 North College Avenue, Bloomington, Indiana 47404",
                                          "College Avenue, Bloomington, Indiana"]
     assert out[0]["exact"] and not out[1]["exact"]
@@ -49,7 +50,7 @@ def test_geoapify_when_key_set(monkeypatch):
         return R(data)
     monkeypatch.setattr(requests, "get", get)
     suggest._cached.cache_clear()
-    out = suggest.suggest("5299 dtc blvd")
+    out, _ = suggest.suggest("5299 dtc blvd")
     assert seen["url"] == suggest.GEOAPIFY and seen["params"]["filter"] == "countrycode:us"
     assert out[0] == {"label": "5299 DTC Boulevard, Greenwood Village, CO 80111", "lat": 39.6202, "lon": -104.8932,
                       "exact": True}
@@ -57,10 +58,10 @@ def test_geoapify_when_key_set(monkeypatch):
 
 
 def test_short_query_and_outage(monkeypatch):
-    assert suggest.suggest("ab") == []
+    assert suggest.suggest("ab") == ([], True)
 
     def boom(*a, **k):
         raise requests.ConnectionError("down")
     monkeypatch.setattr(requests, "get", boom)
     suggest._cached.cache_clear()
-    assert suggest.suggest("401 college ave") == []
+    assert suggest.suggest("401 college ave") == ([], False)
