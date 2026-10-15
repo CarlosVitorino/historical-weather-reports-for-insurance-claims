@@ -53,7 +53,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
         fulfiller.resume()   # orders interrupted by a restart
         yield
 
-    app = FastAPI(title="Loss-Site Weather Report", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
+    app = FastAPI(title=site.BRAND, docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
     app.state.cfg, app.state.store, app.state.fulfiller = cfg, store, fulfiller
     security = HTTPBasic(realm="admin")
     app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -88,7 +88,7 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
                 detail[k] = request.query_params[k][:100]
         store.log("page_view", request.state.vid, **detail)
         prefill = {k: request.query_params.get(k) for k in ("address", "loss_date", "email", "lat", "lon")}
-        return page(f"{site.BRAND} — historical weather evidence for any US address",
+        return page(f"{site.BRAND} — weather records for any US address and date of loss",
                     site.landing(site.order_form(prefill)))
 
     @app.post("/order", response_class=HTMLResponse)

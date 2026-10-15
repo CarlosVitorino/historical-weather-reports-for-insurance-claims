@@ -2,6 +2,7 @@
 from datetime import datetime
 from html import escape
 
+from . import BRAND
 from .config import Settings
 from .store import FUNNEL, Store
 
@@ -104,7 +105,7 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
 
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>Admin · Loss-Site Weather Report</title><style>{CSS}</style></head><body><main>
+<title>Admin · {BRAND}</title><style>{CSS}</style></head><body><main>
 <header><h1>Sales and traffic <span class="muted" style="font-weight:400">· {label}</span></h1><nav>{nav}</nav></header>
 {warn_html}<div class="kpis">{kpi_html}</div>
 <h2>Funnel (unique visitors per step)</h2><div class="wrap"><table><tr><th>Step</th><th>Visitors</th>

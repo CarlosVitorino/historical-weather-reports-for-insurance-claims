@@ -11,9 +11,10 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas as rl_canvas
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+from . import DOMAIN, PRODUCT
+
 rl_config.invariant = 1
 
-PRODUCT = "Loss-Site Weather Report"
 INK = colors.HexColor("#1b2430")
 MUTED = colors.HexColor("#5b6675")
 RULE = colors.HexColor("#c9d1db")
@@ -81,7 +82,7 @@ def _numbered_canvas(report_id: str):
                 self.setFont("Helvetica", 7)
                 self.setFillColor(MUTED)
                 self.drawString(0.75 * inch, 0.5 * inch,
-                                f"{PRODUCT} — Page {self._pageNumber} of {total} — ID: {report_id}")
+                                f"{PRODUCT} · {DOMAIN} — Page {self._pageNumber} of {total} — ID: {report_id}")
                 super().showPage()
             super().save()
     return NumberedCanvas

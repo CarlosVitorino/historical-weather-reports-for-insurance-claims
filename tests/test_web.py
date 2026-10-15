@@ -90,7 +90,7 @@ def test_purchase_path_end_to_end(env):
 
     o = store.get(oid)
     assert o["status"] == "ready" and o["amount_cents"] == 999 and o["email_status"] == "sent"
-    assert o["report_id"].startswith("LWR-2026-02-19-")
+    assert o["report_id"].startswith("WE-2026-02-19-")
     email = posts[-1][1]
     assert posts[-1][0] == "https://api.resend.com/emails" and email["to"] == ["adjuster@example.com"]
     assert email["attachments"][0]["filename"] == f"{o['report_id']}.pdf"

@@ -154,4 +154,5 @@ def report_id(day: str, snap: Snapshot, render_version: str = "") -> str:
     """Canonical report ID: loss date + 12 hex of SHA-256(snapshot digest, renderer version).
     Same data and same renderer → same ID → byte-identical PDF."""
     h = hashlib.sha256(f"{snap.digest()}|render:{render_version}".encode()).hexdigest()
-    return f"LWR-{day}-{h[:12].upper()}"
+    from . import ID_PREFIX
+    return f"{ID_PREFIX}-{day}-{h[:12].upper()}"

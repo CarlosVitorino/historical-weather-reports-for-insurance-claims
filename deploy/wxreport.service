@@ -2,7 +2,7 @@
 #   systemctl daemon-reload && systemctl enable --now wxreport
 # Put a reverse proxy (Caddy/nginx) with HTTPS in front of 127.0.0.1:8000; creem needs an HTTPS webhook URL.
 [Unit]
-Description=Loss-Site Weather Report (order page, creem webhook, report generation)
+Description=Weather Evidence (order page, creem webhook, report generation)
 After=network-online.target
 
 [Service]

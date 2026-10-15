@@ -3,13 +3,14 @@ import base64
 
 import requests
 
+from . import PRODUCT
 from .config import Settings
 
 
 def send_report(cfg: Settings, order: dict, pdf: bytes, link: str) -> tuple[bool, str]:
     if not cfg.email_ready:
         return False, "email not configured"
-    html = f"""<p>Your Loss-Site Weather Report is ready.</p>
+    html = f"""<p>Your {PRODUCT} is ready.</p>
 <p><b>{_esc(order.get('matched_address') or order['address'])}</b> · loss date {order['loss_date']}<br>
 Report ID: {order['report_id']}</p>
 <p><a href="{link}">Download the report (PDF)</a> — the PDF is also attached.</p>
