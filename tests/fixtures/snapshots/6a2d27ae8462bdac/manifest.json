@@ -1,0 +1,196 @@
+{
+  "frozen_at": "2026-10-14T21:55:09+00:00",
+  "request": {
+    "address": "401 N College Ave, Bloomington, IN",
+    "date": "2026-02-19",
+    "lat": null,
+    "lon": null
+  },
+  "sources": {
+    "census_address": {
+      "bytes": 1166,
+      "file": "census_address.raw.gz",
+      "params": {
+        "address": "401 N College Ave, Bloomington, IN",
+        "benchmark": "Public_AR_Current",
+        "format": "json",
+        "layers": "Counties",
+        "vintage": "Current_Current"
+      },
+      "retrieved_at": "2026-10-14T21:54:43+00:00",
+      "sha256": "4cd82c4a33daa9a9ae18852ea2f3fdebe84ce174ff317784c0a804cbc95c57c0",
+      "status": "ok",
+      "url": "https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress?benchmark=Public_AR_Current&vintage=Current_Current&layers=Counties&format=json&address=401+N+College+Ave%2C+Bloomington%2C+IN"
+    },
+    "ghcnh_USC00123091_2026": {
+      "bytes": 138269,
+      "file": "ghcnh_USC00123091_2026.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:55:01+00:00",
+      "sha256": "a78c72c22e09c947a2e72c2a67739912ac8f2764b3c584d4d281c30a9bd6e6bc",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/psv/GHCNh_USC00123091_2026.psv"
+    },
+    "ghcnh_USC00125407_2026": {
+      "bytes": 139421,
+      "file": "ghcnh_USC00125407_2026.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:54:53+00:00",
+      "sha256": "f3095b3f4a2179a8a3e753027d422e541fc55bff4a1afbbfec9edacebd13706f",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/psv/GHCNh_USC00125407_2026.psv"
+    },
+    "ghcnh_USI0000KHBE_2026": {
+      "error": "HTTP 404 Not Found",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:55:00+00:00",
+      "status": "absent",
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/psv/GHCNh_USI0000KHBE_2026.psv"
+    },
+    "ghcnh_USW00003893_2026": {
+      "bytes": 445450,
+      "file": "ghcnh_USW00003893_2026.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:54:49+00:00",
+      "sha256": "909b86d3655a804f29b41e35dab5e7e37b78f8e691b46627809c750e5408d407",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/psv/GHCNh_USW00003893_2026.psv"
+    },
+    "ghcnh_USW00063898_2026": {
+      "bytes": 400055,
+      "file": "ghcnh_USW00063898_2026.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:54:55+00:00",
+      "sha256": "78986be0ec5890fc62f312d2191efb1c2e65f69a06786998ee060755bf51d2fa",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/psv/GHCNh_USW00063898_2026.psv"
+    },
+    "ghcnh_station_list": {
+      "bytes": 4366,
+      "file": "ghcnh_station_list.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:54:45+00:00",
+      "sha256": "98b344f0e963e1e8b797f9d04a7c872aeac3849f810d7bc1ce1cf4eb5289a50b",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/doc/ghcnh-station-list.csv"
+    },
+    "iem_lsr": {
+      "bytes": 14492,
+      "file": "iem_lsr.raw.gz",
+      "params": {
+        "ets": "202602200500",
+        "sts": "202602190500"
+      },
+      "retrieved_at": "2026-10-14T21:55:04+00:00",
+      "sha256": "b9c9eb45fe9f5e2ee62743fc0730918a3065ad237f02833236a8878f44110a5a",
+      "status": "ok",
+      "url": "https://mesonet.agron.iastate.edu/geojson/lsr.php?sts=202602190500&ets=202602200500"
+    },
+    "iem_vtec_2026-KIND-TO-A-0010": {
+      "bytes": 24707,
+      "file": "iem_vtec_2026-KIND-TO-A-0010.raw.gz",
+      "params": {
+        "etn": 10,
+        "phenomena": "TO",
+        "significance": "A",
+        "wfo": "IND",
+        "year": 2026
+      },
+      "retrieved_at": "2026-10-14T21:55:03+00:00",
+      "sha256": "d4374833a19f8c932cc69f647027c368c2a72ed7033fe771d0f4adb39359470a",
+      "status": "ok",
+      "url": "https://mesonet.agron.iastate.edu/json/vtec_event.py?wfo=IND&year=2026&phenomena=TO&significance=A&etn=10"
+    },
+    "iem_vtec_2026-KIND-TO-W-0008": {
+      "bytes": 5957,
+      "file": "iem_vtec_2026-KIND-TO-W-0008.raw.gz",
+      "params": {
+        "etn": 8,
+        "phenomena": "TO",
+        "significance": "W",
+        "wfo": "IND",
+        "year": 2026
+      },
+      "retrieved_at": "2026-10-14T21:55:03+00:00",
+      "sha256": "3f02801cb23ab2087514f562f9d8470ab46515f00818d76c7662162433eb70dc",
+      "status": "ok",
+      "url": "https://mesonet.agron.iastate.edu/json/vtec_event.py?wfo=IND&year=2026&phenomena=TO&significance=W&etn=8"
+    },
+    "iem_vtec_2026-KIND-TO-W-0009": {
+      "bytes": 5841,
+      "file": "iem_vtec_2026-KIND-TO-W-0009.raw.gz",
+      "params": {
+        "etn": 9,
+        "phenomena": "TO",
+        "significance": "W",
+        "wfo": "IND",
+        "year": 2026
+      },
+      "retrieved_at": "2026-10-14T21:55:04+00:00",
+      "sha256": "7bcdd0c2e2ab3813f7be08d79fba514f0b592359ab45e4114b4c9811deebc166",
+      "status": "ok",
+      "url": "https://mesonet.agron.iastate.edu/json/vtec_event.py?wfo=IND&year=2026&phenomena=TO&significance=W&etn=9"
+    },
+    "iem_vtec_bypoint": {
+      "bytes": 1341,
+      "file": "iem_vtec_bypoint.raw.gz",
+      "params": {
+        "edate": "2026-02-21",
+        "lat": "39.1696",
+        "lon": "-86.5349",
+        "sdate": "2026-02-18"
+      },
+      "retrieved_at": "2026-10-14T21:55:02+00:00",
+      "sha256": "952d46c02d67f64b3ac1f6a3bf040587991319502b1424aaa6f8c551b9c0fbb2",
+      "status": "ok",
+      "url": "https://mesonet.agron.iastate.edu/json/vtec_events_bypoint.py?lat=39.1696&lon=-86.5349&sdate=2026-02-18&edate=2026-02-21"
+    },
+    "nldn_tiles_202602": {
+      "bytes": 11025,
+      "file": "nldn_tiles_202602.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:55:09+00:00",
+      "sha256": "a0e2df100248e2e24f4a7023f17e3cf91633eaa74fb229e27096a821079c0a78",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/pub/data/swdi/database-csv/v2/nldn-tiles-202602.csv.gz"
+    },
+    "nws_points": {
+      "bytes": 3932,
+      "file": "nws_points.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:54:44+00:00",
+      "sha256": "92f24f6aedd194a8a2ac2490a775b5b74efc621af02b33c2ac881f28c31a84e7",
+      "status": "ok",
+      "url": "https://api.weather.gov/points/39.1696,-86.5349"
+    },
+    "stormevents_details_2026": {
+      "bytes": 159411,
+      "file": "stormevents_details_2026.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:55:05+00:00",
+      "sha256": "da6d450120b4af88d15532d6d0e7eb420d88c7de4a0c33f8eb33b08696042a45",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2026_c20260918.csv.gz"
+    },
+    "stormevents_listing": {
+      "bytes": 53138,
+      "file": "stormevents_listing.raw.gz",
+      "params": null,
+      "retrieved_at": "2026-10-14T21:55:05+00:00",
+      "sha256": "cf7cd06e8aaef8c9b830d705e6ecffe9f0265d4e2b5d567ea1dbb058473612f1",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/"
+    },
+    "swdi_nx3hail": {
+      "bytes": 1821,
+      "file": "swdi_nx3hail.raw.gz",
+      "params": {
+        "bbox": "-86.935,38.870,-86.135,39.470"
+      },
+      "retrieved_at": "2026-10-14T21:55:09+00:00",
+      "sha256": "df2df96a94df051c0046d811e7d34a2fabf06639a935e3cb4610f2b7aa9388bd",
+      "status": "ok",
+      "url": "https://www.ncei.noaa.gov/swdiws/csv/nx3hail/20260219:20260221?bbox=-86.935%2C38.870%2C-86.135%2C39.470"
+    }
+  }
+}

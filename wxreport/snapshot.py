@@ -8,6 +8,7 @@ import hashlib
 import json
 import re
 import shutil
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,24 @@ class SourceUnavailable(Exception):
 
 def _now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+RETRY_DELAYS = (2, 6)   # seconds between attempts on timeouts, connection errors and 5xx/429
+
+
+def _get(url: str, params: dict | None, timeout: float) -> requests.Response:
+    for attempt in range(len(RETRY_DELAYS) + 1):
+        try:
+            r = requests.get(url, params=params, timeout=timeout, headers={"User-Agent": USER_AGENT})
+            if r.status_code < 500 and r.status_code != 429:
+                return r
+            if attempt == len(RETRY_DELAYS):
+                return r
+        except (requests.ConnectionError, requests.Timeout):
+            if attempt == len(RETRY_DELAYS):
+                raise
+        time.sleep(RETRY_DELAYS[attempt])
+    raise AssertionError("unreachable")
 
 
 def request_key(address: str, day: str, lat: float | None = None, lon: float | None = None) -> str:
@@ -72,7 +91,8 @@ class Snapshot:
                                     f"{name} is not part of this snapshot")
         retrieved_at = _now()
         try:
-            r = requests.get(url, params=params, timeout=timeout, headers={"User-Agent": USER_AGENT})
+            r = _get(url, params, timeout)
+            retrieved_at = _now()
             final_url = r.url
             if missing_ok and r.status_code == 404:
                 # A definite "no such file" (e.g. a station with no data that year) is recorded, not retried.

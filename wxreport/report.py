@@ -14,6 +14,11 @@ class InvalidRequest(Exception):
     pass
 
 
+# NWS VTEC warnings and the IEM storm-report archive are complete from 2005; earlier dates would print
+# gaps as if nothing happened.
+MIN_DATE = date(2005, 1, 1)
+
+
 @dataclass
 class ReportContext:
     loc: Location
@@ -55,6 +60,8 @@ def gather(address: str, day_str: str, lat: float | None = None, lon: float | No
         day = date.fromisoformat(day_str)
     except ValueError as e:
         raise InvalidRequest(f"Loss date must be YYYY-MM-DD, got {day_str!r}") from e
+    if day < MIN_DATE:
+        raise InvalidRequest(f"Reports cover loss dates from {MIN_DATE:%B %-d, %Y} onward.")
     if (lat is None) != (lon is None):
         raise InvalidRequest("Supply both latitude and longitude, or neither.")
     if not address.strip():

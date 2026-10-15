@@ -123,6 +123,16 @@ def findings(ctx: ReportContext) -> list:
                      f"{', '.join(_ymd(x.utc_day) for x in site_tiles) or 'covering the date'})"])
     if se and se.status != "ok":
         rows.append(["NCEI Storm Events", se.note])
+    down = [label for label, note in (("station measurements", ctx.stations_note), ("NWS warnings", ctx.warnings_note),
+                                      ("Local Storm Reports", ctx.lsrs_note), ("radar hail", ctx.hail_note))
+            if note and "unavailable" in note]
+    down += [f"station {s.station.icao or s.station.id}" for s in ctx.stations if s.status == "unavailable"]
+    if se and se.status == "unavailable":
+        down.append("Storm Events")
+    if down:
+        rows.append([P("<b>Sources unavailable when this report was made</b>", "cell"),
+                     P(f"<b>{esc(', '.join(down))}</b>. Their absence here is not evidence that nothing happened.",
+                       "cell")])
     return [P("Key findings", "h1"),
             table(rows, col_widths=[2.2 * inch, 4.8 * inch], header=False),
             Spacer(1, 4),

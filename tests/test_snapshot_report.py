@@ -66,6 +66,25 @@ def test_bad_date_format(tmp_path):
         gather(ADDR, "02/19/2026", root=tmp_path)
 
 
+def test_date_before_archive_coverage(tmp_path):
+    with pytest.raises(InvalidRequest):
+        gather(ADDR, "1999-05-03", root=tmp_path)
+
+
+def test_404_recorded_as_absent_not_retried(tmp_path, monkeypatch):
+    import requests
+
+    class R:
+        status_code, url, content = 404, "https://example.invalid/x", b""
+
+    calls = []
+    monkeypatch.setattr(requests, "get", lambda *a, **k: calls.append(1) or R())
+    snap = Snapshot.open({"address": "x", "date": "2026-01-01"}, root=tmp_path)
+    assert snap.fetch("f", "https://example.invalid/x", missing_ok=True) is None
+    assert snap.fetch("f", "https://example.invalid/x", missing_ok=True) is None
+    assert len(calls) == 1 and snap.sources["f"]["status"] == "absent"
+
+
 def test_recorded_failure_replays_when_frozen_and_retries_when_open(tmp_path, monkeypatch):
     import requests
     snap = Snapshot.open({"address": "x", "date": "2026-01-01"}, root=tmp_path)
@@ -75,12 +94,13 @@ def test_recorded_failure_replays_when_frozen_and_retries_when_open(tmp_path, mo
         calls.append(1)
         raise requests.ConnectionError("down")
     monkeypatch.setattr(requests, "get", boom)
+    monkeypatch.setattr("wxreport.snapshot.RETRY_DELAYS", (0, 0))
     with pytest.raises(SourceUnavailable):
         snap.fetch("s", "https://example.invalid")
     with pytest.raises(SourceUnavailable):
         snap.fetch("s", "https://example.invalid")
-    assert len(calls) == 2  # open snapshot retries
+    assert len(calls) == 6  # 3 attempts per fetch; an open snapshot retries a recorded failure
     snap.freeze()
     with pytest.raises(SourceUnavailable):
         snap.fetch("s", "https://example.invalid")
-    assert len(calls) == 2  # frozen snapshot replays the failure
+    assert len(calls) == 6  # a frozen snapshot replays the failure without calling out
