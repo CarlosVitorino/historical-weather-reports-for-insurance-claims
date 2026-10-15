@@ -1,0 +1,17 @@
+# systemd unit — copy to /etc/systemd/system/wxreport.service, adjust paths/user, then:
+#   systemctl daemon-reload && systemctl enable --now wxreport
+# Put a reverse proxy (Caddy/nginx) with HTTPS in front of 127.0.0.1:8000; creem needs an HTTPS webhook URL.
+[Unit]
+Description=Loss-Site Weather Report (order page, creem webhook, report generation)
+After=network-online.target
+
+[Service]
+User=wxreport
+WorkingDirectory=/opt/wxreport
+EnvironmentFile=/opt/wxreport/.env
+# One process: report generation runs in its thread pool and SQLite is local to it.
+ExecStart=/opt/wxreport/.venv/bin/uvicorn wxreport.web:app --host 127.0.0.1 --port 8000 --proxy-headers
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -14,7 +14,7 @@ setup:
 report:
 	$(PY) -m wxreport.cli report --address "$(ADDRESS)" --date "$(DATE)" $(if $(LAT),--lat $(LAT) --lon $(LON))
 
-serve:
+serve:  ## dev server with reload; production: see deploy/wxreport.service
 	.venv/bin/uvicorn wxreport.web:app --reload --port 8000
 
 test:

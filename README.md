@@ -18,9 +18,29 @@ make setup                                   # create .venv and install
 make report ADDRESS="401 N College Ave, Bloomington, IN" DATE=2026-02-19
 make report ADDRESS="..." DATE=... LAT=39.1696 LON=-86.5386   # when the geocoder can't match the address
 make test
-make serve                                   # order page on http://localhost:8000
+make serve                                   # order page on http://localhost:8000 (+ /admin)
 ```
 
 Reports are written to `reports/<report-id>.pdf`. Raw source responses are kept in `data/snapshots/` with
 retrieval times and SHA-256 hashes. Re-running the same request replays the stored snapshot and gives a
 byte-identical PDF. Use `.venv/bin/python -m wxreport.cli report ... --refresh` to re-retrieve everything.
+
+## Selling it
+
+`make serve` runs the order page. A buyer enters the address, loss date and email, confirms the geocoded location,
+pays through creem.io, and is sent back to a status page that turns into a download link. The report is also
+emailed through Resend. `/admin` (HTTP Basic auth, password `ADMIN_PASSWORD`) shows visitors, the funnel,
+revenue, where visitors came from, why order forms were rejected, and every order, with retry and re-send buttons.
+
+Configuration lives in environment variables; see `.env.example`. For a local dry run without creem, set
+`DEV_FAKE_PAYMENTS=1` and orders are marked paid at checkout.
+
+On your server:
+
+1. Copy the repo to `/opt/wxreport`, then run `make setup`.
+2. Create `.env` from `.env.example`.
+3. Install `deploy/wxreport.service`.
+4. Put HTTPS in front of it with a reverse proxy.
+5. In the creem dashboard, set the webhook URL to `https://<your domain>/webhooks/creem`.
+
+Everything is stored in `DATA_DIR`: `app.db` (orders and events) and `orders/<id>/` (snapshots and PDFs). Back it up.

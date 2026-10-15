@@ -54,14 +54,14 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Done when: that report is generated from live data and compared side by side with the sample. ✅ See docs/comparison-bloomington.md
 
 ## 4. Harden
-- [ ] Failures a user will meet: unmatched address, address outside the region, future date, missing station hours, a source being down (report says "unavailable", never zero), Storm Events lag.
-- [ ] Tests for the core path from recorded fixtures; determinism test.
+- [x] Failures a user will meet: unmatched address, address outside the region, future date, missing station hours, a source being down (report says "unavailable", never zero), Storm Events lag.
+- [x] Tests for the core path from recorded fixtures; determinism test.
 - Done when: you are comfortable sending a report to a real adjuster.
 
 ## 5. Ship and learn
-- [ ] Event log (SQLite): page views, form submits, checkout clicks, paid orders, report deliveries.
-- [ ] Admin stats page at `/admin`, protected by an admin password from the environment: visitors, funnel (view → submit → checkout → paid), revenue, orders list with report IDs and delivery status.
-- [ ] creem.io checkout (test mode, then live) + webhook → generate → download link; order log (address, date, report ID, paid, feedback).
+- [x] Event log (SQLite): page views, form submits, checkout clicks, paid orders, report deliveries.
+- [x] Admin stats page at `/admin`, protected by an admin password from the environment: visitors, funnel (view → submit → checkout → paid), revenue, orders list with report IDs and delivery status.
+- [x] creem.io checkout (test mode, then live) + webhook → generate → download link; order log (address, date, report ID, paid, feedback).
 - [ ] Lawyer review of L1–L4 → stop / go.
 - Done when: there is evidence for or against adjusters paying $9.99.
 
@@ -79,3 +79,7 @@ If any of these comes back as a blocker, that is the stop condition, and I'll te
 - Precipitation is never zero-filled: METAR hourly periods without a routine report, or flagged PNO/P////, are counted as missing and the total is labelled a minimum.
 - The observation log uses the nearest airport (METAR) station unless another wind-measuring station is >5 mi closer. USCRN wind (1.5 m) is flagged as not comparable.
 - Report ID includes a renderer version (`wxreport.RENDER_VERSION`), bumped whenever content/layout changes.
+- Orders are created only once the address geocodes inside a US county and the local day has ended, so nobody pays for a report that can't be built. A confirm step shows the matched location before payment.
+- Payment truth comes only from the signed creem webhook (HMAC-SHA256 of the raw body), deduplicated by event ID; the success redirect only shows status.
+- Report generation runs in an in-process thread pool (one server process, SQLite). Orders interrupted by a restart are resumed at startup. Failures show on /admin with a Retry button.
+- Visitor analytics use an anonymous first-party cookie; no IPs stored.
