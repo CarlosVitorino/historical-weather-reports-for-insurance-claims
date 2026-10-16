@@ -1,0 +1,14 @@
+.git
+.venv
+.env
+deploy/.env
+data
+reports
+docs
+tests
+brand
+scripts
+.cursor
+.pytest_cache
+**/__pycache__
+*.egg-info

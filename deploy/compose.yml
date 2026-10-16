@@ -1,0 +1,45 @@
+# Weather Evidence on the shared host (the one running huntingapps.io and narrator.guru).
+# The edge Caddy (venture-lab/deploy/edge) terminates TLS and dials this container as `weatherevidence-web`.
+#
+#   cp .env.example deploy/.env                       # then fill it in; `wxreport check` validates it
+#   docker compose -f deploy/compose.yml up -d --build
+#
+# Settings are read by the app itself from the mounted .env (same parser as local runs), not by Compose.
+
+name: weatherevidence
+
+services:
+  web:
+    build: { context: .. }
+    image: weatherevidence-web
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs: [/tmp]
+    volumes:
+      - data:/data
+      - ./.env:/app/.env:ro
+    # Measured 2026-10-16 (Bloomington, IN, 2026-02-19): one report peaks at 364 MB RSS for the whole process and
+    # uses 9.8 s of CPU on one core; a live build takes ~45 s, the rest is waiting on NOAA/NWS. Idle after a report:
+    # 165 MiB. Two reports at once share the interpreter, so ~0.6 GB is the expected peak.
+    mem_limit: 768m
+    # The GIL keeps one Python process to about one core anyway. The core comes out of the narrator's worker
+    # (cpus 6 → 5), so Hunting Apps keeps its 2 guaranteed cores. See venture-lab/docs/18-the-shared-host.md §3.
+    cpus: 1
+    # A paid report being built is resumed on start, so a restart costs a re-run, not an order. Give it time anyway.
+    stop_grace_period: 60s
+    networks:
+      edge:
+        aliases: [weatherevidence-web]
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '5' }
+
+volumes:
+  data:
+
+networks:
+  edge:
+    external: true
