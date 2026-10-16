@@ -55,6 +55,9 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
         warn.append("ENVIRONMENT=development: creem is skipped and every order is marked paid at checkout")
     elif not cfg.payments_ready:
         warn.append("creem is not configured (CREEM_API_KEY, CREEM_PRODUCT_ID, CREEM_WEBHOOK_SECRET)")
+    if not (cfg.legal_owner and cfg.legal_address):
+        warn.append("LEGAL_OWNER or LEGAL_ADDRESS is not set: /terms, /privacy, /refunds and /imprint say Draft, and "
+                    "creem's review rejects that")
     if not cfg.email_ready:
         warn.append("Resend is not configured (RESEND_API_KEY, RESEND_FROM): reports are not emailed")
     warn_html = "".join(f'<div class="warn">{escape(w)}</div>' for w in warn)

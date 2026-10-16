@@ -10,7 +10,7 @@ import pytest
 import requests
 from fastapi.testclient import TestClient
 
-from wxreport import config, fulfil, web
+from wxreport import SUPPORT_EMAIL, config, fulfil, web
 from wxreport.geocode import AddressNotFound, Location
 from wxreport.report import gather
 
@@ -46,7 +46,9 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setattr(web, "locate", lambda snap, address, lat=None, lon=None: LOC)
     monkeypatch.setattr(fulfil, "gather", lambda *a, **k: gather(ADDR, DAY, root=FIXTURES, offline=True))
     app = web.create_app(cfg)
-    return app, TestClient(app), posts
+    yield app, TestClient(app), posts
+    # Background work must finish while requests.post is still faked, or it reaches the real Resend and creem.
+    app.state.fulfiller.pool.shutdown(wait=True)
 
 
 def sign(body: bytes) -> str:
@@ -91,9 +93,12 @@ def test_purchase_path_end_to_end(env):
     o = store.get(oid)
     assert o["status"] == "ready" and o["amount_cents"] == 999 and o["email_status"] == "sent"
     assert o["report_id"].startswith("WE-2026-02-19-")
-    email = posts[-1][1]
-    assert posts[-1][0] == "https://api.resend.com/emails" and email["to"] == ["adjuster@example.com"]
+    emails = [b for u, b, _ in posts if u == "https://api.resend.com/emails"]
+    email = next(b for b in emails if b["to"] == ["adjuster@example.com"])
     assert email["attachments"][0]["filename"] == f"{o['report_id']}.pdf"
+    assert email["from"] == "Reports <r@test>" and email["reply_to"] == SUPPORT_EMAIL and email["text"]
+    alert = next(b for b in emails if b["to"] == [SUPPORT_EMAIL])
+    assert alert["subject"] == "[Weather Evidence] New order" and "9.99 USD" in alert["text"]
 
     page = client.get(f"/orders/{oid}/{token}").text
     assert "Your report is ready" in page and o["report_id"] in page
@@ -216,3 +221,108 @@ def test_development_skips_creem_even_when_configured(env, monkeypatch):
     assert r.headers["location"] == f"/orders/{oid}/{token}"
     app2.state.fulfiller.pool.shutdown(wait=True)
     assert app2.state.store.get(oid)["creem_order_id"] == "fake"
+
+
+def test_legal_pages_for_creem_review(env):
+    """creem's account review: Terms and Privacy reachable, support email shown, merchant of record named."""
+    app, client, _ = env
+    for path in ("/terms", "/privacy", "/refunds"):
+        r = client.get(path)
+        assert r.status_code == 200, path
+        assert SUPPORT_EMAIL in r.text and 'href="/privacy"' in r.text and 'href="/terms"' in r.text
+    assert "merchant of record" in client.get("/terms").text
+    assert "$9.99" in client.get("/terms").text
+    assert "/refunds" in client.get("/sitemap.xml").text
+    oid, token = place_order(client)
+    confirm = client.get(f"/order/{oid}/{token}").text
+    assert "merchant of record" in confirm and 'href="/terms"' in confirm
+
+
+def test_legal_pages_are_drafts_until_owner_set(env):
+    app, _, _ = env
+    draft = TestClient(web.create_app(replace(app.state.cfg, legal_owner=""), app.state.store))
+    assert "Draft" in draft.get("/terms").text
+    named = TestClient(web.create_app(replace(app.state.cfg, legal_owner="Jane Doe"), app.state.store))
+    assert "Draft" in named.get("/terms").text   # the imprint needs a postal address too
+    full = replace(app.state.cfg, legal_owner="Jane Doe", legal_address="Musterstr. 1 | 10115 Berlin | Germany")
+    named = TestClient(web.create_app(full, app.state.store))
+    page = named.get("/terms").text
+    assert "Draft" not in page and "Jane Doe" in page
+    imprint = named.get("/imprint").text
+    assert "§ 5" in imprint and "Musterstr. 1<br>10115 Berlin<br>Germany" in imprint and SUPPORT_EMAIL in imprint
+    assert 'href="/imprint"' in named.get("/").text and "/imprint" in named.get("/sitemap.xml").text
+
+
+def webhook(client, event: dict):
+    raw = json.dumps(event).encode()
+    return client.post("/webhooks/creem", content=raw, headers={"creem-signature": sign(raw)})
+
+
+def paid_order(app, client) -> str:
+    oid, _ = place_order(client)
+    webhook(client, {"id": f"evt_{oid}", "eventType": "checkout.completed",
+                     "object": {"id": "ch_1", "request_id": oid,
+                                "order": {"id": f"creem_{oid}", "amount": 999, "currency": "USD",
+                                          "product": "prod_1"}}})
+    app.state.fulfiller.pool.shutdown(wait=True)
+    return oid
+
+
+def test_refund_and_dispute_found_by_creem_order_id(env):
+    """creem's dispute sample nests a checkout with no request_id; the creem order id still finds the sale."""
+    app, client, posts = env
+    oid = paid_order(app, client)
+    app.state.fulfiller.pool = fulfil.ThreadPoolExecutor(max_workers=1)
+    webhook(client, {"id": "evt_d", "eventType": "dispute.created",
+                     "object": {"amount": 999, "currency": "USD", "checkout": {"id": "ch_1"},
+                                "order": {"id": f"creem_{oid}"}}})
+    webhook(client, {"id": "evt_r", "eventType": "refund.created",
+                     "object": {"refund_amount": 999, "refund_currency": "USD", "reason": "requested_by_customer",
+                                "transaction": {"order": f"creem_{oid}"}}})
+    app.state.fulfiller.pool.shutdown(wait=True)
+    assert app.state.store.get(oid)["status"] == "refunded"
+    subjects = [b["subject"] for u, b, _ in posts if "resend" in u and b["to"] == [SUPPORT_EMAIL]]
+    assert "[Weather Evidence] Dispute (chargeback)" in subjects and "[Weather Evidence] Refund" in subjects
+
+
+def test_checkout_for_another_product_is_ignored(env):
+    app, client, _ = env
+    oid, _ = place_order(client)
+    r = webhook(client, {"id": "evt_x", "eventType": "checkout.completed",
+                         "object": {"request_id": oid, "order": {"id": "o", "amount": 5000, "product": "prod_other"}}})
+    assert r.json()["ignored"] == "other product" and app.state.store.get(oid)["status"] == "draft"
+
+
+def test_failed_report_alerts_the_operator(env, monkeypatch):
+    app, client, posts = env
+    monkeypatch.setattr(fulfil, "gather", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("NCEI down")))
+    oid = paid_order(app, client)
+    assert app.state.store.get(oid)["status"] == "failed"
+    alerts = [b for u, b, _ in posts if "resend" in u and b["subject"] == "[Weather Evidence] Report failed"]
+    assert len(alerts) == 1 and "NCEI down" in alerts[0]["text"] and oid in alerts[0]["text"]
+
+
+def test_rate_limits(env, monkeypatch):
+    app, _, _ = env
+    from wxreport.ratelimit import Limiter
+    app2 = web.create_app(app.state.cfg, app.state.store,
+                          limiter=Limiter({"POST /order": (2, 600), "GET /api/suggest": (3, 600)}))
+    client = TestClient(app2)
+    monkeypatch.setattr(web, "suggest", lambda q: ([], True))
+    assert [client.get("/api/suggest", params={"q": "401 N"}).status_code for _ in range(4)] == [200, 200, 200, 429]
+    codes = [client.post("/order", data={"address": ADDR, "loss_date": DAY, "email": "a@b.co"},
+                         follow_redirects=False).status_code for _ in range(3)]
+    assert codes == [303, 303, 429]
+    assert client.get("/").status_code == 200   # pages without a rule are never limited
+
+
+def test_admin_buttons_refuse_cross_site_posts(env):
+    app, client, _ = env
+    oid = paid_order(app, client)
+    app.state.fulfiller.pool = fulfil.ThreadPoolExecutor(max_workers=1)   # the fixture waits for it
+    url = f"/admin/orders/{oid}/resend"
+    assert client.post(url, auth=("a", "pw"), follow_redirects=False).status_code == 403
+    assert client.post(url, auth=("a", "pw"), headers={"origin": "https://evil.example"},
+                       follow_redirects=False).status_code == 403
+    assert client.post(url, auth=("a", "pw"), headers={"origin": "https://reports.test"},
+                       follow_redirects=False).status_code == 303

@@ -13,15 +13,28 @@ from functools import lru_cache
 
 import requests
 
+from .ratelimit import DailyBudget
+
 log = logging.getLogger("wxreport.suggest")
 PHOTON = "https://photon.komoot.io/api/"
 GEOAPIFY = "https://api.geoapify.com/v1/geocode/autocomplete"
 USER_AGENT = "weatherevidence.com order form"
 _TTL = 3600
+# Geoapify's free tier is 3,000 requests a day for the whole key. Past this many, fall back to Photon for the rest
+# of the UTC day rather than let one script spend the quota and break autocomplete for real buyers.
+GEOAPIFY_BUDGET = DailyBudget(int(os.environ.get("GEOAPIFY_DAILY_LIMIT", "2500")))
 
 
 def provider() -> str:
     return "geoapify" if os.environ.get("GEOAPIFY_API_KEY") else "photon"
+
+
+def _spend(prov: str) -> str:
+    """The provider to call now: Geoapify only while today's budget lasts."""
+    if prov == "geoapify" and not GEOAPIFY_BUDGET.take():
+        log.warning("Geoapify daily budget used up; using Photon until midnight UTC")
+        return "photon"
+    return prov
 
 
 def _photon_label(p: dict) -> str | None:
@@ -65,7 +78,7 @@ def _geoapify(q: str) -> list[dict]:
 
 @lru_cache(maxsize=2048)
 def _cached(q: str, prov: str, bucket: int) -> tuple:
-    rows = _geoapify(q) if prov == "geoapify" else _photon(q)
+    rows = _geoapify(q) if _spend(prov) == "geoapify" else _photon(q)
     seen, out = set(), []
     for row in rows:
         if row["label"] in seen:
@@ -92,7 +105,7 @@ def suggest(q: str) -> tuple[list[dict], bool]:
 
 def reverse(lat: float, lon: float) -> str | None:
     """Nearest street address for a map pin, from the configured provider; None if unavailable."""
-    prov = provider()
+    prov = _spend(provider())
     try:
         if prov == "geoapify":
             r = requests.get("https://api.geoapify.com/v1/geocode/reverse", timeout=4,

@@ -8,6 +8,7 @@ from xml.sax.saxutils import escape as xml_escape
 
 from . import BRAND, DOMAIN
 from .content import GUIDES, PAGES, Page
+from .legal import PATHS as LEGAL_PATHS, UPDATED as LEGAL_UPDATED
 
 SITE_UPDATED = date(2026, 10, 15)   # bump when the home or order page changes meaningfully
 
@@ -53,7 +54,7 @@ def article(base: str, page: Page) -> list[dict]:
 
 def sitemap(base: str) -> str:
     entries = [("/", SITE_UPDATED), ("/order", SITE_UPDATED), ("/guides", max(g.updated for g in GUIDES)),
-               *((p.path, p.updated) for p in PAGES.values()), ("/static/sample-report.pdf", SITE_UPDATED)]
+               *((p.path, p.updated) for p in PAGES.values()), *((p, LEGAL_UPDATED) for p in LEGAL_PATHS), ("/static/sample-report.pdf", SITE_UPDATED)]
     urls = "".join(f"<url><loc>{xml_escape(base + path)}</loc><lastmod>{d.isoformat()}</lastmod></url>"
                    for path, d in entries)
     return ('<?xml version="1.0" encoding="UTF-8"?>'

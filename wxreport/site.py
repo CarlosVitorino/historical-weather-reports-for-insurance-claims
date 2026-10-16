@@ -9,7 +9,7 @@ from datetime import date, timedelta
 from html import escape
 from pathlib import Path
 
-from . import BRAND, DOMAIN
+from . import BRAND, DOMAIN, SUPPORT_EMAIL
 from .brand import FAVICON, mark_svg
 from .geocode import _pretty
 from .report import MIN_DATE
@@ -402,7 +402,9 @@ they are not certified records or expert opinions.</p></div>
 <div><p class="links"><a href="/#sample">Sample report</a><a href="/methodology">How it's built</a>
 <a href="/certified-weather-records">Certified records</a><a href="/guides">Guides</a><a href="/#faq">FAQ</a>
 <a href="/order">Order</a></p>
-<p>{DOMAIN} · Payments processed by Creem</p></div></div></footer>"""
+<p class="links"><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="/refunds">Refunds</a><a href="/imprint">Imprint</a></p>
+<p>Support: <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a></p>
+<p>{DOMAIN} · Payments processed by Creem, our merchant of record</p></div></div></footer>"""
 
 
 def order_form(v: dict, error: str = "", ask_coords: bool = False, title: str = "") -> str:
@@ -545,7 +547,11 @@ email.</span></div></li></ol></div></section>"""
         ("What if the address isn't found?",
          "Place a pin on the map instead. The report notes that the location was set by pin."),
         ("What if the report can't be built?",
-         "We're notified automatically and will deliver the report or refund you."),
+         'We\'re notified automatically and will deliver the report or refund you. See the <a href="/refunds">refund '
+         "policy</a>."),
+        ("Who processes the payment?",
+         "Creem (creem.io), our reseller and merchant of record. It takes the payment, calculates any sales tax and "
+         f'emails your receipt. Questions about an order: <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a>.'),
     ]
     faq = "".join(f"<details><summary>{escape(q)}</summary><p>{a}</p></details>" for q, a in faq_items)  # trusted HTML
     faq_html = f"""<section id="faq"><div class="wrap">

@@ -135,6 +135,28 @@ class Store:
         with self._conn() as c:
             return [dict(r) for r in c.execute(q, [*args, limit]).fetchall()]
 
+    def by_creem_order(self, creem_order_id: str) -> dict | None:
+        """Refund and dispute webhooks don't always carry our request_id; creem's order id identifies the sale."""
+        with self._conn() as c:
+            r = c.execute("SELECT * FROM orders WHERE creem_order_id=?", (creem_order_id,)).fetchone()
+        return dict(r) if r else None
+
+    def stale_drafts(self, older_than_hours: int) -> list[str]:
+        """Drafts nobody took to payment. Orders that reached checkout are kept: creem may still confirm them."""
+        cutoff = (datetime.now(timezone.utc) - timedelta(hours=older_than_hours)).replace(microsecond=0).isoformat()
+        with self._conn() as c:
+            return [r[0] for r in c.execute("SELECT id FROM orders WHERE status='draft' AND created_at<?", (cutoff,))]
+
+    def backup(self, target: Path) -> None:
+        """A consistent copy of the live database (SQLite online backup), safe while the app is writing."""
+        with self._lock:
+            src, dst = sqlite3.connect(self.path), sqlite3.connect(target)
+            try:
+                src.backup(dst)
+            finally:
+                dst.close()
+                src.close()
+
     def pending_work(self) -> list[str]:
         with self._conn() as c:
             return [r[0] for r in c.execute("SELECT id FROM orders WHERE status IN ('paid','generating')")]

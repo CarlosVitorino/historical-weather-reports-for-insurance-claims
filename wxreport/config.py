@@ -15,9 +15,14 @@ def _load_dotenv(path: Path = Path(".env")) -> None:
             v = v.strip()
             if v and v[0] in "\"'" and v.find(v[0], 1) > 0:
                 v = v[1:v.find(v[0], 1)]  # quoted: keep what's inside, drop any trailing comment
+            elif v.startswith("#"):
+                v = ""  # "KEY=   # comment": empty
             else:
                 v = re.split(r"\s+#", v, maxsplit=1)[0]  # unquoted: " # ..." is a comment
             os.environ.setdefault(k.strip(), v)
+
+
+DEFAULT_FROM = "Weather Evidence <report@weatherevidence.com>"   # a sender on the domain verified in Resend
 
 
 @dataclass(frozen=True)
@@ -33,6 +38,14 @@ class Settings:
     resend_from: str
     admin_password: str
     fake_payments: bool
+    legal_owner: str = ""        # legal name on /terms and /privacy; empty marks them as drafts
+    legal_law: str = "Germany"
+    legal_address: str = ""      # postal address for the imprint (Impressum) and privacy policy
+    legal_vat_id: str = ""       # USt-IdNr., if one has been issued
+    legal_phone: str = ""        # a second quick way to reach the operator, shown in the imprint
+    alert_email: str = ""        # where failures and new orders are reported; empty: SUPPORT_EMAIL
+    backup_keep: int = 14        # nightly database copies kept in DATA_DIR/backups
+    draft_ttl_hours: int = 24    # unpaid drafts older than this are deleted with their snapshots
 
     @property
     def payments_ready(self) -> bool:
@@ -59,7 +72,15 @@ def load() -> Settings:
         creem_webhook_secret=os.environ.get("CREEM_WEBHOOK_SECRET", ""),
         creem_api_base=os.environ.get("CREEM_API_BASE", default_base).rstrip("/"),
         resend_api_key=os.environ.get("RESEND_API_KEY", ""),
-        resend_from=os.environ.get("RESEND_FROM", ""),
+        resend_from=os.environ.get("RESEND_FROM", "") or DEFAULT_FROM,
         admin_password=os.environ.get("ADMIN_PASSWORD", ""),
         fake_payments=environment == "development",
+        legal_owner=os.environ.get("LEGAL_OWNER", "").strip(),
+        legal_law=os.environ.get("LEGAL_LAW", "").strip() or "Germany",
+        legal_address=os.environ.get("LEGAL_ADDRESS", "").strip(),
+        legal_vat_id=os.environ.get("LEGAL_VAT_ID", "").strip(),
+        legal_phone=os.environ.get("LEGAL_PHONE", "").strip(),
+        alert_email=os.environ.get("ALERT_EMAIL", "").strip(),
+        backup_keep=int(os.environ.get("BACKUP_KEEP", "14")),
+        draft_ttl_hours=int(os.environ.get("DRAFT_TTL_HOURS", "24")),
     )

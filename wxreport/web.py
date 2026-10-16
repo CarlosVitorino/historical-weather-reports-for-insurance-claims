@@ -3,6 +3,7 @@
 Plus /admin: visitors, funnel, sales and orders, behind ADMIN_PASSWORD (HTTP Basic auth).
 """
 import json
+import logging
 from contextlib import asynccontextmanager
 import re
 import secrets
@@ -17,9 +18,10 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Red
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, content, payments, seo, site
+from . import config, content, housekeeping, legal, payments, seo, site
 from .fulfil import Fulfiller, order_dir
 from .geocode import AddressNotFound, find, locate, where
+from .ratelimit import Limiter
 from .suggest import reverse, suggest
 from .report import MIN_DATE
 from .snapshot import Snapshot, SourceUnavailable
@@ -49,20 +51,37 @@ def _float(s: str | None) -> float | None:
         raise ValueError("Latitude and longitude must be numbers, e.g. 39.16955 and -86.53493.")
 
 
-def create_app(cfg: config.Settings | None = None, store: Store | None = None) -> FastAPI:
+def create_app(cfg: config.Settings | None = None, store: Store | None = None,
+               limiter: Limiter | None = None) -> FastAPI:
     cfg = cfg or config.load()
     store = store or Store(cfg.data_dir / "app.db")
     fulfiller = Fulfiller(cfg, store)
+    limiter = limiter or Limiter()
+
     @asynccontextmanager
     async def lifespan(_app):
         fulfiller.resume()   # orders interrupted by a restart
+        housekeeping.start(cfg, store)   # stale drafts and the nightly database copy
         yield
 
     app = FastAPI(title=site.BRAND, docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
-    app.state.cfg, app.state.store, app.state.fulfiller = cfg, store, fulfiller
+    app.state.cfg, app.state.store, app.state.fulfiller, app.state.limiter = cfg, store, fulfiller, limiter
     security = HTTPBasic(realm="admin")
     app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
+    @app.middleware("http")
+    async def rate_limit(request: Request, call_next):
+        client = request.client.host if request.client else "unknown"
+        if limiter.allow(request.method, request.url.path, client):
+            return await call_next(request)
+        store.log("rate_limited", path=request.url.path, method=request.method)
+        if request.url.path.startswith("/api/"):
+            return Response('{"ok": false, "error": "rate_limited"}', status_code=429, media_type="application/json",
+                            headers={"Retry-After": "600"})
+        resp = inner_page("Too many requests", "Too many requests", '<div class="panel"><p class="err">That was a '
+                          'lot of requests in a short time. Please wait a few minutes and try again.</p></div>')
+        resp.status_code, resp.headers["Retry-After"] = 429, "600"
+        return resp
 
     @app.middleware("http")
     async def seo_headers(request: Request, call_next):
@@ -145,6 +164,14 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
 
     for path in content.PAGES:
         app.add_api_route(path, content_page, methods=["GET"], response_class=HTMLResponse)
+
+    def legal_page(request: Request):
+        lp = legal.PAGES[request.url.path](cfg)
+        log_view(request)
+        return page(lp.title, site.article(lp, []), url=f"{base}{lp.path}", index=True, description=lp.description)
+
+    for path in legal.PAGES:
+        app.add_api_route(path, legal_page, methods=["GET"], response_class=HTMLResponse)
 
     @app.get("/robots.txt", response_class=PlainTextResponse)
     def robots():
@@ -236,7 +263,10 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None) -
 <button class="btn btn-amber" type="submit">Pay {price} securely</button></form>
 <a class="btn btn-ghost" href="{escape(back, quote=True)}">Change details</a></div>
 <p class="fine">The report is centred on the location shown. If it isn't the property, choose Change details and
-place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow="Step 2 of 3", map_assets=True)
+place a pin on the building.</p>
+<p class="fine">Payment is processed by Creem (creem.io), our reseller and merchant of record, which also issues your
+receipt. By paying you agree to our <a href="/terms">Terms</a> and <a href="/refunds">Refund policy</a>. The report
+is built and delivered straight away.</p></div>""", eyebrow="Step 2 of 3", map_assets=True)
 
     @app.post("/order/{oid}/{token}/checkout")
     def checkout(request: Request, oid: str, token: str):
@@ -316,20 +346,32 @@ place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow
             raise HTTPException(400, "malformed event")
         if ev.get("id") and store.seen_webhook(ev["id"]):
             return {"ok": True, "duplicate": True}
-        oid = payments.order_ref(obj) if etype == "checkout.completed" else \
-            payments.order_ref(obj.get("checkout") or {}) or (obj.get("metadata") or {}).get("order_id")
+        oid = payments.order_id_for(etype, obj, store)
         store.log("webhook", order_id=oid, event=etype)
         if etype == "checkout.completed" and oid and store.get(oid):
             order = obj.get("order") or {}
+            product = order.get("product") or (obj.get("product") or {}).get("id")
+            if product and product != cfg.creem_product_id:   # another product on the same creem store
+                store.log("webhook_ignored", order_id=oid, event=etype, product=product)
+                return {"ok": True, "ignored": "other product"}
             amount = order.get("amount_paid", order.get("amount"))
             if store.transition(oid, ("draft", "checkout"), "paid", paid_at=now(), amount_cents=amount,
                                 currency=order.get("currency"), creem_order_id=order.get("id"),
                                 checkout_id=obj.get("id")):
                 store.log("paid", store.get(oid)["visitor"], oid, amount_cents=amount)
                 fulfiller.submit(oid)
+                fulfiller.alert_later(oid, "New order", f"Paid {payments.money(amount, order.get('currency'))}.")
         elif etype == "refund.created" and oid and store.get(oid):
             store.update(oid, status="refunded")
-            store.log("refund", order_id=oid)
+            store.log("refund", order_id=oid, amount_cents=obj.get("refund_amount"), reason=obj.get("reason"))
+            fulfiller.alert_later(oid, "Refund", f"creem refunded "
+                                  f"{payments.money(obj.get('refund_amount'), obj.get('refund_currency'))} "
+                                  f"({obj.get('reason') or 'no reason given'}).")
+        elif etype == "dispute.created":
+            store.log("dispute", order_id=oid, amount_cents=obj.get("amount"))
+            fulfiller.alert_later(oid, "Dispute (chargeback)", f"A buyer disputed a payment of "
+                                  f"{payments.money(obj.get('amount'), obj.get('currency'))}. "
+                                  "Answer it in the creem dashboard.")
         return {"ok": True}
 
     @app.get("/api/suggest")
@@ -364,11 +406,22 @@ place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow
         return {"ok": True, "payments": cfg.payments_ready, "email": cfg.email_ready}
 
     # -- admin ------------------------------------------------------------------------------
-    def admin_auth(creds: HTTPBasicCredentials = Depends(security)):
+    def admin_auth(request: Request, creds: HTTPBasicCredentials = Depends(security)):
         if not cfg.admin_password:
             raise HTTPException(503, "Set ADMIN_PASSWORD to enable the admin page.")
         if not secrets.compare_digest(creds.password.encode(), cfg.admin_password.encode()):
             raise HTTPException(401, headers={"WWW-Authenticate": 'Basic realm="admin"'})
+        if request.method == "POST" and not same_origin(request):
+            # The browser resends Basic credentials on any request to this host, so a page elsewhere could post
+            # to these buttons. Browsers always send Origin on a cross-site POST; it has to be ours.
+            raise HTTPException(403, "cross-site request refused")
+
+    def same_origin(request: Request) -> bool:
+        origin = request.headers.get("origin") or request.headers.get("referer")
+        if not origin:
+            return False
+        host = urlparse(origin).netloc
+        return host in (request.headers.get("host"), urlparse(cfg.base_url).netloc)
 
     @app.get("/admin", response_class=HTMLResponse, dependencies=[Depends(admin_auth)])
     def admin(days: int = 30):
@@ -401,6 +454,7 @@ place a pin on the building. Checkout is handled by Creem.</p></div>""", eyebrow
 def __getattr__(name: str):
     # `uvicorn wxreport.web:app` — build the app lazily so importing this module (e.g. in tests) has no side effects.
     if name == "app":
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
         globals()["app"] = create_app()
         return globals()["app"]
     raise AttributeError(name)

@@ -3,6 +3,7 @@
 BRAND = "Weather Evidence"
 PRODUCT = "Weather Evidence Report"        # title printed on every report
 DOMAIN = "weatherevidence.com"
+SUPPORT_EMAIL = "support@weatherevidence.com"   # shown on every page; must match creem's Business Details
 ID_PREFIX = "WE"                           # report IDs: WE-<loss date>-<12 hex>
 
 # Bump whenever report content or layout changes: it is part of the report ID, so one ID is one exact PDF.
