@@ -20,7 +20,13 @@ services:
     tmpfs: [/tmp]
     volumes:
       - data:/data
-      - ./.env:/app/.env:ro
+      # Long form so a missing deploy/.env stops `up` with an error. The short form would silently create a
+      # directory there, and the app would crash on start reading it.
+      - type: bind
+        source: ./.env
+        target: /app/.env
+        read_only: true
+        bind: { create_host_path: false }
     # Measured 2026-10-16 (Bloomington, IN, 2026-02-19): one report peaks at 364 MB RSS for the whole process and
     # uses 9.8 s of CPU on one core; a live build takes ~45 s, the rest is waiting on NOAA/NWS. Idle after a report:
     # 165 MiB. Two reports at once share the interpreter, so ~0.6 GB is the expected peak.
