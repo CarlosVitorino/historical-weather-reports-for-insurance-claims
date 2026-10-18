@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copy Weather Evidence's data off this host. Run nightly from root's cron, after the app's own daily copy:
 #   30 3 * * *  BACKUP_REMOTE=u123456@u123456.your-storagebox.de:weatherevidence \
-#               /opt/weatherevidence/deploy/backup-offsite.sh >> /var/log/weatherevidence-backup.log 2>&1
+#               /home/<user>/weatherevidence/deploy/backup-offsite.sh >> /var/log/weatherevidence-backup.log 2>&1
 #
 # What goes: backups/ (one consistent database copy per day, BACKUP_KEEP kept) and orders/ (each order's PDF and
 # the source snapshots it was built from, so any report can be regenerated and verified). The live app.db is

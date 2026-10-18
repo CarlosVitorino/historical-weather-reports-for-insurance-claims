@@ -70,11 +70,11 @@ behind the shared Caddy in `venture-lab/deploy/edge/` (which already has the `we
 
 1. Point `weatherevidence.com` and `www.weatherevidence.com` at the host. Let DNS settle first: Caddy requests a
    certificate as soon as it reloads, and failures count against Let's Encrypt's rate limits.
-2. Clone the repo to `/opt/weatherevidence`, `cp .env.example deploy/.env`, fill it in with live creem keys and
+2. Clone the repo to `~/weatherevidence` (next to `~/narrator`), `cp .env.example deploy/.env`, fill it in with live creem keys and
    `ENVIRONMENT=production`.
 3. `docker compose -f deploy/compose.yml up -d --build`, then
    `docker compose -f deploy/compose.yml exec web python -m wxreport.cli check --email-to you@example.com`.
-4. Reload the edge Caddy: `docker compose -f /opt/buildcase/deploy/edge/compose.yml restart caddy`.
+4. Reload the edge Caddy: `docker compose -f ~/venture-lab/deploy/edge/compose.yml restart caddy`.
 5. In the creem dashboard, set the webhook URL to `https://weatherevidence.com/webhooks/creem`.
 6. Before creem's account review: set `LEGAL_OWNER` and `LEGAL_ADDRESS` (the legal pages and `/imprint` say Draft
    until you do), make sure `support@weatherevidence.com` receives mail, and enter the same address in creem →
