@@ -65,8 +65,8 @@ compares its price with `PRICE_CENTS`), and with `--email-to you@example.com` se
 ## Deploying
 
 It runs on the shared host with huntingapps.io and narrator.guru: one container on the `edge` Docker network,
-behind the shared Caddy in `venture-lab/deploy/edge/` (which already has the `weatherevidence.com` block). Budget:
-`cpus: 1`, `mem_limit: 768m`; the core came out of the narrator's worker (`venture-lab/docs/18-the-shared-host.md`).
+behind the shared Caddy in `huntingApps/deploy/edge/` (which already has the `weatherevidence.com` block). Budget:
+`cpus: 1`, `mem_limit: 768m`; the core came out of the narrator's worker (`huntingApps/docs/18-the-shared-host.md`).
 
 1. Point `weatherevidence.com` and `www.weatherevidence.com` at the host. Let DNS settle first: Caddy requests a
    certificate as soon as it reloads, and failures count against Let's Encrypt's rate limits.
@@ -74,7 +74,7 @@ behind the shared Caddy in `venture-lab/deploy/edge/` (which already has the `we
    `ENVIRONMENT=production`.
 3. `docker compose -f deploy/compose.yml up -d --build`, then
    `docker compose -f deploy/compose.yml exec web python -m wxreport.cli check --email-to you@example.com`.
-4. Reload the edge Caddy: `docker compose -f ~/venture-lab/deploy/edge/compose.yml restart caddy`.
+4. Reload the edge Caddy: `docker compose -f ~/huntingApps/deploy/edge/compose.yml restart caddy`.
 5. In the creem dashboard, set the webhook URL to `https://weatherevidence.com/webhooks/creem`.
 6. Before creem's account review: set `LEGAL_OWNER` and `LEGAL_ADDRESS` (the legal pages and `/imprint` say Draft
    until you do), make sure `support@weatherevidence.com` receives mail, and enter the same address in creem →

@@ -1,5 +1,5 @@
 # Weather Evidence on the shared host (the one running huntingapps.io and narrator.guru).
-# The edge Caddy (venture-lab/deploy/edge) terminates TLS and dials this container as `weatherevidence-web`.
+# The edge Caddy (huntingApps/deploy/edge) terminates TLS and dials this container as `weatherevidence-web`.
 #
 #   cp .env.example deploy/.env                       # then fill it in; `wxreport check` validates it
 #   docker compose -f deploy/compose.yml up -d --build
@@ -32,7 +32,7 @@ services:
     # 165 MiB. Two reports at once share the interpreter, so ~0.6 GB is the expected peak.
     mem_limit: 768m
     # The GIL keeps one Python process to about one core anyway. The core comes out of the narrator's worker
-    # (cpus 6 → 5), so Hunting Apps keeps its 2 guaranteed cores. See venture-lab/docs/18-the-shared-host.md §3.
+    # (cpus 6 → 5), so Hunting Apps keeps its 2 guaranteed cores. See huntingApps/docs/18-the-shared-host.md §3.
     cpus: 1
     # A paid report being built is resumed on start, so a restart costs a re-run, not an order. Give it time anyway.
     stop_grace_period: 60s
