@@ -2,99 +2,96 @@
 
 ## Where we are
 
-Live, well-built, at search-near-zero (12 pages indexed, ~110 impressions/28 days). Keyword work is
-done and the conclusions hold:
+Live, well-built, at search-near-zero (12 pages indexed, ~110 impressions/28 days). The keyword
+investigation and the GEO (generative-engine) research both concluded, and the conclusions hold:
 
 - The market is **hail-centric but tiny**. `hail report by address` (140, KD 0) is the only measurable
-  money term; `weather report for insurance claim` is below the Ads floor. That phrasing is honest
-  framing, not a keyword.
+  money term; `weather report for insurance claim` is below the Ads floor — honest framing, not a keyword.
 - **"Historical weather data"** terms are data/API intent, not report-buying — excluded.
-- **International, multi-day, bulk and API** all have no measurable search demand — excluded.
+- **International, multi-day, bulk, and API** have no measurable search demand — excluded.
 - **Separate per-peril landing pages** = doorway pages — excluded.
-- After the GEO research: **exact-match keywords are context signals, not ranking signals.** AI
-  (Perplexity, ChatGPT, Claude, Gemini) cites pages that *answer the question in quotable form*, not
-  pages that repeat a phrase. All hail-led title/meta/schema over-optimization was reverted; the site
-  copy is broad and honest again, and "hail" lives in the content as a topic.
+- **Exact-match keywords are context signals, not ranking signals.** AI (Perplexity, ChatGPT, Claude,
+  Gemini) cites pages that *answer the question in quotable form*. All hail-led title/meta/schema
+  over-optimization was reverted; the copy is broad and honest, and "hail" lives in the content as a topic.
 
-**Principle: answer the real questions in self-contained, quotable sentences. Topical coverage,
-clarity, and corroboration win — not keyword placement.**
-
----
-
-## Priority 1 — Corroboration (off-page) — the biggest lever, currently absent
-
-LLMs cite you because *other places mention you*. This is now the top priority and the one thing the
-plan has never addressed.
-
-1. **Get listed in the "best hail/weather report tools" roundups** the competitor research already
-   found (HailMate, roofingsoftwareguide.com, and similar). One honest comparison mention outweighs
-   ten keyword tweaks.
-2. **Be present where adjusters/homeowners/roofers talk**: r/Insurance, r/Roofing, r/homeowners —
-   honest answers under a real name, no astroturfing.
-3. **Reviews**: a Trustpilot (or equivalent) listing, once there are real customers.
-4. **Directory listings**: any weather/insurance/claims directories where AI actually looks for this
-   category.
-
-Measure by searching your key questions in Perplexity and ChatGPT and seeing whether "Weather
-Evidence" shows up — and where it appears, and where it doesn't.
+**Principle: answer the real questions in self-contained, quotable sentences — and classify content by
+the buyer's *case*, not by keyword.**
 
 ---
 
-## Priority 2 — Optimize the answer pages (on-page, quick wins)
+## Done — 2026-10-29
 
-These are the pages AI cites, and two already rank:
+1. **Reverted hail-led over-optimization** — `<title>`, meta description, and Product structured data are
+   back to broad wording ("Weather report by address…", "Weather Evidence report"). Syntax verified.
+2. **Certified page** (`/certified-weather-records`) — added the direct, quotable answer to
+   "certified weather report cost": *"about $180 for the first 40 pages… A Weather Evidence report is
+   $9.99 and is not certified"* (NCEI fee verified), plus a quotable-copy fix ("A Weather Evidence report"
+   instead of "Our report").
+3. **Three case guides added** to `content.py` (now 6 guides total), each written to the recipe below:
 
-- **`/certified-weather-records`** (already pos 8.3) — make the direct answer to *"certified weather
-  report cost"* its own line ("NCEI charges ~$180+; ours is not certified — here's the link"). One
-  quotable sentence, first.
-- **`/methodology`** — this is your credibility/proof page. Ensure it leads with a self-contained
-  "how it's built" summary that can be quoted as-is.
-- **`/compare`** — add **named competitors** (StormRecord, HailTrace, AtmosDays, Stormview). AI and
-  Perplexity love comparison tables; a neutral, sourced table is directly quotable.
+| Guide | Path | The hook |
+|---|---|---|
+| Did it hail at your address? | `/guides/hail-damage-claim` | "Steps 2–6 are yours with a camera; Step 1 (prove the storm) is what our report does in a minute." |
+| Lightning strike near your house? | `/guides/lightning-damage-claim` | "Check the public counts for $9.99 before you pay $95 for an exact strike report." |
+| How insurance companies verify weather claims | `/guides/how-insurers-verify-weather-claims` | "See what the adjuster sees, before they do." |
 
----
-
-## Priority 3 — Answer-block / quotable-copy pass (on-page, quick)
-
-The single highest-value GEO tweak the site doesn't yet do consistently:
-
-1. Add a **1–2 sentence answer block** under each page's H1 (homepage and guides) — a self-contained
-   "what this is" that survives being lifted out, no pronouns, every fact names its subject.
-2. **Audit copy for quotability**: each claim should stand alone when extracted. (The report PDF
-   already does this — "each reading names its station and distance" — the web copy should match.)
-
-The "What you get" question-headings and the FAQ are already correct; keep them.
+These are served automatically (routes + guides index + sitemap, since they're in `GUIDES`).
 
 ---
 
-## Priority 4 — Storm-event pages (unique data, later)
+## The case-guide recipe (the reusable pattern)
 
-**`/storms/{state}/{county}/{yyyy-mm-dd}`**, built only where NCEI/SPC records exist.
+Distilled from researching how the best guides in this space (ClaimClosed, LegalClarity, state DOI
+guides) actually convert:
 
-This survives because it's **unique, non-commodity data** ("did it hail in [county] on [date]?") —
-exactly the kind of first-hand content AI values and Google's scaled-content rules *don't* punish.
-Never every city × every date; "no records" pages are the risk. Each page: event list with
-times/sizes/gusts, nearest ASOS observations, map, preliminary-vs-final label, "check your address" CTA.
+1. **Short answer first** — the lede states the whole thing in two sentences.
+2. **Numbered, concrete steps** — real specifics (hail-size thresholds, the 10×10 chalk test square,
+   "check the soft metal first", hail-vs-wear table), so it genuinely helps someone do it themselves.
+3. **The report is the shortcut for exactly one step** — the weather-data step ("prove the storm") — never
+   a fake substitute for the whole process. This keeps it honest and legally safe.
+4. **Adapt the hook to the case's reality** — hail = the tedious distance-measuring step; lightning =
+   the $95-vs-$9.99 price check; insurer-verification = "see what they see".
+
+---
+
+## Remaining priorities
+
+### Priority 1 — Corroboration (off-page) — the biggest lever, still open
+
+LLMs cite you because *other places mention you*.
+
+1. Get listed in the "best hail/weather report tools" roundups (HailMate, roofingsoftwareguide.com).
+2. Be present where adjusters/homeowners/roofers talk: r/Insurance, r/Roofing, r/homeowners — honest
+   answers, no astroturfing.
+3. Reviews (Trustpilot or equivalent) once there are real customers.
+4. Directory listings where AI actually looks for this category.
+
+### Priority 2 — Storm-event pages (unique data, later)
+
+`/storms/{state}/{county}/{yyyy-mm-dd}`, built only where NCEI/SPC records exist — unique, non-commodity
+data ("did it hail in [county] on [date]?"). Never every city × every date.
+
+### Priority 3 — Measurement
+
+1. Search Console: striking distance in 2–4 weeks + the new **Generative AI performance report**.
+2. Manual AI-citation check (monthly): search the top questions in Perplexity/ChatGPT/Claude — is Weather
+   Evidence cited, where, and where not.
 
 ---
 
 ## Housekeeping (already done — don't redo)
 
-- **AI crawlers**: `robots.txt` uses `User-agent: *`, only `/admin`/`/api`/`/webhooks` blocked — AI
-  bots are allowed. ✅
+- **AI crawlers**: `robots.txt` uses `User-agent: *`, only `/admin`/`/api`/`/webhooks` blocked. ✅
 - **Server-side rendering**: FastAPI + Jinja2. ✅
-- **Structured data**: `Product`/`Offer`, `Organization`, `Article`, `BreadcrumbList` already present.
-  Housekeeping, not a lever — don't invest more.
-- **Legal wording**: "not certified records or expert opinions" — keep.
+- **Structured data**: `Product`/`Offer`, `Organization`, `Article`, `BreadcrumbList` present — housekeeping. ✅
+- **Legal wording**: "not certified records or expert opinions" — keep. ✅
 
 ---
 
-## Measurement
+## Deliberately removed / ruled out
 
-1. **Search Console**: re-check striking distance in 2–4 weeks; also watch the new **Generative AI
-   performance report** in Search Console for AI-overview impressions.
-2. **AI citation check** (manual, monthly): search your top questions in Perplexity, ChatGPT, and
-   Claude — is Weather Evidence cited? Which pages? What's missing?
-3. **Done when**: the homepage shows impressions for the hail/weather cluster, `/certified-weather-records`
-   holds top 5, and Weather Evidence starts appearing in AI answers for "weather report for insurance
-   claim" and "did it hail at my address".
+- Separate per-peril landing pages (`/hail-report`, `/wind-report`, `/lightning-report`) — doorway pages.
+- "Historical weather" informational terms — data/API intent, tagged `awareness` in OpenSEO.
+- Named-competitor comparison on the homepage — legal risk + zero-volume keywords; the generic
+  "Free / Weather Evidence / Forensic" table stays.
+- International, multi-day, bulk, API expansion — no measurable search demand.
