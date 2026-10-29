@@ -10,7 +10,7 @@ from . import BRAND, DOMAIN
 from .content import GUIDES, PAGES, Page
 from .legal import PATHS as LEGAL_PATHS, UPDATED as LEGAL_UPDATED
 
-SITE_UPDATED = date(2026, 10, 15)   # bump when the home or order page changes meaningfully
+SITE_UPDATED = date(2026, 10, 29)   # bump when the home or order page changes meaningfully
 
 
 def organization(base: str) -> dict:
