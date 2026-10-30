@@ -22,9 +22,13 @@ def main(argv: list[str] | None = None) -> int:
     c = sub.add_parser("check", help="Check the production settings: creem key and product, Resend, legal pages.")
     c.add_argument("--email-to", help="Also send a test email to this address through Resend.")
     sub.add_parser("backup", help="Copy the database to DATA_DIR/backups now (also runs daily inside the server).")
+    s = sub.add_parser("storms", help="Storm Reports data: first load, or refresh the last days now.")
+    s.add_argument("action", choices=["backfill", "refresh", "relink", "status"])
     a = ap.parse_args(argv)
     if a.cmd == "check":
         return check(a.email_to)
+    if a.cmd == "storms":
+        return storms_cmd(a.action)
     if a.cmd == "backup":
         from .housekeeping import backup_db
         from .store import Store
@@ -38,6 +42,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {e}", file=sys.stderr)
         return 2
     print(f"{rid}\n{path}")
+    return 0
+
+
+def storms_cmd(action: str) -> int:
+    from . import storms
+    db = storms.StormDB(config.load().data_dir / "storms.db")
+    if action == "backfill":
+        print(storms.backfill(db))
+    elif action == "refresh":
+        print(storms.refresh(db), "reports in the last 3 days")
+    elif action == "relink":
+        print(db.relink(), "report-city links")
+    live = storms.live_cities(db)
+    print(f"{db.count()} reports, NCEI through {db.get_meta('ncei_through')}, last sync {db.get_meta('synced')}")
+    print(f"{len(live)} city pages since {storms.PAGES_SINCE}: " +
+          ", ".join(sorted(storms.CITIES[g].label for g in live)))
     return 0
 
 

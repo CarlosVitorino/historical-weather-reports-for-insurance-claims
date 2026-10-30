@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 import re
 import secrets
 import shutil
+from collections import Counter
 from datetime import date, datetime, timezone
 from html import escape
 from pathlib import Path
@@ -18,8 +19,9 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Red
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, content, housekeeping, legal, payments, seo, site
+from . import config, content, housekeeping, legal, payments, seo, site, storm_pages, storms
 from .fulfil import Fulfiller, order_dir
+from .geo import distance_mi
 from .geocode import AddressNotFound, find, locate, where
 from .ratelimit import Limiter
 from .suggest import reverse, suggest
@@ -31,6 +33,7 @@ from .timewin import local_day
 PRIVATE_PATHS = ("/order/", "/orders/", "/admin", "/api/", "/webhooks/")   # never indexed
 EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 VISITOR_COOKIE = "vid"
+NO_STATS_COOKIE = "nostats"   # set by the "Don't count this browser" switch in /admin
 
 def page(title: str, body: str, refresh: int | None = None, map_assets: bool = False, url: str = "",
          index: bool = False, jsonld: list | None = None, description: str = "") -> HTMLResponse:
@@ -52,16 +55,20 @@ def _float(s: str | None) -> float | None:
 
 
 def create_app(cfg: config.Settings | None = None, store: Store | None = None,
-               limiter: Limiter | None = None) -> FastAPI:
+               limiter: Limiter | None = None, storm_db: "storms.StormDB | None" = None) -> FastAPI:
     cfg = cfg or config.load()
     store = store or Store(cfg.data_dir / "app.db")
     fulfiller = Fulfiller(cfg, store)
     limiter = limiter or Limiter()
+    storm_db = storm_db or storms.StormDB(cfg.data_dir / "storms.db")
+    site.configure_analytics(cfg.umami_website_id, cfg.base_url)
 
     @asynccontextmanager
     async def lifespan(_app):
         fulfiller.resume()   # orders interrupted by a restart
         housekeeping.start(cfg, store)   # stale drafts and the nightly database copy
+        if cfg.storm_sync:
+            storms.start(storm_db)   # Storm Reports: first load, then hourly Local Storm Reports, daily NCEI
         yield
 
     app = FastAPI(title=site.BRAND, docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
@@ -111,7 +118,10 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
         return o
 
     def log_view(request: Request, kind: str = "page_view") -> None:
-        """A visit, with where it came from: referrer host, utm_* tags, and the landing path for content pages."""
+        """A visit, with where it came from: referrer host, utm_* tags, and the landing path for content pages.
+        Browsers the owner excluded in /admin (cookie nostats=1) are not counted, here or in Umami."""
+        if request.cookies.get(NO_STATS_COOKIE) == "1":
+            return
         ref = request.headers.get("referer") or ""
         host = urlparse(ref).hostname or ""
         detail = {}
@@ -173,13 +183,126 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
     for path in legal.PAGES:
         app.add_api_route(path, legal_page, methods=["GET"], response_class=HTMLResponse)
 
+    # -- Storm Reports (docs/storm-reports-plan.md): index → state → city -----------------------
+    sr = storm_pages.SECTION
+    memo: dict = {}
+
+    def cached(key: str, build):
+        """Storm data changes only when the sync runs, so pages are worked out once per sync."""
+        stamp = storm_db.get_meta("synced")
+        hit = memo.get(key)
+        if hit is None or hit[0] != stamp:
+            hit = memo[key] = (stamp, build())
+        return hit[1]
+
+    def city_days(city: storms.City) -> list[dict]:
+        return cached(f"city:{city.geoid}", lambda: storms.storm_days(storm_db.city_reports(city.geoid), city.tz))
+
+    def live_cities() -> list[tuple[storms.City, list[dict]]]:
+        """Cities with a page and their storm days, most recently hit first."""
+        def build():
+            out = [(storms.CITIES[g], city_days(storms.CITIES[g])) for g in storms.live_cities(storm_db)]
+            return sorted(((c, d) for c, d in out if d), key=lambda x: (x[1][0]["day"], x[0].population),
+                          reverse=True)
+        return cached("live", build)
+
+    def storm_page_response(title, body, path, trail, description, index=True, map_assets=False):
+        return page(f"{title} — Storm Reports", body, url=f"{base}{path}", index=index, map_assets=map_assets,
+                    description=description, jsonld=[seo.breadcrumbs(base, trail)])
+
+    def storm_list(request: Request, state: str = ""):
+        """The index and the state pages: one filterable table. Only the unfiltered view is indexed."""
+        tq = storm_pages.TableQuery.parse(request.query_params)
+        cities = live_cities()
+        in_state = [(c, d) for c, d in cities if not state or c.state.lower() == state]
+        if state and not in_state:
+            raise HTTPException(404)
+        log_view(request)
+        synced = storm_db.get_meta("synced")
+        today = date.fromisoformat(synced[:10]) if synced else date.today()
+        states = sorted((st, name, n) for (st, name), n in Counter((c.state, c.state_name) for c, _ in cities).items())
+        path = f"{sr}/{state}" if state else sr
+        rows = storm_pages.table_rows(in_state, tq, today)
+        latest = {c.geoid: d[0]["day"] for c, d in in_state}
+        table = storm_pages.storm_table(path, tq, rows, [c for c, _ in in_state], latest, states, state)
+        trail = [("Home", "/"), ("Storm Reports", sr if state else None)]
+        if state:
+            name = in_state[0][0].state_name
+            trail.append((name, None))
+            heading, title = f"{name} hail storms by city", f"{name} hail storm history by city"
+            lede = (f"Every day with large hail, damaging wind or a tornado near "
+                    f"{storm_pages.join([c.name for c, _ in in_state])} since {storms.HISTORY_FROM}. Pick a row to "
+                    f"see the reports on a map.")
+            description = (f"Hail, wind and tornado reports near {storm_pages.join([c.name for c, _ in in_state])}, "
+                           f"{name}, since {storms.HISTORY_FROM}: dates, sizes and places.")
+        else:
+            heading, title = "Hail storms by city and date", "Hail storm history by city"
+            lede = ("When did hail or a tornado hit your city? Every storm day near the cities below, back to "
+                    f"{storms.HISTORY_FROM}, with hail sizes, wind speeds and the reports on a map.")
+            description = ("When did hail or a tornado hit your city? Dates, hail sizes and places of storm reports "
+                           f"near US cities since {storms.HISTORY_FROM}, from NWS and NOAA records.")
+        body = storm_pages.storm_index(path, heading, lede, [(n, p) for n, p in trail], table,
+                                       in_state[0][0].state_name if state else "")
+        crumbs = [(n, p or path) for n, p in trail]
+        return storm_page_response(title, body, path, crumbs, description, index=not tq.filtered)
+
+    @app.get(sr, response_class=HTMLResponse)
+    def storm_index(request: Request, state: str = ""):
+        if state:   # the filter form's state choice: the state page is the real URL
+            rest = {k: v for k, v in request.query_params.items() if k != "state" and v}
+            target = f"{sr}/{state.lower()}" + (f"?{urlencode(rest)}" if rest else "")
+            return RedirectResponse(target, status_code=303)
+        return storm_list(request)
+
+    @app.get(sr + "/{state}", response_class=HTMLResponse)
+    def storm_state(request: Request, state: str):
+        return storm_list(request, state)
+
+    @app.get(sr + "/{state}/{slug}", response_class=HTMLResponse)
+    def storm_city(request: Request, state: str, slug: str, day: str = ""):
+        live = dict((c.geoid, (c, d)) for c, d in live_cities())
+        city, days = next(((c, d) for c, d in live.values() if c.state.lower() == state and c.slug == slug),
+                          (None, None))
+        if city is None:   # not a city of 50,000+, or no qualifying storm yet: no page
+            raise HTTPException(404)
+        log_view(request)
+        others = [c for c, _ in live.values() if c.geoid != city.geoid]
+        nearby = sorted(others, key=lambda c: distance_mi(city.lat, city.lon, c.lat, c.lon))[:6]
+        # Other cities with a page that had a storm the same day within 60 miles: "Also hit that day".
+        also = {}
+        for c in nearby_within(city, others, 60):
+            for d in live[c.geoid][1]:
+                also.setdefault(d["day"], []).append(c)
+        # ?day= shows another storm day in the big view; same page, so it is canonical to the city and not indexed.
+        selected = next((d for d in days if d["day"].isoformat() == day), None) if day else days[0]
+        if selected is None:
+            return RedirectResponse(city.path, status_code=303)
+        body = storm_pages.city_page(city, days, selected, also, nearby, storm_db.get_meta("synced"))
+        return storm_page_response(
+            storm_pages.city_title(city, days), body, city.path,
+            [("Home", "/"), ("Storm Reports", sr), (city.state_name, f"{sr}/{state}"), (city.name, city.path)],
+            storm_pages.city_description(city, days),
+            index=storm_pages.city_indexable(len(days)) and not day, map_assets=True)
+
+    def nearby_within(city: storms.City, others: list[storms.City], miles: float) -> list[storms.City]:
+        return [c for c in others if distance_mi(city.lat, city.lon, c.lat, c.lon) <= miles]
+
+    def storm_sitemap() -> list[tuple[str, date]]:
+        cities = live_cities()
+        if not cities:
+            return []
+        synced = storm_db.get_meta("synced")
+        today = date.fromisoformat(synced[:10]) if synced else date.today()
+        return ([(sr, today)] + [(f"{sr}/{st.lower()}", today) for st in sorted({c.state for c, _ in cities})] +
+                [(c.path, d[0]["day"]) for c, d in cities if storm_pages.city_indexable(len(d))])
+
     @app.get("/robots.txt", response_class=PlainTextResponse)
     def robots():
         return seo.robots(base)
 
     @app.get("/sitemap.xml")
     def sitemap():
-        return Response(seo.sitemap(base), media_type="application/xml")
+        return Response(seo.sitemap(base, storm_sitemap()), media_type="application/xml")
 
     @app.post("/order", response_class=HTMLResponse)
     def order(request: Request, address: str = Form(""), loss_date: str = Form(""), email: str = Form(""),

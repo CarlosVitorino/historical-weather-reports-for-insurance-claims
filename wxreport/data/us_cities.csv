@@ -1,0 +1,818 @@
+geoid,name,slug,state,state_name,population,lat,lon,tz,centre,radius_mi
+0203000,Anchorage,anchorage,AK,Alaska,289600,61.21667,-149.89361,America/Anchorage,wikidata,20
+0137000,Huntsville,huntsville,AL,Alabama,230402,34.71361,-86.58611,America/Chicago,wikidata,10
+0150000,Mobile,mobile,AL,Alabama,201367,30.72767,-88.05267,America/Chicago,wikidata,9
+0107000,Birmingham,birmingham,AL,Alabama,196357,33.51750,-86.80944,America/Chicago,wikidata,9
+0151000,Montgomery,montgomery,AL,Alabama,195818,32.36750,-86.30000,America/Chicago,wikidata,9
+0177256,Tuscaloosa,tuscaloosa,AL,Alabama,114288,33.20667,-87.53472,America/Chicago,wikidata,8
+0135896,Hoover,hoover,AL,Alabama,93013,33.38611,-86.80556,America/Chicago,wikidata,8
+0103076,Auburn,auburn,AL,Alabama,83757,32.59768,-85.48082,America/Chicago,wikidata,8
+0121184,Dothan,dothan,AL,Alabama,71650,31.22722,-85.40722,America/Chicago,wikidata,8
+0145784,Madison,madison,AL,Alabama,64029,34.71507,-86.73964,America/Chicago,wikidata,8
+0120104,Decatur,decatur,AL,Alabama,57974,34.58099,-86.98339,America/Chicago,wikidata,8
+0541000,Little Rock,little-rock,AR,Arkansas,204774,34.74444,-92.28806,America/Chicago,wikidata,8
+0523290,Fayetteville,fayetteville,AR,Arkansas,103134,36.07639,-94.16083,America/Chicago,wikidata,8
+0524550,Fort Smith,fort-smith,AR,Arkansas,90507,35.35000,-94.36667,America/Chicago,wikidata,8
+0566080,Springdale,springdale,AR,Arkansas,89368,36.18139,-94.14583,America/Chicago,wikidata,8
+0535710,Jonesboro,jonesboro,AR,Arkansas,82384,35.83333,-90.70000,America/Chicago,wikidata,8
+0560410,Rogers,rogers,AR,Arkansas,75639,36.32944,-94.14139,America/Chicago,wikidata,8
+0515190,Conway,conway,AR,Arkansas,70711,35.08722,-92.45333,America/Chicago,wikidata,8
+0550450,North Little Rock,north-little-rock,AR,Arkansas,64498,34.77139,-92.26639,America/Chicago,wikidata,8
+0505320,Bentonville,bentonville,AR,Arkansas,61791,36.36667,-94.21333,America/Chicago,wikidata,8
+0455000,Phoenix,phoenix,AZ,Arizona,1673164,33.44833,-112.07389,America/Phoenix,wikidata,15
+0477000,Tucson,tucson,AZ,Arizona,554013,32.22167,-110.92639,America/Phoenix,wikidata,11
+0446000,Mesa,mesa,AZ,Arizona,517151,33.41500,-111.83139,America/Phoenix,wikidata,9
+0427400,Gilbert,gilbert,AZ,Arizona,288790,33.35000,-111.78917,America/Phoenix,wikidata,8
+0412000,Chandler,chandler,AZ,Arizona,281231,33.30333,-111.84139,America/Phoenix,wikidata,8
+0427820,Glendale,glendale,AZ,Arizona,258143,33.58333,-112.20000,America/Phoenix,wikidata,8
+0465000,Scottsdale,scottsdale,AZ,Arizona,246170,33.49306,-111.92611,America/Phoenix,wikidata,10
+0454050,Peoria,peoria,AZ,Arizona,199924,33.58250,-112.23861,America/Phoenix,wikidata,10
+0473000,Tempe,tempe,AZ,Arizona,190114,33.42556,-111.94000,America/Phoenix,wikidata,8
+0471510,Surprise,surprise,AZ,Arizona,167564,33.62919,-112.36780,America/Phoenix,wikidata,8
+0428380,Goodyear,goodyear,AZ,Arizona,118186,33.43532,-112.35821,America/Phoenix,wikidata,10
+0407940,Buckeye,buckeye,AZ,Arizona,114334,33.37056,-112.59083,America/Phoenix,wikidata,13
+0485540,Yuma,yuma,AZ,Arizona,103559,32.69222,-114.61528,America/Phoenix,wikidata,8
+0404720,Avondale,avondale,AZ,Arizona,96609,33.43361,-112.34972,America/Phoenix,wikidata,8
+0458150,Queen Creek,queen-creek,AZ,Arizona,83781,33.26306,-111.63472,America/Phoenix,wikidata,8
+0423620,Flagstaff,flagstaff,AZ,Arizona,77539,35.19917,-111.63111,America/Phoenix,wikidata,8
+0444410,Maricopa,maricopa,AZ,Arizona,76654,33.05667,-112.04667,America/Phoenix,wikidata,8
+0410530,Casa Grande,casa-grande,AZ,Arizona,68927,32.88583,-111.74389,America/Phoenix,wikidata,8
+0444270,Marana,marana,AZ,Arizona,62380,32.43667,-111.22528,America/Phoenix,wikidata,8
+0439370,Lake Havasu City,lake-havasu-city,AZ,Arizona,59037,34.49000,-114.30889,America/Phoenix,wikidata,8
+0457450,Prescott Valley,prescott-valley,AZ,Arizona,51440,34.60222,-112.32194,America/Phoenix,wikidata,8
+0644000,Los Angeles,los-angeles,CA,California,3878704,34.05223,-118.24368,America/Los_Angeles,wikidata,14
+0666000,San Diego,san-diego,CA,California,1404452,32.71500,-117.16250,America/Los_Angeles,wikidata,12
+0668000,San Jose,san-jose,CA,California,997368,37.30417,-121.87278,America/Los_Angeles,wikidata,10
+0667000,San Francisco,san-francisco,CA,California,827526,37.77500,-122.41944,America/Los_Angeles,wikidata,8
+0627000,Fresno,fresno,CA,California,550105,36.78167,-119.79222,America/Los_Angeles,wikidata,8
+0664000,Sacramento,sacramento,CA,California,535798,38.58111,-121.49389,America/Los_Angeles,wikidata,8
+0643000,Long Beach,long-beach,CA,California,450901,33.76806,-118.19556,America/Los_Angeles,wikidata,8
+0653000,Oakland,oakland,CA,California,443554,37.80000,-122.25000,America/Los_Angeles,wikidata,8
+0603526,Bakersfield,bakersfield,CA,California,417468,35.37333,-119.01889,America/Los_Angeles,wikidata,9
+0602000,Anaheim,anaheim,CA,California,344561,33.83611,-117.88972,America/Los_Angeles,wikidata,8
+0675000,Stockton,stockton,CA,California,324975,37.95750,-121.29250,America/Los_Angeles,wikidata,8
+0662000,Riverside,riverside,CA,California,323757,33.98222,-117.37250,America/Los_Angeles,wikidata,8
+0636770,Irvine,irvine,CA,California,318683,33.68417,-117.79250,America/Los_Angeles,wikidata,8
+0669000,Santa Ana,santa-ana,CA,California,316184,33.74083,-117.88139,America/Los_Angeles,wikidata,8
+0613392,Chula Vista,chula-vista,CA,California,278546,32.62778,-117.04806,America/Los_Angeles,wikidata,8
+0669088,Santa Clarita,santa-clarita,CA,California,229159,34.39166,-118.54259,America/Los_Angeles,wikidata,8
+0626000,Fremont,fremont,CA,California,228192,37.54861,-121.98833,America/Los_Angeles,wikidata,8
+0665000,San Bernardino,san-bernardino,CA,California,224775,34.10417,-117.29222,America/Los_Angeles,wikidata,8
+0648354,Modesto,modesto,CA,California,220592,37.66139,-120.99444,America/Los_Angeles,wikidata,8
+0624680,Fontana,fontana,CA,California,218455,34.10000,-117.46667,America/Los_Angeles,wikidata,8
+0649270,Moreno Valley,moreno-valley,CA,California,213919,33.94306,-117.22833,America/Los_Angeles,wikidata,8
+0654652,Oxnard,oxnard,CA,California,200616,34.19139,-119.18250,America/Los_Angeles,wikidata,8
+0636000,Huntington Beach,huntington-beach,CA,California,193151,33.69278,-117.99972,America/Los_Angeles,wikidata,8
+0630000,Glendale,glendale,CA,California,187823,34.17083,-118.25000,America/Los_Angeles,wikidata,8
+0653896,Ontario,ontario,CA,California,185285,34.05278,-117.62778,America/Los_Angeles,wikidata,8
+0622020,Elk Grove,elk-grove,CA,California,182797,38.43833,-121.38194,America/Los_Angeles,wikidata,8
+0670098,Santa Rosa,santa-rosa,CA,California,177524,38.44861,-122.70472,America/Los_Angeles,wikidata,8
+0659451,Rancho Cucamonga,rancho-cucamonga,CA,California,176675,34.12333,-117.57944,America/Los_Angeles,wikidata,8
+0629000,Garden Grove,garden-grove,CA,California,172361,33.77889,-117.96028,America/Los_Angeles,wikidata,8
+0653322,Oceanside,oceanside,CA,California,170941,33.21167,-117.32583,America/Los_Angeles,wikidata,8
+0640130,Lancaster,lancaster,CA,California,167426,34.68694,-118.15417,America/Los_Angeles,wikidata,8
+0662938,Roseville,roseville,CA,California,163304,38.75250,-121.28944,America/Los_Angeles,wikidata,8
+0655156,Palmdale,palmdale,CA,California,162536,34.57944,-118.11667,America/Los_Angeles,wikidata,8
+0616350,Corona,corona,CA,California,161540,33.86667,-117.56667,America/Los_Angeles,wikidata,8
+0664224,Salinas,salinas,CA,California,160783,36.67778,-121.65556,America/Los_Angeles,wikidata,8
+0633000,Hayward,hayward,CA,California,158440,37.66889,-122.08083,America/Los_Angeles,wikidata,8
+0677000,Sunnyvale,sunnyvale,CA,California,156792,37.36889,-122.03694,America/Los_Angeles,wikidata,8
+0622804,Escondido,escondido,CA,California,148847,33.12472,-117.08083,America/Los_Angeles,wikidata,8
+0658072,Pomona,pomona,CA,California,147966,34.06083,-117.75583,America/Los_Angeles,wikidata,8
+0682954,Visalia,visalia,CA,California,146271,36.33028,-119.29250,America/Los_Angeles,wikidata,8
+0682590,Victorville,victorville,CA,California,140721,34.53611,-117.28833,America/Los_Angeles,wikidata,8
+0628000,Fullerton,fullerton,CA,California,140054,33.88000,-117.92861,America/Los_Angeles,wikidata,8
+0680000,Torrance,torrance,CA,California,139576,33.83585,-118.34063,America/Los_Angeles,wikidata,8
+0653980,Orange,orange,CA,California,137941,33.80306,-117.83250,America/Los_Angeles,wikidata,8
+0656000,Pasadena,pasadena,CA,California,137195,34.14750,-118.14389,America/Los_Angeles,wikidata,8
+0669084,Santa Clara,santa-clara,CA,California,133132,37.35000,-121.96667,America/Los_Angeles,wikidata,8
+0614218,Clovis,clovis,CA,California,127993,36.82528,-119.70306,America/Los_Angeles,wikidata,8
+0672016,Simi Valley,simi-valley,CA,California,125778,34.27083,-118.73917,America/Los_Angeles,wikidata,8
+0678582,Thousand Oaks,thousand-oaks,CA,California,124229,34.18944,-118.87500,America/Los_Angeles,wikidata,8
+0616000,Concord,concord,CA,California,124016,37.97806,-122.03111,America/Los_Angeles,wikidata,8
+0681666,Vallejo,vallejo,CA,California,123475,38.10409,-122.25664,America/Los_Angeles,wikidata,8
+0623182,Fairfield,fairfield,CA,California,122646,38.25778,-122.05417,America/Los_Angeles,wikidata,8
+0606000,Berkeley,berkeley,CA,California,121749,37.87028,-122.26806,America/Los_Angeles,wikidata,8
+0602252,Antioch,antioch,CA,California,118453,38.00500,-121.80583,America/Los_Angeles,wikidata,8
+0646842,Menifee,menifee,CA,California,117041,33.67833,-117.16694,America/Los_Angeles,wikidata,8
+0660620,Richmond,richmond,CA,California,115353,37.93583,-122.34778,America/Los_Angeles,wikidata,8
+0611194,Carlsbad,carlsbad,CA,California,113575,33.15827,-117.35100,America/Los_Angeles,wikidata,8
+0650076,Murrieta,murrieta,CA,California,112539,33.56944,-117.20250,America/Los_Angeles,wikidata,8
+0678120,Temecula,temecula,CA,California,112431,33.50333,-117.12361,America/Los_Angeles,wikidata,8
+0669196,Santa Maria,santa-maria,CA,California,111346,34.95139,-120.43333,America/Los_Angeles,wikidata,8
+0665042,Ventura,ventura,CA,California,109831,34.26778,-119.25421,America/Los_Angeles,wikidata,8
+0619766,Downey,downey,CA,California,109368,33.93806,-118.13083,America/Los_Angeles,wikidata,8
+0616532,Costa Mesa,costa-mesa,CA,California,109131,33.67000,-117.91000,America/Los_Angeles,wikidata,8
+0637692,Jurupa Valley,jurupa-valley,CA,California,108154,33.99940,-117.47500,America/Los_Angeles,wikidata,8
+0684200,West Covina,west-covina,CA,California,106920,34.05667,-117.91861,America/Los_Angeles,wikidata,8
+0660466,Rialto,rialto,CA,California,104918,34.11139,-117.38250,America/Los_Angeles,wikidata,8
+0622230,El Monte,el-monte,CA,California,104639,34.07333,-118.02750,America/Los_Angeles,wikidata,8
+0681554,Vacaville,vacaville,CA,California,103994,38.35389,-121.97278,America/Los_Angeles,wikidata,8
+0608954,Burbank,burbank,CA,California,103533,34.18028,-118.32833,America/Los_Angeles,wikidata,8
+0621712,El Cajon,el-cajon,CA,California,103291,32.79833,-116.96000,America/Los_Angeles,wikidata,8
+0668252,San Mateo,san-mateo,CA,California,103006,37.55417,-122.31306,America/Los_Angeles,wikidata,8
+0613014,Chico,chico,CA,California,102911,39.74000,-121.83556,America/Los_Angeles,wikidata,8
+0636546,Inglewood,inglewood,CA,California,102774,33.95750,-118.34611,America/Los_Angeles,wikidata,8
+0633434,Hesperia,hesperia,CA,California,101836,34.41278,-117.30611,America/Los_Angeles,wikidata,8
+0617918,Daly City,daly-city,CA,California,101418,37.68639,-122.46833,America/Los_Angeles,wikidata,8
+0680238,Tracy,tracy,CA,California,100136,37.73806,-121.43389,America/Los_Angeles,wikidata,8
+0682996,Vista,vista,CA,California,99322,33.19361,-117.24111,America/Los_Angeles,wikidata,8
+0652526,Norwalk,norwalk,CA,California,98230,33.90694,-118.08333,America/Los_Angeles,wikidata,8
+0668196,San Marcos,san-marcos,CA,California,96620,33.14194,-117.17028,America/Los_Angeles,wikidata,8
+0646898,Merced,merced,CA,California,96073,37.30222,-120.48306,America/Los_Angeles,wikidata,8
+0645484,Manteca,manteca,CA,California,94292,37.80278,-121.22083,America/Los_Angeles,wikidata,8
+0636448,Indio,indio,CA,California,94275,33.72000,-116.23194,America/Los_Angeles,wikidata,8
+0613210,Chino,chino,CA,California,94010,34.01778,-117.69000,America/Los_Angeles,wikidata,8
+0659920,Redding,redding,CA,California,93502,40.58639,-122.39167,America/Los_Angeles,wikidata,8
+0633182,Hemet,hemet,CA,California,92912,33.74194,-116.98306,America/Los_Angeles,wikidata,8
+0648256,Mission Viejo,mission-viejo,CA,California,91601,33.61278,-117.65611,America/Los_Angeles,wikidata,8
+0611530,Carson,carson,CA,California,91358,33.83972,-118.25972,America/Los_Angeles,wikidata,8
+0615044,Compton,compton,CA,California,91129,33.89667,-118.22500,America/Los_Angeles,wikidata,8
+0673080,South Gate,south-gate,CA,California,90805,33.94417,-118.19500,America/Los_Angeles,wikidata,8
+0670000,Santa Monica,santa-monica,CA,California,90729,34.02194,-118.48139,America/Los_Angeles,wikidata,8
+0684550,Westminster,westminster,CA,California,89537,33.75139,-117.99389,America/Los_Angeles,wikidata,8
+0624638,Folsom,folsom,CA,California,88091,38.67222,-121.15778,America/Los_Angeles,wikidata,8
+0649670,Mountain View,mountain-view,CA,California,87316,37.39278,-122.04194,America/Los_Angeles,wikidata,8
+0669070,Santa Barbara,santa-barbara,CA,California,87291,34.42583,-119.71417,America/Los_Angeles,wikidata,8
+0639496,Lake Forest,lake-forest,CA,California,87159,33.64167,-117.69083,America/Los_Angeles,wikidata,8
+0613588,Citrus Heights,citrus-heights,CA,California,86909,38.69000,-121.29000,America/Los_Angeles,wikidata,8
+0668084,San Leandro,san-leandro,CA,California,86571,37.72500,-122.15611,America/Los_Angeles,wikidata,8
+0668378,San Ramon,san-ramon,CA,California,85924,37.78000,-121.97806,America/Los_Angeles,wikidata,8
+0685292,Whittier,whittier,CA,California,85589,33.96556,-118.02444,America/Los_Angeles,wikidata,8
+0641992,Livermore,livermore,CA,California,84867,37.68556,-121.76417,America/Los_Angeles,wikidata,8
+0659444,Rancho Cordova,rancho-cordova,CA,California,84113,38.58917,-121.30278,America/Los_Angeles,wikidata,8
+0632548,Hawthorne,hawthorne,CA,California,83633,33.91721,-118.34861,America/Los_Angeles,wikidata,8
+0656700,Perris,perris,CA,California,83032,33.78250,-117.22861,America/Los_Angeles,wikidata,8
+0660102,Redwood City,redwood-city,CA,California,82982,37.48278,-122.23611,America/Los_Angeles,wikidata,8
+0651182,Newport Beach,newport-beach,CA,California,82970,33.61667,-117.89750,America/Los_Angeles,wikidata,8
+0608786,Buena Park,buena-park,CA,California,82611,33.85611,-118.00417,America/Los_Angeles,wikidata,8
+0600884,Alhambra,alhambra,CA,California,80279,34.08194,-118.13500,America/Los_Angeles,wikidata,8
+0647766,Milpitas,milpitas,CA,California,79746,37.43472,-121.89500,America/Los_Angeles,wikidata,8
+0681344,Upland,upland,CA,California,79684,34.09990,-117.64700,America/Los_Angeles,wikidata,8
+0680854,Tustin,tustin,CA,California,78863,33.73972,-117.81361,America/Los_Angeles,wikidata,8
+0600562,Alameda,alameda,CA,California,78795,37.76389,-122.25694,America/Los_Angeles,wikidata,8
+0639892,Lakewood,lakewood,CA,California,78494,33.84750,-118.12000,America/Los_Angeles,wikidata,8
+0613214,Chino Hills,chino-hills,CA,California,77418,33.97000,-117.75000,America/Los_Angeles,wikidata,8
+0657456,Pittsburg,pittsburg,CA,California,77131,38.02806,-121.88472,America/Los_Angeles,wikidata,8
+0650258,Napa,napa,CA,California,76921,38.30000,-122.30000,America/Los_Angeles,wikidata,8
+0604982,Bellflower,bellflower,CA,California,75716,33.88806,-118.12750,America/Los_Angeles,wikidata,8
+0657792,Pleasanton,pleasanton,CA,California,75664,37.67250,-121.88250,America/Los_Angeles,wikidata,8
+0662364,Rocklin,rocklin,CA,California,75129,38.80000,-121.24667,America/Los_Angeles,wikidata,8
+0602364,Apple Valley,apple-valley,CA,California,75029,34.51667,-117.21667,America/Los_Angeles,wikidata,8
+0659962,Redlands,redlands,CA,California,74279,34.05472,-117.18250,America/Los_Angeles,wikidata,8
+0639486,Lake Elsinore,lake-elsinore,CA,California,73595,33.68139,-117.34528,America/Los_Angeles,wikidata,8
+0680812,Turlock,turlock,CA,California,72888,37.50583,-120.84889,America/Los_Angeles,wikidata,8
+0680644,Tulare,tulare,CA,California,72601,36.20667,-119.34250,America/Los_Angeles,wikidata,8
+0683346,Walnut Creek,walnut-creek,CA,California,70817,37.90631,-122.06496,America/Los_Angeles,wikidata,8
+0621230,Eastvale,eastvale,CA,California,70751,33.96306,-117.56389,America/Los_Angeles,wikidata,8
+0620018,Dublin,dublin,CA,California,70544,37.71417,-121.91250,America/Los_Angeles,wikidata,8
+0610046,Camarillo,camarillo,CA,California,69881,34.22556,-119.03222,America/Los_Angeles,wikidata,8
+0603666,Baldwin Park,baldwin-park,CA,California,69247,34.08278,-117.97111,America/Los_Angeles,wikidata,8
+0686972,Yuba City,yuba-city,CA,California,69148,39.13472,-121.62611,America/Los_Angeles,wikidata,8
+0645022,Madera,madera,CA,California,69094,36.96139,-120.06083,America/Los_Angeles,wikidata,8
+0642202,Lodi,lodi,CA,California,68642,38.12889,-121.28083,America/Los_Angeles,wikidata,8
+0660018,Redondo Beach,redondo-beach,CA,California,68075,33.85639,-118.37694,America/Los_Angeles,wikidata,8
+0655282,Palo Alto,palo-alto,CA,California,67658,37.44444,-122.16000,America/Los_Angeles,wikidata,8
+0618100,Davis,davis,CA,California,67125,38.55389,-121.73806,America/Los_Angeles,wikidata,8
+0686832,Yorba Linda,yorba-linda,CA,California,66489,33.88855,-117.81323,America/Los_Angeles,wikidata,8
+0608142,Brentwood,brentwood,CA,California,66286,37.93194,-121.69583,America/Los_Angeles,wikidata,8
+0681204,Union City,union-city,CA,California,66196,37.59639,-122.04833,America/Los_Angeles,wikidata,8
+0673262,South San Francisco,south-san-francisco,CA,California,64660,37.65611,-122.42556,America/Los_Angeles,wikidata,8
+0639248,Laguna Niguel,laguna-niguel,CA,California,64185,33.53194,-117.70250,America/Los_Angeles,wikidata,8
+0644574,Lynwood,lynwood,CA,California,63596,33.92472,-118.20194,America/Los_Angeles,wikidata,8
+0658240,Porterville,porterville,CA,California,63517,36.06861,-119.02750,America/Los_Angeles,wikidata,8
+0686328,Woodland,woodland,CA,California,62983,38.67861,-121.77333,America/Los_Angeles,wikidata,8
+0665084,San Clemente,san-clemente,CA,California,62627,33.43778,-117.62028,America/Los_Angeles,wikidata,8
+0669112,Santa Cruz,santa-cruz,CA,California,62581,36.97205,-122.02625,America/Los_Angeles,wikidata,8
+0639290,La Habra,la-habra,CA,California,61391,33.93194,-117.94611,America/Los_Angeles,wikidata,8
+0622678,Encinitas,encinitas,CA,California,61137,33.04444,-117.27167,America/Los_Angeles,wikidata,8
+0640004,La Mesa,la-mesa,CA,California,60767,32.77139,-117.02278,America/Los_Angeles,wikidata,8
+0648816,Montebello,montebello,CA,California,60617,34.01544,-118.11079,America/Los_Angeles,wikidata,8
+0631960,Hanford,hanford,CA,California,60594,36.32750,-119.64556,America/Los_Angeles,wikidata,8
+0629504,Gilroy,gilroy,CA,California,60390,37.01194,-121.58000,America/Los_Angeles,wikidata,8
+0668364,San Rafael,san-rafael,CA,California,59961,37.97333,-122.53083,America/Los_Angeles,wikidata,8
+0604758,Beaumont,beaumont,CA,California,59502,33.92417,-116.97361,America/Los_Angeles,wikidata,8
+0656784,Petaluma,petaluma,CA,California,59393,38.24583,-122.63139,America/Los_Angeles,wikidata,8
+0656924,Pico Rivera,pico-rivera,CA,California,59363,33.98889,-118.08917,America/Los_Angeles,wikidata,8
+0670224,Santee,santee,CA,California,59104,32.86972,-116.97111,America/Los_Angeles,wikidata,8
+0628168,Gardena,gardena,CA,California,58921,33.89361,-118.30778,America/Los_Angeles,wikidata,8
+0617610,Cupertino,cupertino,CA,California,58710,37.31750,-122.04194,America/Los_Angeles,wikidata,8
+0650398,National City,national-city,CA,California,58460,32.67806,-117.09917,America/Los_Angeles,wikidata,8
+0648914,Monterey Park,monterey-park,CA,California,57996,34.04917,-118.13556,America/Los_Angeles,wikidata,8
+0633588,Highland,highland,CA,California,56499,34.11833,-117.20250,America/Los_Angeles,wikidata,8
+0641474,Lincoln,lincoln,CA,California,56268,38.88722,-121.29611,America/Los_Angeles,wikidata,8
+0625380,Fountain Valley,fountain-valley,CA,California,56036,33.70862,-117.95629,America/Los_Angeles,wikidata,8
+0684816,West Sacramento,west-sacramento,CA,California,55991,38.57111,-121.53917,America/Los_Angeles,wikidata,8
+0667112,San Jacinto,san-jacinto,CA,California,55515,33.78722,-116.96667,America/Los_Angeles,wikidata,8
+0602462,Arcadia,arcadia,CA,California,54472,34.13278,-118.03639,America/Los_Angeles,wikidata,8
+0687042,Yucaipa,yucaipa,CA,California,54465,34.03028,-117.04861,America/Los_Angeles,wikidata,8
+0614890,Colton,colton,CA,California,53528,34.07389,-117.31361,America/Los_Angeles,wikidata,8
+0657526,Placentia,placentia,CA,California,53395,33.88250,-117.85500,America/Los_Angeles,wikidata,8
+0618394,Delano,delano,CA,California,53198,35.76889,-119.24694,America/Los_Angeles,wikidata,8
+0655184,Palm Desert,palm-desert,CA,California,53147,33.72556,-116.36944,America/Los_Angeles,wikidata,8
+0612048,Cathedral City,cathedral-city,CA,California,52517,33.80778,-116.46472,America/Los_Angeles,wikidata,8
+0652582,Novato,novato,CA,California,52311,38.10750,-122.56972,America/Los_Angeles,wikidata,8
+0619192,Diamond Bar,diamond-bar,CA,California,52292,34.00167,-117.82083,America/Los_Angeles,wikidata,8
+0636056,Huntington Park,huntington-park,CA,California,52166,33.98250,-118.21750,America/Los_Angeles,wikidata,8
+0683668,Watsonville,watsonville,CA,California,51320,36.92000,-121.76361,America/Los_Angeles,wikidata,8
+0655618,Paramount,paramount,CA,California,51169,33.90000,-118.16667,America/Los_Angeles,wikidata,8
+0600947,Aliso Viejo,aliso-viejo,CA,California,50457,33.61619,-117.74443,America/Los_Angeles,wikidata,8
+0630014,Glendora,glendora,CA,California,50101,34.13083,-117.85417,America/Los_Angeles,wikidata,8
+0820000,Denver,denver,CO,Colorado,729019,39.73917,-104.98472,America/Denver,wikidata,9
+0816000,Colorado Springs,colorado-springs,CO,Colorado,493554,38.86333,-104.79194,America/Denver,wikidata,10
+0804000,Aurora,aurora,CO,Colorado,403130,39.71083,-104.81250,America/Denver,wikidata,9
+0827425,Fort Collins,fort-collins,CO,Colorado,170924,40.56667,-105.08333,America/Denver,wikidata,8
+0843000,Lakewood,lakewood,CO,Colorado,156868,39.70639,-105.10278,America/Denver,wikidata,8
+0877290,Thornton,thornton,CO,Colorado,146689,39.90310,-104.95400,America/Denver,wikidata,8
+0803455,Arvada,arvada,CO,Colorado,121873,39.80276,-105.08748,America/Denver,wikidata,8
+0883835,Westminster,westminster,CO,Colorado,115302,39.83611,-105.03722,America/Denver,wikidata,8
+0832155,Greeley,greeley,CO,Colorado,114363,40.41667,-104.70000,America/Denver,wikidata,8
+0862000,Pueblo,pueblo,CO,Colorado,111166,38.26694,-104.62028,America/Denver,wikidata,8
+0812815,Centennial,centennial,CO,Colorado,108853,39.59639,-104.84389,America/Denver,wikidata,8
+0807850,Boulder,boulder,CO,Colorado,106803,40.01944,-105.29278,America/Denver,wikidata,8
+0845970,Longmont,longmont,CO,Colorado,99818,40.17167,-105.10917,America/Denver,wikidata,8
+0812415,Castle Rock,castle-rock,CO,Colorado,83213,39.37220,-104.85600,America/Denver,wikidata,8
+0846465,Loveland,loveland,CO,Colorado,81102,40.40470,-105.08600,America/Denver,wikidata,8
+0809280,Broomfield,broomfield,CO,Colorado,78323,39.93333,-105.05000,America/Denver,wikidata,8
+0831660,Grand Junction,grand-junction,CO,Colorado,70554,39.06670,-108.56700,America/Denver,wikidata,8
+0816495,Commerce City,commerce-city,CO,Colorado,70245,39.84083,-104.90111,America/Denver,wikidata,8
+0857630,Parker,parker,CO,Colorado,65473,39.51940,-104.76600,America/Denver,wikidata,8
+0908000,Bridgeport,bridgeport,CT,Connecticut,151599,41.18333,-73.20000,America/New_York,wikidata,8
+0973000,Stamford,stamford,CT,Connecticut,139134,41.09667,-73.55222,America/New_York,wikidata,8
+0952000,New Haven,new-haven,CT,Connecticut,137562,41.30833,-72.92500,America/New_York,wikidata,8
+0937000,Hartford,hartford,CT,Connecticut,122129,41.76333,-72.68500,America/New_York,wikidata,8
+0980000,Waterbury,waterbury,CT,Connecticut,115908,41.55833,-73.03694,America/New_York,wikidata,8
+0955990,Norwalk,norwalk,CT,Connecticut,93661,41.09389,-73.41972,America/New_York,wikidata,8
+0918430,Danbury,danbury,CT,Connecticut,88692,41.40222,-73.47111,America/New_York,wikidata,8
+0950370,New Britain,new-britain,CT,Connecticut,75871,41.67500,-72.78722,America/New_York,wikidata,8
+0908420,Bristol,bristol,CT,Connecticut,62195,41.68111,-72.94056,America/New_York,wikidata,8
+0946450,Meriden,meriden,CT,Connecticut,60849,41.53667,-72.79472,America/New_York,wikidata,8
+0982800,West Haven,west-haven,CT,Connecticut,55379,41.27389,-72.96778,America/New_York,wikidata,8
+0947515,Milford,milford,CT,Connecticut,51004,41.22361,-73.06167,America/New_York,wikidata,8
+1150000,Washington,washington,DC,District of Columbia,702250,38.89500,-77.03667,America/New_York,wikidata,8
+1077580,Wilmington,wilmington,DE,Delaware,73176,39.74833,-75.55139,America/New_York,wikidata,8
+1235000,Jacksonville,jacksonville,FL,Florida,1009833,30.31667,-81.65000,America/New_York,wikidata,17
+1245000,Miami,miami,FL,Florida,487014,25.77417,-80.19361,America/New_York,wikidata,8
+1271000,Tampa,tampa,FL,Florida,414547,27.94750,-82.45861,America/New_York,wikidata,8
+1253000,Orlando,orlando,FL,Florida,334854,28.53361,-81.38667,America/New_York,wikidata,8
+1263000,St. Petersburg,st-petersburg,FL,Florida,267102,27.77306,-82.64000,America/New_York,wikidata,8
+1258715,Port St. Lucie,port-st-lucie,FL,Florida,258575,27.27583,-80.35500,America/New_York,wikidata,8
+1230000,Hialeah,hialeah,FL,Florida,235388,25.86056,-80.29389,America/New_York,wikidata,8
+1210275,Cape Coral,cape-coral,FL,Florida,233025,26.63333,-81.98333,America/New_York,wikidata,8
+1270600,Tallahassee,tallahassee,FL,Florida,205089,30.43833,-84.28056,America/New_York,wikidata,8
+1224000,Fort Lauderdale,fort-lauderdale,FL,Florida,190641,26.13583,-80.14194,America/New_York,wikidata,8
+1255775,Pembroke Pines,pembroke-pines,FL,Florida,179326,26.01250,-80.31361,America/New_York,wikidata,8
+1232000,Hollywood,hollywood,FL,Florida,159073,26.02139,-80.17500,America/New_York,wikidata,8
+1225175,Gainesville,gainesville,FL,Florida,148720,29.66528,-82.33611,America/New_York,wikidata,8
+1245975,Miramar,miramar,FL,Florida,143242,25.97889,-80.28250,America/New_York,wikidata,8
+1254000,Palm Bay,palm-bay,FL,Florida,142023,27.99792,-80.67001,America/New_York,wikidata,8
+1214400,Coral Springs,coral-springs,FL,Florida,140808,26.27056,-80.25917,America/New_York,wikidata,8
+1276600,West Palm Beach,west-palm-beach,FL,Florida,127744,26.70972,-80.06417,America/New_York,wikidata,8
+1238250,Lakeland,lakeland,FL,Florida,124990,28.04111,-81.95889,America/New_York,wikidata,8
+1258050,Pompano Beach,pompano-beach,FL,Florida,118104,26.23472,-80.12556,America/New_York,wikidata,8
+1212875,Clearwater,clearwater,FL,Florida,116811,27.96556,-82.80000,America/New_York,wikidata,8
+1245060,Miami Gardens,miami-gardens,FL,Florida,116173,25.94194,-80.24556,America/New_York,wikidata,8
+1216475,Davie,davie,FL,Florida,112052,26.08139,-80.28028,America/New_York,wikidata,8
+1254200,Palm Coast,palm-coast,FL,Florida,106729,29.53806,-81.22333,America/New_York,wikidata,8
+1207300,Boca Raton,boca-raton,FL,Florida,102238,26.36861,-80.10000,America/New_York,wikidata,8
+1257425,Plantation,plantation,FL,Florida,100694,26.12444,-80.24944,America/New_York,wikidata,8
+1217200,Deltona,deltona,FL,Florida,100513,28.90500,-81.21111,America/New_York,wikidata,8
+1269700,Sunrise,sunrise,FL,Florida,100128,26.15722,-80.28611,America/New_York,wikidata,8
+1224125,Fort Myers,fort-myers,FL,Florida,99918,26.61667,-81.83333,America/New_York,wikidata,8
+1249675,North Port,north-port,FL,Florida,92875,27.06611,-82.17194,America/New_York,wikidata,8
+1216725,Deerfield Beach,deerfield-beach,FL,Florida,90507,26.31806,-80.09972,America/New_York,wikidata,8
+1243975,Melbourne,melbourne,FL,Florida,87561,28.08363,-80.60811,America/New_York,wikidata,8
+1216525,Daytona Beach,daytona-beach,FL,Florida,86015,29.21083,-81.02278,America/New_York,wikidata,8
+1232275,Homestead,homestead,FL,Florida,85796,25.46872,-80.47756,America/New_York,wikidata,8
+1236950,Kissimmee,kissimmee,FL,Florida,84756,28.30389,-81.41278,America/New_York,wikidata,8
+1217935,Doral,doral,FL,Florida,83625,25.80814,-80.35332,America/New_York,wikidata,8
+1245025,Miami Beach,miami-beach,FL,Florida,83251,25.81389,-80.13250,America/New_York,wikidata,8
+1207875,Boynton Beach,boynton-beach,FL,Florida,83095,26.52806,-80.07639,America/New_York,wikidata,8
+1239425,Largo,largo,FL,Florida,82337,27.90917,-82.78750,America/New_York,wikidata,8
+1239550,Lauderhill,lauderhill,FL,Florida,76627,26.16556,-80.23250,America/New_York,wikidata,8
+1270675,Tamarac,tamarac,FL,Florida,75147,26.21250,-80.25000,America/New_York,wikidata,8
+1262625,St. Cloud,st-cloud,FL,Florida,71036,28.24667,-81.28750,America/New_York,wikidata,8
+1276582,Weston,weston,FL,Florida,70674,26.10750,-80.38806,America/New_York,wikidata,8
+1250750,Ocala,ocala,FL,Florida,70251,29.18750,-82.14139,America/New_York,wikidata,8
+1217100,Delray Beach,delray-beach,FL,Florida,70140,26.45917,-80.08306,America/New_York,wikidata,8
+1263650,Sanford,sanford,FL,Florida,66919,28.78944,-81.27556,America/New_York,wikidata,8
+1258575,Port Orange,port-orange,FL,Florida,66556,29.11889,-81.00278,America/New_York,wikidata,8
+1254075,Palm Beach Gardens,palm-beach-gardens,FL,Florida,63284,26.84879,-80.16712,America/New_York,wikidata,8
+1275812,Wellington,wellington,FL,Florida,63258,26.65500,-80.25417,America/New_York,wikidata,8
+1235875,Jupiter,jupiter,FL,Florida,62987,26.92611,-80.10500,America/New_York,wikidata,8
+1201700,Apopka,apopka,FL,Florida,62777,28.67611,-81.51056,America/New_York,wikidata,8
+1249450,North Miami,north-miami,FL,Florida,62202,25.89502,-80.18575,America/New_York,wikidata,8
+1243125,Margate,margate,FL,Florida,60650,26.24639,-80.21222,America/New_York,wikidata,8
+1278275,Winter Haven,winter-haven,FL,Florida,59975,28.03333,-81.71667,America/New_York,wikidata,8
+1213275,Coconut Creek,coconut-creek,FL,Florida,59721,26.27500,-80.18472,America/New_York,wikidata,8
+1207950,Bradenton,bradenton,FL,Florida,58184,27.48333,-82.58333,America/New_York,wikidata,8
+1264175,Sarasota,sarasota,FL,Florida,57764,27.33722,-82.53528,America/New_York,wikidata,8
+1207525,Bonita Springs,bonita-springs,FL,Florida,57112,26.34972,-81.79083,America/New_York,wikidata,8
+1255925,Pensacola,pensacola,FL,Florida,53898,30.42139,-87.21722,America/Chicago,wikidata,8
+1256975,Pinellas Park,pinellas-park,FL,Florida,53503,27.85222,-82.70722,America/New_York,wikidata,8
+1251075,Ocoee,ocoee,FL,Florida,51269,28.57417,-81.53056,America/New_York,wikidata,8
+1212925,Clermont,clermont,FL,Florida,50851,28.54750,-81.74944,America/New_York,wikidata,8
+1224300,Fort Pierce,fort-pierce,FL,Florida,50805,27.43889,-80.33556,America/New_York,wikidata,8
+1214250,Coral Gables,coral-gables,FL,Florida,50379,25.75000,-80.27111,America/New_York,wikidata,8
+1304000,Atlanta,atlanta,GA,Georgia,520070,33.75444,-84.38972,America/New_York,wikidata,9
+1319000,Columbus,columbus,GA,Georgia,201830,32.49222,-84.94028,America/New_York,wikidata,10
+1304204,Augusta,augusta,GA,Georgia,201737,33.36444,-82.07083,America/New_York,wikidata,12
+1349008,Macon,macon,GA,Georgia,157056,32.80899,-83.69406,America/New_York,census,11
+1369000,Savannah,savannah,GA,Georgia,148808,32.05083,-81.10389,America/New_York,wikidata,8
+1303440,Athens,athens,GA,Georgia,128691,33.95083,-83.36889,America/New_York,wikidata,8
+1372122,South Fulton,south-fulton,GA,Georgia,112003,33.60148,-84.55052,America/New_York,wikidata,8
+1368516,Sandy Springs,sandy-springs,GA,Georgia,105505,33.93750,-84.36861,America/New_York,wikidata,8
+1367284,Roswell,roswell,GA,Georgia,92227,34.03390,-84.34420,America/New_York,wikidata,8
+1380508,Warner Robins,warner-robins,GA,Georgia,86199,32.60860,-83.63810,America/New_York,wikidata,8
+1342425,Johns Creek,johns-creek,GA,Georgia,81167,34.02890,-84.19860,America/New_York,wikidata,8
+1348288,Mableton,mableton,GA,Georgia,78314,33.81833,-84.57611,America/New_York,wikidata,8
+1301696,Alpharetta,alpharetta,GA,Georgia,67275,34.07333,-84.28111,America/New_York,wikidata,8
+1301052,Albany,albany,GA,Georgia,66705,31.58222,-84.16556,America/New_York,wikidata,8
+1349756,Marietta,marietta,GA,Georgia,63122,33.95333,-84.54056,America/New_York,wikidata,8
+1373784,Stonecrest,stonecrest,GA,Georgia,61015,33.70111,-84.17194,America/New_York,wikidata,8
+1310944,Brookhaven,brookhaven,GA,Georgia,59370,33.85920,-84.33890,America/New_York,wikidata,8
+1371492,Smyrna,smyrna,GA,Georgia,57177,33.87190,-84.51830,America/New_York,wikidata,8
+1378800,Valdosta,valdosta,GA,Georgia,55667,30.84667,-83.28306,America/New_York,wikidata,8
+1324768,Dunwoody,dunwoody,GA,Georgia,51795,33.94280,-84.31780,America/New_York,wikidata,8
+1571550,Honolulu,honolulu,HI,Hawaii,344967,21.33110,-157.84300,Pacific/Honolulu,wikidata,8
+1921000,Des Moines,des-moines,IA,Iowa,213096,41.59083,-93.62083,America/Chicago,wikidata,8
+1912000,Cedar Rapids,cedar-rapids,IA,Iowa,137904,41.98333,-91.66861,America/Chicago,wikidata,8
+1919000,Davenport,davenport,IA,Iowa,100938,41.54306,-90.59083,America/Chicago,wikidata,8
+1973335,Sioux City,sioux-city,IA,Iowa,86875,42.49806,-96.39556,America/Chicago,wikidata,8
+1902305,Ankeny,ankeny,IA,Iowa,76727,41.72667,-93.60417,America/Chicago,wikidata,8
+1938595,Iowa City,iowa-city,IA,Iowa,76710,41.65583,-91.52500,America/Chicago,wikidata,8
+1983910,West Des Moines,west-des-moines,IA,Iowa,73664,41.57500,-93.70920,America/Chicago,wikidata,8
+1901855,Ames,ames,IA,Iowa,69026,42.02734,-93.63159,America/Chicago,wikidata,8
+1982425,Waterloo,waterloo,IA,Iowa,67477,42.49244,-92.34616,America/Chicago,wikidata,8
+1916860,Council Bluffs,council-bluffs,IA,Iowa,62665,41.25300,-95.86200,America/Chicago,wikidata,8
+1922395,Dubuque,dubuque,IA,Iowa,58987,42.50432,-90.68686,America/Chicago,wikidata,8
+1608830,Boise,boise,ID,Idaho,237963,43.61361,-116.23778,America/Boise,wikidata,8
+1652120,Meridian,meridian,ID,Idaho,139740,43.61417,-116.39889,America/Boise,wikidata,8
+1656260,Nampa,nampa,ID,Idaho,117350,43.57472,-116.56361,America/Boise,wikidata,8
+1612250,Caldwell,caldwell,ID,Idaho,73088,43.65833,-116.68028,America/Boise,wikidata,8
+1639700,Idaho Falls,idaho-falls,ID,Idaho,69523,43.49167,-112.03250,America/Boise,wikidata,8
+1664090,Pocatello,pocatello,ID,Idaho,58231,42.86222,-112.45056,America/Boise,wikidata,8
+1616750,Coeur d'Alene,coeur-dalene,ID,Idaho,57355,47.69278,-116.78000,America/Los_Angeles,wikidata,8
+1682810,Twin Falls,twin-falls,ID,Idaho,55589,42.57806,-114.47500,America/Boise,wikidata,8
+1714000,Chicago,chicago,IL,Illinois,2721308,41.88194,-87.62778,America/Chicago,wikidata,11
+1703012,Aurora,aurora,IL,Illinois,180710,41.76000,-88.29861,America/Chicago,wikidata,8
+1751622,Naperville,naperville,IL,Illinois,153124,41.74826,-88.16585,America/Chicago,wikidata,8
+1738570,Joliet,joliet,IL,Illinois,151837,41.52519,-88.08340,America/Chicago,wikidata,8
+1765000,Rockford,rockford,IL,Illinois,147486,42.27113,-89.09400,America/Chicago,wikidata,8
+1723074,Elgin,elgin,IL,Illinois,114701,42.03725,-88.28119,America/Chicago,wikidata,8
+1772000,Springfield,springfield,IL,Illinois,112949,39.79750,-89.64500,America/Chicago,wikidata,8
+1759000,Peoria,peoria,IL,Illinois,111696,40.69250,-89.59000,America/Chicago,wikidata,8
+1712385,Champaign,champaign,IL,Illinois,91961,40.11639,-88.24361,America/Chicago,wikidata,8
+1779293,Waukegan,waukegan,IL,Illinois,88570,42.36363,-87.84479,America/Chicago,wikidata,8
+1714351,Cicero,cicero,IL,Illinois,82090,41.84556,-87.75389,America/Chicago,wikidata,8
+1706613,Bloomington,bloomington,IL,Illinois,79232,40.48417,-88.99361,America/Chicago,wikidata,8
+1768003,Schaumburg,schaumburg,IL,Illinois,77099,42.03028,-88.08389,America/Chicago,wikidata,8
+1724582,Evanston,evanston,IL,Illinois,76006,42.04722,-87.68500,America/Chicago,wikidata,8
+1702154,Arlington Heights,arlington-heights,IL,Illinois,75596,42.09500,-87.98083,America/Chicago,wikidata,8
+1707133,Bolingbrook,bolingbrook,IL,Illinois,74756,41.69860,-88.08860,America/Chicago,wikidata,8
+1718823,Decatur,decatur,IL,Illinois,68763,39.85167,-88.94417,America/Chicago,wikidata,8
+1757225,Palatine,palatine,IL,Illinois,65951,42.11690,-88.04060,America/Chicago,wikidata,8
+1770122,Skokie,skokie,IL,Illinois,65850,42.03361,-87.73278,America/Chicago,wikidata,8
+1719642,Des Plaines,des-plaines,IL,Illinois,58832,42.04167,-87.88750,America/Chicago,wikidata,8
+1756640,Orland Park,orland-park,IL,Illinois,58020,41.61167,-87.85417,America/Chicago,wikidata,8
+1754820,Oak Lawn,oak-lawn,IL,Illinois,56531,41.71500,-87.75330,America/Chicago,wikidata,8
+1751089,Mount Prospect,mount-prospect,IL,Illinois,55460,42.06560,-87.93610,America/Chicago,wikidata,8
+1705573,Berwyn,berwyn,IL,Illinois,55152,41.84333,-87.79093,America/Chicago,wikidata,8
+1775484,Tinley Park,tinley-park,IL,Illinois,54856,41.57389,-87.80389,America/Chicago,wikidata,8
+1781048,Wheaton,wheaton,IL,Illinois,53741,41.85607,-88.10836,America/Chicago,wikidata,8
+1753234,Normal,normal,IL,Illinois,53304,40.51222,-88.98861,America/Chicago,wikidata,8
+1754885,Oak Park,oak-park,IL,Illinois,52947,41.88833,-87.78944,America/Chicago,wikidata,8
+1735411,Hoffman Estates,hoffman-estates,IL,Illinois,50920,42.06306,-88.11917,America/Chicago,wikidata,8
+1720591,Downers Grove,downers-grove,IL,Illinois,50552,41.79470,-88.01690,America/Chicago,wikidata,8
+1836003,Indianapolis,indianapolis,IN,Indiana,891484,39.77722,-86.14583,America/Indiana/Indianapolis,wikidata,13
+1825000,Fort Wayne,fort-wayne,IN,Indiana,273203,41.08045,-85.13915,America/Indiana/Indianapolis,wikidata,8
+1822000,Evansville,evansville,IN,Indiana,115395,37.97472,-87.55583,America/Chicago,wikidata,8
+1823278,Fishers,fishers,IN,Indiana,103986,39.95611,-86.01278,America/Indiana/Indianapolis,wikidata,8
+1871000,South Bend,south-bend,IN,Indiana,103713,41.67639,-86.25028,America/Indiana/Indianapolis,wikidata,8
+1810342,Carmel,carmel,IN,Indiana,103606,39.96667,-86.10000,America/Indiana/Indianapolis,wikidata,8
+1805860,Bloomington,bloomington,IN,Indiana,79986,39.16667,-86.53472,America/Indiana/Indianapolis,wikidata,8
+1831000,Hammond,hammond,IN,Indiana,76030,41.61110,-87.49310,America/Chicago,wikidata,8
+1854180,Noblesville,noblesville,IN,Indiana,75239,40.05000,-86.02140,America/Indiana/Indianapolis,wikidata,8
+1840788,Lafayette,lafayette,IN,Indiana,71757,40.41720,-86.87860,America/Indiana/Indianapolis,wikidata,8
+1829898,Greenwood,greenwood,IN,Indiana,68175,39.61139,-86.11806,America/Indiana/Indianapolis,wikidata,8
+1827000,Gary,gary,IN,Indiana,67555,41.58083,-87.34556,America/Chicago,wikidata,8
+1851876,Muncie,muncie,IN,Indiana,65320,40.19333,-85.38806,America/Indiana/Indianapolis,wikidata,8
+1882700,Westfield,westfield,IN,Indiana,62994,40.03220,-86.12890,America/Indiana/Indianapolis,wikidata,8
+1840392,Kokomo,kokomo,IN,Indiana,60093,40.48222,-86.13167,America/Indiana/Indianapolis,wikidata,8
+1875428,Terre Haute,terre-haute,IN,Indiana,58531,39.46959,-87.38976,America/Indiana/Indianapolis,wikidata,8
+1801468,Anderson,anderson,IN,Indiana,55851,40.10000,-85.68139,America/Indiana/Indianapolis,wikidata,8
+1820728,Elkhart,elkhart,IN,Indiana,53690,41.68310,-85.96890,America/Indiana/Indianapolis,wikidata,8
+1838358,Jeffersonville,jeffersonville,IN,Indiana,52912,38.29560,-85.73140,America/Kentucky/Louisville,wikidata,8
+1814734,Columbus,columbus,IN,Indiana,51970,39.21400,-85.91106,America/Indiana/Indianapolis,wikidata,8
+1849932,Mishawaka,mishawaka,IN,Indiana,51020,41.66750,-86.17139,America/Indiana/Indianapolis,wikidata,8
+2079000,Wichita,wichita,KS,Kansas,400991,37.68889,-97.33611,America/Chicago,wikidata,9
+2053775,Overland Park,overland-park,KS,Kansas,202893,38.94007,-94.68070,America/Chicago,wikidata,8
+2036000,Kansas City,kansas-city,KS,Kansas,156752,39.10667,-94.67639,America/Chicago,wikidata,8
+2052575,Olathe,olathe,KS,Kansas,149035,38.88080,-94.80310,America/Chicago,wikidata,8
+2071000,Topeka,topeka,KS,Kansas,125467,39.04833,-95.67804,America/Chicago,wikidata,8
+2038900,Lawrence,lawrence,KS,Kansas,97271,38.97167,-95.23528,America/Chicago,wikidata,8
+2064500,Shawnee,shawnee,KS,Kansas,69724,39.01280,-94.76580,America/Chicago,wikidata,8
+2039350,Lenexa,lenexa,KS,Kansas,59427,38.96472,-94.75944,America/Chicago,wikidata,8
+2044250,Manhattan,manhattan,KS,Kansas,54700,39.19000,-96.58667,America/Chicago,wikidata,8
+2148006,Louisville,louisville,KY,Kentucky,640796,38.16639,-85.64833,America/Kentucky/Louisville,wikidata,11
+2146027,Lexington,lexington,KY,Kentucky,329437,38.04068,-84.45827,America/New_York,census,12
+2108902,Bowling Green,bowling-green,KY,Kentucky,79076,36.98167,-86.44444,America/Chicago,wikidata,8
+2158620,Owensboro,owensboro,KY,Kentucky,60675,37.75775,-87.11839,America/Chicago,wikidata,8
+2255000,New Orleans,new-orleans,LA,Louisiana,362701,29.97611,-90.07833,America/Chicago,wikidata,9
+2205000,Baton Rouge,baton-rouge,LA,Louisiana,220907,30.44750,-91.17861,America/Chicago,wikidata,8
+2270000,Shreveport,shreveport,LA,Louisiana,176578,32.50806,-93.76278,America/Chicago,wikidata,8
+2240735,Lafayette,lafayette,LA,Louisiana,122280,30.24306,-92.01265,America/Chicago,wikidata,8
+2241155,Lake Charles,lake-charles,LA,Louisiana,81157,30.21472,-93.20861,America/Chicago,wikidata,8
+2239475,Kenner,kenner,LA,Louisiana,64650,29.99422,-90.24178,America/Chicago,wikidata,8
+2208920,Bossier City,bossier-city,LA,Louisiana,63218,32.51780,-93.69140,America/Chicago,wikidata,8
+2507000,Boston,boston,MA,Massachusetts,673458,42.36028,-71.05778,America/New_York,wikidata,8
+2582000,Worcester,worcester,MA,Massachusetts,211286,42.27139,-71.79889,America/New_York,wikidata,8
+2567000,Springfield,springfield,MA,Massachusetts,154888,42.11241,-72.54745,America/New_York,wikidata,8
+2511000,Cambridge,cambridge,MA,Massachusetts,121186,42.37500,-71.10611,America/New_York,wikidata,8
+2537000,Lowell,lowell,MA,Massachusetts,120418,42.63944,-71.31472,America/New_York,wikidata,8
+2509000,Brockton,brockton,MA,Massachusetts,105788,42.08333,-71.01889,America/New_York,wikidata,8
+2537490,Lynn,lynn,MA,Massachusetts,103489,42.46667,-70.95000,America/New_York,wikidata,8
+2555745,Quincy,quincy,MA,Massachusetts,103434,42.25000,-71.00000,America/New_York,wikidata,8
+2545000,New Bedford,new-bedford,MA,Massachusetts,101318,41.63611,-70.93472,America/New_York,wikidata,8
+2523000,Fall River,fall-river,MA,Massachusetts,94689,41.70139,-71.15556,America/New_York,wikidata,8
+2545560,Newton,newton,MA,Massachusetts,90700,42.33694,-71.20972,America/New_York,wikidata,8
+2534550,Lawrence,lawrence,MA,Massachusetts,89332,42.70694,-71.16333,America/New_York,wikidata,8
+2562535,Somerville,somerville,MA,Massachusetts,82149,42.38750,-71.10000,America/New_York,wikidata,8
+2524960,Framingham,framingham,MA,Massachusetts,73361,42.27917,-71.41667,America/New_York,wikidata,8
+2529405,Haverhill,haverhill,MA,Massachusetts,68291,42.78333,-71.08333,America/New_York,wikidata,8
+2537875,Malden,malden,MA,Massachusetts,66693,42.42500,-71.06667,America/New_York,wikidata,8
+2572600,Waltham,waltham,MA,Massachusetts,65849,42.38060,-71.23501,America/New_York,wikidata,8
+2569170,Taunton,taunton,MA,Massachusetts,61936,41.90000,-71.09028,America/New_York,wikidata,8
+2556585,Revere,revere,MA,Massachusetts,60702,42.40833,-71.01250,America/New_York,wikidata,8
+2578972,Weymouth Town,weymouth-town,MA,Massachusetts,60159,42.22083,-70.94028,America/New_York,wikidata,8
+2539835,Medford,medford,MA,Massachusetts,59898,42.41833,-71.10667,America/New_York,wikidata,8
+2552490,Peabody,peabody,MA,Massachusetts,55418,42.52778,-70.92917,America/New_York,wikidata,8
+2513660,Chicopee,chicopee,MA,Massachusetts,55381,42.14861,-72.60833,America/New_York,wikidata,8
+2540675,Methuen,methuen,MA,Massachusetts,54272,42.74264,-71.17865,America/New_York,census,8
+2521990,Everett,everett,MA,Massachusetts,51825,42.40833,-71.05417,America/New_York,wikidata,8
+2404000,Baltimore,baltimore,MD,Maryland,568271,39.28639,-76.61500,America/New_York,wikidata,8
+2430325,Frederick,frederick,MD,Maryland,89537,39.42639,-77.42028,America/New_York,wikidata,8
+2431175,Gaithersburg,gaithersburg,MD,Maryland,70686,39.13992,-77.19292,America/New_York,wikidata,8
+2467675,Rockville,rockville,MD,Maryland,68417,39.08400,-77.15276,America/New_York,wikidata,8
+2408775,Bowie,bowie,MD,Maryland,58421,38.94278,-76.73028,America/New_York,wikidata,8
+2360545,Portland,portland,ME,Maine,69568,43.66000,-70.25500,America/New_York,wikidata,8
+2622000,Detroit,detroit,MI,Michigan,645705,42.33167,-83.04750,America/Detroit,wikidata,9
+2634000,Grand Rapids,grand-rapids,MI,Michigan,200117,42.96333,-85.66778,America/Detroit,wikidata,8
+2684000,Warren,warren,MI,Michigan,137686,42.51250,-83.02500,America/Detroit,wikidata,8
+2676460,Sterling Heights,sterling-heights,MI,Michigan,134342,42.58028,-83.03028,America/Detroit,wikidata,8
+2603000,Ann Arbor,ann-arbor,MI,Michigan,122925,42.28139,-83.74833,America/Detroit,wikidata,8
+2646000,Lansing,lansing,MI,Michigan,114336,42.73350,-84.54670,America/Detroit,wikidata,8
+2621000,Dearborn,dearborn,MI,Michigan,106377,42.31133,-83.21348,America/Detroit,wikidata,8
+2649000,Livonia,livonia,MI,Michigan,93113,42.40111,-83.37111,America/Detroit,wikidata,8
+2680700,Troy,troy,MI,Michigan,89209,42.58028,-83.14306,America/Detroit,wikidata,8
+2627440,Farmington Hills,farmington-hills,MI,Michigan,84173,42.48528,-83.37694,America/Detroit,wikidata,8
+2686000,Westland,westland,MI,Michigan,82745,42.32417,-83.40028,America/Detroit,wikidata,8
+2629000,Flint,flint,MI,Michigan,79735,43.01889,-83.69333,America/Detroit,wikidata,8
+2688940,Wyoming,wyoming,MI,Michigan,78559,42.91361,-85.70556,America/Detroit,wikidata,8
+2669035,Rochester Hills,rochester-hills,MI,Michigan,78330,42.65806,-83.14972,America/Detroit,wikidata,8
+2674900,Southfield,southfield,MI,Michigan,76874,42.47333,-83.22167,America/Detroit,wikidata,8
+2642160,Kalamazoo,kalamazoo,MI,Michigan,73290,42.29000,-85.59000,America/Detroit,wikidata,8
+2659440,Novi,novi,MI,Michigan,67675,42.48056,-83.47556,America/Detroit,wikidata,8
+2665440,Pontiac,pontiac,MI,Michigan,62528,42.64611,-83.29250,America/Detroit,wikidata,8
+2679000,Taylor,taylor,MI,Michigan,61544,42.24083,-83.26972,America/Detroit,wikidata,8
+2621020,Dearborn Heights,dearborn-heights,MI,Michigan,61040,42.33556,-83.28889,America/Detroit,wikidata,8
+2670040,Royal Oak,royal-oak,MI,Michigan,58251,42.48889,-83.14278,America/Detroit,wikidata,8
+2670760,St. Clair Shores,st-clair-shores,MI,Michigan,58077,42.49556,-82.90028,America/Detroit,wikidata,8
+2642820,Kentwood,kentwood,MI,Michigan,54768,42.86670,-85.63330,America/Detroit,wikidata,8
+2605920,Battle Creek,battle-creek,MI,Michigan,52205,42.31222,-85.20417,America/Detroit,wikidata,8
+2743000,Minneapolis,minneapolis,MN,Minnesota,428579,44.98194,-93.26917,America/Chicago,wikidata,8
+2758000,St. Paul,st-paul,MN,Minnesota,307465,44.94417,-93.09361,America/Chicago,wikidata,8
+2754880,Rochester,rochester,MN,Minnesota,123624,44.02340,-92.46295,America/Chicago,wikidata,8
+2706616,Bloomington,bloomington,MN,Minnesota,88344,44.84083,-93.29833,America/Chicago,wikidata,8
+2717000,Duluth,duluth,MN,Minnesota,87986,46.78444,-92.10528,America/Chicago,wikidata,8
+2707966,Brooklyn Park,brooklyn-park,MN,Minnesota,82893,45.09417,-93.35611,America/Chicago,wikidata,8
+2771428,Woodbury,woodbury,MN,Minnesota,80596,44.91989,-92.93394,America/Chicago,wikidata,8
+2751730,Plymouth,plymouth,MN,Minnesota,78551,45.01056,-93.45556,America/Chicago,wikidata,8
+2735180,Lakeville,lakeville,MN,Minnesota,77971,44.64972,-93.24250,America/Chicago,wikidata,8
+2706382,Blaine,blaine,MN,Minnesota,75172,45.16080,-93.23495,America/Chicago,wikidata,8
+2740166,Maple Grove,maple-grove,MN,Minnesota,72739,45.07250,-93.45556,America/Chicago,wikidata,8
+2756896,St. Cloud,st-cloud,MN,Minnesota,72145,45.55389,-94.17028,America/Chicago,wikidata,8
+2717288,Eagan,eagan,MN,Minnesota,67240,44.81778,-93.16694,America/Chicago,wikidata,8
+2708794,Burnsville,burnsville,MN,Minnesota,64864,44.76778,-93.27750,America/Chicago,wikidata,8
+2713114,Coon Rapids,coon-rapids,MN,Minnesota,63807,45.12000,-93.28750,America/Chicago,wikidata,8
+2718116,Eden Prairie,eden-prairie,MN,Minnesota,62905,44.85472,-93.47083,America/Chicago,wikidata,8
+2701900,Apple Valley,apple-valley,MN,Minnesota,55272,44.73194,-93.21750,America/Chicago,wikidata,8
+2718188,Edina,edina,MN,Minnesota,53564,44.88969,-93.35011,America/Chicago,wikidata,8
+2743252,Minnetonka,minnetonka,MN,Minnesota,52651,44.91333,-93.50333,America/Chicago,wikidata,8
+2938000,Kansas City,kansas-city,MO,Missouri,516032,39.05000,-94.58333,America/Chicago,wikidata,12
+2965000,St. Louis,st-louis,MO,Missouri,279695,38.62639,-90.19944,America/Chicago,wikidata,8
+2970000,Springfield,springfield,MO,Missouri,170596,37.19500,-93.28611,America/Chicago,wikidata,8
+2915670,Columbia,columbia,MO,Missouri,130900,38.95171,-92.33407,America/Chicago,wikidata,8
+2935000,Independence,independence,MO,Missouri,121629,39.09250,-94.41389,America/Chicago,wikidata,8
+2941348,Lee's Summit,lees-summit,MO,Missouri,106419,38.92250,-94.37417,America/Chicago,wikidata,8
+2954074,O'Fallon,ofallon,MO,Missouri,95355,38.78444,-90.70806,America/Chicago,wikidata,8
+2964082,St. Charles,st-charles,MO,Missouri,72458,38.78861,-90.51167,America/Chicago,wikidata,8
+2964550,St. Joseph,st-joseph,MO,Missouri,71098,39.76861,-94.84664,America/Chicago,wikidata,8
+2965126,St. Peters,st-peters,MO,Missouri,61398,38.77889,-90.60306,America/Chicago,wikidata,8
+2906652,Blue Springs,blue-springs,MO,Missouri,61246,39.01778,-94.27444,America/Chicago,wikidata,8
+2937592,Joplin,joplin,MO,Missouri,53605,37.08420,-94.51310,America/Chicago,wikidata,8
+2924778,Florissant,florissant,MO,Missouri,51290,38.79778,-90.32556,America/Chicago,wikidata,8
+2836000,Jackson,jackson,MS,Mississippi,141449,32.29889,-90.18472,America/Chicago,wikidata,8
+2829700,Gulfport,gulfport,MS,Mississippi,74621,30.36742,-89.09281,America/Chicago,wikidata,8
+2869280,Southaven,southaven,MS,Mississippi,57493,34.98739,-90.00350,America/Chicago,wikidata,8
+3006550,Billings,billings,MT,Montana,121483,45.78667,-108.53722,America/Denver,wikidata,8
+3050200,Missoula,missoula,MT,Montana,78204,46.86250,-114.01167,America/Denver,wikidata,8
+3032800,Great Falls,great-falls,MT,Montana,60013,47.50361,-111.28639,America/Denver,wikidata,8
+3008950,Bozeman,bozeman,MT,Montana,57894,45.67944,-111.03722,America/Denver,wikidata,8
+3712000,Charlotte,charlotte,NC,North Carolina,943476,35.22694,-80.84333,America/New_York,wikidata,12
+3755000,Raleigh,raleigh,NC,North Carolina,499825,35.78000,-78.64000,America/New_York,wikidata,9
+3728000,Greensboro,greensboro,NC,North Carolina,307381,36.07250,-79.79028,America/New_York,wikidata,9
+3719000,Durham,durham,NC,North Carolina,301870,35.99417,-78.89861,America/New_York,wikidata,8
+3775000,Winston-Salem,winston-salem,NC,North Carolina,255769,36.10250,-80.26056,America/New_York,wikidata,9
+3722920,Fayetteville,fayetteville,NC,North Carolina,209496,35.06667,-78.91750,America/New_York,wikidata,9
+3710740,Cary,cary,NC,North Carolina,182659,35.77889,-78.80028,America/New_York,wikidata,8
+3774440,Wilmington,wilmington,NC,North Carolina,125284,34.22333,-77.91222,America/New_York,wikidata,8
+3731400,High Point,high-point,NC,North Carolina,118601,35.97056,-79.99750,America/New_York,wikidata,8
+3714100,Concord,concord,NC,North Carolina,112395,35.40440,-80.60060,America/New_York,wikidata,8
+3728080,Greenville,greenville,NC,North Carolina,95138,35.60167,-77.37250,America/New_York,wikidata,8
+3702140,Asheville,asheville,NC,North Carolina,94992,35.59556,-82.55194,America/New_York,wikidata,8
+3725580,Gastonia,gastonia,NC,North Carolina,85535,35.25528,-81.18028,America/New_York,wikidata,8
+3701520,Apex,apex,NC,North Carolina,75977,35.73194,-78.85278,America/New_York,wikidata,8
+3734200,Jacksonville,jacksonville,NC,North Carolina,70840,34.75972,-77.40972,America/New_York,wikidata,8
+3733120,Huntersville,huntersville,NC,North Carolina,67087,35.40944,-80.86361,America/New_York,wikidata,8
+3711800,Chapel Hill,chapel-hill,NC,North Carolina,64028,35.90731,-79.04992,America/New_York,wikidata,8
+3709060,Burlington,burlington,NC,North Carolina,61365,36.08972,-79.44556,America/New_York,wikidata,8
+3735200,Kannapolis,kannapolis,NC,North Carolina,60521,35.49059,-80.61835,America/New_York,wikidata,8
+3770540,Wake Forest,wake-forest,NC,North Carolina,56764,35.97333,-78.51889,America/New_York,wikidata,8
+3757500,Rocky Mount,rocky-mount,NC,North Carolina,54541,35.95411,-77.80557,America/New_York,wikidata,8
+3744220,Mooresville,mooresville,NC,North Carolina,52884,35.58444,-80.82028,America/New_York,wikidata,8
+3825700,Fargo,fargo,ND,North Dakota,136285,46.87722,-96.78944,America/Chicago,wikidata,8
+3807200,Bismarck,bismarck,ND,North Dakota,77772,46.80833,-100.78375,America/Chicago,wikidata,8
+3832060,Grand Forks,grand-forks,ND,North Dakota,59845,47.92528,-97.03250,America/Chicago,wikidata,8
+3137000,Omaha,omaha,NE,Nebraska,489265,41.25861,-95.93750,America/Chicago,wikidata,9
+3128000,Lincoln,lincoln,NE,Nebraska,300619,40.80917,-96.67806,America/Chicago,wikidata,8
+3103950,Bellevue,bellevue,NE,Nebraska,64777,41.15861,-95.93417,America/Chicago,wikidata,8
+3119595,Grand Island,grand-island,NE,Nebraska,53250,40.92428,-98.33869,America/Chicago,wikidata,8
+3345140,Manchester,manchester,NH,New Hampshire,116386,42.99083,-71.46361,America/New_York,wikidata,8
+3350260,Nashua,nashua,NH,New Hampshire,91851,42.75750,-71.46444,America/New_York,wikidata,8
+3451000,Newark,newark,NJ,New Jersey,317303,40.73556,-74.17222,America/New_York,wikidata,8
+3436000,Jersey City,jersey-city,NJ,New Jersey,302824,40.71000,-74.06000,America/New_York,wikidata,8
+3457000,Paterson,paterson,NJ,New Jersey,160463,40.91667,-74.17222,America/New_York,wikidata,8
+3421000,Elizabeth,elizabeth,NJ,New Jersey,140413,40.66222,-74.20917,America/New_York,wikidata,8
+3474000,Trenton,trenton,NJ,New Jersey,91193,40.22028,-74.76583,America/New_York,wikidata,8
+3413690,Clifton,clifton,NJ,New Jersey,90322,40.86210,-74.16040,America/New_York,wikidata,8
+3403580,Bayonne,bayonne,NJ,New Jersey,74532,40.66240,-74.11020,America/New_York,wikidata,8
+3419390,East Orange,east-orange,NJ,New Jersey,71850,40.76611,-74.21167,America/New_York,wikidata,8
+3410000,Camden,camden,NJ,New Jersey,71749,39.93680,-75.10660,America/New_York,wikidata,8
+3456550,Passaic,passaic,NJ,New Jersey,70722,40.85750,-74.12889,America/New_York,wikidata,8
+3474630,Union City,union-city,NJ,New Jersey,66918,40.76778,-74.03194,America/New_York,wikidata,8
+3476070,Vineland,vineland,NJ,New Jersey,62070,39.46500,-75.00639,America/New_York,wikidata,8
+3432250,Hoboken,hoboken,NJ,New Jersey,59149,40.74500,-74.03250,America/New_York,wikidata,8
+3451210,New Brunswick,new-brunswick,NJ,New Jersey,57487,40.48667,-74.44444,America/New_York,wikidata,8
+3458200,Perth Amboy,perth-amboy,NJ,New Jersey,56939,40.50861,-74.26778,America/New_York,wikidata,8
+3459190,Plainfield,plainfield,NJ,New Jersey,56507,40.61528,-74.41611,America/New_York,wikidata,8
+3479610,West New York,west-new-york,NJ,New Jersey,52975,40.78583,-74.00944,America/New_York,wikidata,8
+3502000,Albuquerque,albuquerque,NM,New Mexico,560326,35.08444,-106.65028,America/Denver,wikidata,10
+3539380,Las Cruces,las-cruces,NM,New Mexico,116998,32.31403,-106.77981,America/Denver,wikidata,8
+3563460,Rio Rancho,rio-rancho,NM,New Mexico,112524,35.23338,-106.66447,America/Denver,wikidata,8
+3570500,Santa Fe,santa-fe,NM,New Mexico,90551,35.66667,-105.96667,America/Denver,wikidata,8
+3240000,Las Vegas,las-vegas,NV,Nevada,678922,36.16722,-115.14861,America/Los_Angeles,wikidata,9
+3231900,Henderson,henderson,NV,Nevada,350039,36.03167,-114.98139,America/Los_Angeles,wikidata,8
+3251800,North Las Vegas,north-las-vegas,NV,Nevada,294034,36.20058,-115.12158,America/Los_Angeles,wikidata,8
+3260600,Reno,reno,NV,Nevada,281714,39.52611,-119.81250,America/Los_Angeles,wikidata,8
+3268400,Sparks,sparks,NV,Nevada,111520,39.54047,-119.74872,America/Los_Angeles,wikidata,8
+3209700,Carson City,carson-city,NV,Nevada,58148,39.16083,-119.75389,America/Los_Angeles,wikidata,9
+3651000,New York,new-york,NY,New York,8478072,40.71278,-74.00611,America/New_York,wikidata,12
+3611000,Buffalo,buffalo,NY,New York,276617,42.88639,-78.87806,America/New_York,wikidata,8
+3684000,Yonkers,yonkers,NY,New York,211040,40.94139,-73.86444,America/New_York,wikidata,8
+3663000,Rochester,rochester,NY,New York,207282,43.16556,-77.61139,America/New_York,wikidata,8
+3673000,Syracuse,syracuse,NY,New York,146097,43.04690,-76.14442,America/New_York,wikidata,8
+3601000,Albany,albany,NY,New York,101317,42.65000,-73.76667,America/New_York,wikidata,8
+3650617,New Rochelle,new-rochelle,NY,New York,85512,40.90861,-73.78194,America/New_York,wikidata,8
+3649121,Mount Vernon,mount-vernon,NY,New York,71999,40.91417,-73.83056,America/New_York,wikidata,8
+3665508,Schenectady,schenectady,NY,New York,69495,42.80417,-73.92917,America/New_York,wikidata,8
+3676540,Utica,utica,NY,New York,63660,43.10083,-75.23250,America/New_York,wikidata,8
+3681677,White Plains,white-plains,NY,New York,62561,41.03250,-73.76667,America/New_York,wikidata,8
+3633139,Hempstead,hempstead,NY,New York,59569,40.70611,-73.61861,America/New_York,wikidata,8
+3675484,Troy,troy,NY,New York,51065,42.73167,-73.69250,America/New_York,wikidata,8
+3918000,Columbus,columbus,OH,Ohio,933263,39.96222,-83.00056,America/New_York,wikidata,10
+3916000,Cleveland,cleveland,OH,Ohio,365379,41.49917,-81.69472,America/New_York,wikidata,8
+3915000,Cincinnati,cincinnati,OH,Ohio,314915,39.10000,-84.51250,America/New_York,wikidata,8
+3977000,Toledo,toledo,OH,Ohio,265638,41.65278,-83.53778,America/New_York,wikidata,8
+3901000,Akron,akron,OH,Ohio,189664,41.07306,-81.51778,America/New_York,wikidata,8
+3921000,Dayton,dayton,OH,Ohio,136346,39.76667,-84.20000,America/New_York,wikidata,8
+3961000,Parma,parma,OH,Ohio,79350,41.39167,-81.72778,America/New_York,wikidata,8
+3912000,Canton,canton,OH,Ohio,69211,40.79861,-81.37500,America/New_York,wikidata,8
+3944856,Lorain,lorain,OH,Ohio,65751,41.44833,-82.16889,America/New_York,wikidata,8
+3933012,Hamilton,hamilton,OH,Ohio,63953,39.39583,-84.56500,America/New_York,wikidata,8
+3988000,Youngstown,youngstown,OH,Ohio,59123,41.09639,-80.64917,America/New_York,wikidata,8
+3974118,Springfield,springfield,OH,Ohio,58138,39.92694,-83.80417,America/New_York,wikidata,8
+3940040,Kettering,kettering,OH,Ohio,57028,39.69722,-84.15222,America/New_York,wikidata,8
+3925256,Elyria,elyria,OH,Ohio,53604,41.37333,-82.10167,America/New_York,wikidata,8
+3949840,Middletown,middletown,OH,Ohio,52291,39.50611,-84.37583,America/New_York,wikidata,8
+3954040,Newark,newark,OH,Ohio,51424,40.06301,-82.41678,America/New_York,wikidata,8
+3919778,Cuyahoga Falls,cuyahoga-falls,OH,Ohio,50979,41.14556,-81.49667,America/New_York,wikidata,8
+4055000,Oklahoma City,oklahoma-city,OK,Oklahoma,712919,35.48222,-97.53528,America/Chicago,wikidata,16
+4075000,Tulsa,tulsa,OK,Oklahoma,415154,36.13139,-95.93722,America/Chicago,wikidata,10
+4052500,Norman,norman,OK,Oklahoma,131010,35.22083,-97.44361,America/Chicago,wikidata,10
+4009050,Broken Arrow,broken-arrow,OK,Oklahoma,122756,36.03639,-95.78361,America/Chicago,wikidata,8
+4023200,Edmond,edmond,OK,Oklahoma,99040,35.65714,-97.46492,America/Chicago,wikidata,8
+4041850,Lawton,lawton,OK,Oklahoma,90027,34.60869,-98.39033,America/Chicago,wikidata,8
+4049200,Moore,moore,OK,Oklahoma,63845,35.33833,-97.48667,America/Chicago,wikidata,8
+4048350,Midwest City,midwest-city,OK,Oklahoma,58505,35.44950,-97.39669,America/Chicago,wikidata,8
+4023950,Enid,enid,OK,Oklahoma,50519,36.39675,-97.87914,America/Chicago,wikidata,8
+4070300,Stillwater,stillwater,OK,Oklahoma,50138,36.11344,-97.05864,America/Chicago,wikidata,8
+4159000,Portland,portland,OR,Oregon,635749,45.51500,-122.67917,America/Los_Angeles,wikidata,9
+4164900,Salem,salem,OR,Oregon,180406,44.94000,-123.03889,America/Los_Angeles,wikidata,8
+4123850,Eugene,eugene,OR,Oregon,178786,44.05222,-123.09250,America/Los_Angeles,wikidata,8
+4131250,Gresham,gresham,OR,Oregon,111507,45.50361,-122.43944,America/Los_Angeles,wikidata,8
+4134100,Hillsboro,hillsboro,OR,Oregon,110337,45.52278,-122.98972,America/Los_Angeles,wikidata,8
+4105800,Bend,bend,OR,Oregon,106926,44.05639,-121.30806,America/Los_Angeles,wikidata,8
+4105350,Beaverton,beaverton,OR,Oregon,98302,45.48694,-122.80361,America/Los_Angeles,wikidata,8
+4147000,Medford,medford,OR,Oregon,86301,42.33194,-122.86167,America/Los_Angeles,wikidata,8
+4115800,Corvallis,corvallis,OR,Oregon,61993,44.57078,-123.27600,America/Los_Angeles,wikidata,8
+4169600,Springfield,springfield,OR,Oregon,61182,44.04611,-123.02194,America/Los_Angeles,wikidata,8
+4173650,Tigard,tigard,OR,Oregon,57301,45.42778,-122.77889,America/Los_Angeles,wikidata,8
+4101000,Albany,albany,OR,Oregon,57156,44.63028,-123.09611,America/Los_Angeles,wikidata,8
+4260000,Philadelphia,philadelphia,PA,Pennsylvania,1573916,39.95278,-75.16361,America/New_York,wikidata,9
+4261000,Pittsburgh,pittsburgh,PA,Pennsylvania,307668,40.44167,-80.00000,America/New_York,wikidata,8
+4202000,Allentown,allentown,PA,Pennsylvania,127138,40.60000,-75.48333,America/New_York,wikidata,8
+4263624,Reading,reading,PA,Pennsylvania,96000,40.34167,-75.92611,America/New_York,wikidata,8
+4224000,Erie,erie,PA,Pennsylvania,92940,42.12956,-80.08521,America/New_York,wikidata,8
+4206088,Bethlehem,bethlehem,PA,Pennsylvania,79453,40.62611,-75.37556,America/New_York,wikidata,8
+4269000,Scranton,scranton,PA,Pennsylvania,75905,41.40897,-75.66241,America/New_York,wikidata,8
+4241216,Lancaster,lancaster,PA,Pennsylvania,58441,40.03972,-76.30444,America/New_York,wikidata,8
+4232800,Harrisburg,harrisburg,PA,Pennsylvania,50649,40.26455,-76.88338,America/New_York,wikidata,8
+4459000,Providence,providence,RI,Rhode Island,194706,41.82399,-71.41283,America/New_York,wikidata,8
+4419180,Cranston,cranston,RI,Rhode Island,84448,41.78333,-71.44167,America/New_York,wikidata,8
+4474300,Warwick,warwick,RI,Rhode Island,83554,41.71667,-71.41667,America/New_York,wikidata,8
+4454640,Pawtucket,pawtucket,RI,Rhode Island,76996,41.87556,-71.37611,America/New_York,wikidata,8
+4513330,Charleston,charleston,SC,South Carolina,157665,32.78333,-79.93194,America/New_York,wikidata,8
+4516000,Columbia,columbia,SC,South Carolina,144788,34.00056,-81.04417,America/New_York,wikidata,9
+4550875,North Charleston,north-charleston,SC,South Carolina,126005,32.88528,-80.01694,America/New_York,wikidata,8
+4548535,Mount Pleasant,mount-pleasant,SC,South Carolina,95604,32.79407,-79.86259,America/New_York,wikidata,8
+4561405,Rock Hill,rock-hill,SC,South Carolina,75798,34.93806,-81.02611,America/New_York,wikidata,8
+4530850,Greenville,greenville,SC,South Carolina,74371,34.84444,-82.38556,America/New_York,wikidata,8
+4570270,Summerville,summerville,SC,South Carolina,52625,33.01850,-80.17565,America/New_York,wikidata,8
+4529815,Goose Creek,goose-creek,SC,South Carolina,50352,32.99556,-80.02889,America/New_York,wikidata,8
+4659020,Sioux Falls,sioux-falls,SD,South Dakota,209289,43.54606,-96.73139,America/Chicago,wikidata,8
+4652980,Rapid City,rapid-city,SD,South Dakota,79894,44.08106,-103.22867,America/Denver,wikidata,8
+4752006,Nashville,nashville,TN,Tennessee,704963,36.17139,-86.78417,America/Chicago,wikidata,14
+4748000,Memphis,memphis,TN,Tennessee,610919,35.14611,-90.05194,America/Chicago,wikidata,12
+4740000,Knoxville,knoxville,TN,Tennessee,198722,35.96167,-83.92333,America/New_York,wikidata,8
+4714000,Chattanooga,chattanooga,TN,Tennessee,191496,35.04556,-85.26722,America/New_York,wikidata,9
+4715160,Clarksville,clarksville,TN,Tennessee,185690,36.52972,-87.35944,America/Chicago,wikidata,8
+4751560,Murfreesboro,murfreesboro,TN,Tennessee,168387,35.84611,-86.39194,America/Chicago,wikidata,8
+4727740,Franklin,franklin,TN,Tennessee,89142,35.92917,-86.85750,America/Chicago,wikidata,8
+4738320,Johnson City,johnson-city,TN,Tennessee,73635,36.31344,-82.35347,America/New_York,wikidata,8
+4737640,Jackson,jackson,TN,Tennessee,69303,35.61444,-88.81775,America/Chicago,wikidata,8
+4733280,Hendersonville,hendersonville,TN,Tennessee,63947,36.30472,-86.62000,America/Chicago,wikidata,8
+4769420,Smyrna,smyrna,TN,Tennessee,60302,35.98247,-86.51994,America/Chicago,wikidata,8
+4770580,Spring Hill,spring-hill,TN,Tennessee,59398,35.75250,-86.91389,America/Chicago,wikidata,8
+4739560,Kingsport,kingsport,TN,Tennessee,57109,36.55025,-82.55944,America/New_York,wikidata,8
+4703440,Bartlett,bartlett,TN,Tennessee,56708,35.22299,-89.84117,America/Chicago,wikidata,8
+4728540,Gallatin,gallatin,TN,Tennessee,52489,36.38139,-86.45139,America/Chicago,wikidata,8
+4716420,Collierville,collierville,TN,Tennessee,51951,35.05437,-89.68231,America/Chicago,wikidata,8
+4741520,Lebanon,lebanon,TN,Tennessee,51501,36.20810,-86.32640,America/Chicago,wikidata,8
+4715400,Cleveland,cleveland,TN,Tennessee,50232,35.17140,-84.87110,America/New_York,wikidata,8
+4835000,Houston,houston,TX,Texas,2390125,29.76278,-95.38306,America/Chicago,wikidata,16
+4865000,San Antonio,san-antonio,TX,Texas,1526656,29.42500,-98.49389,America/Chicago,wikidata,15
+4819000,Dallas,dallas,TX,Texas,1326087,32.77917,-96.80889,America/Chicago,wikidata,12
+4827000,Fort Worth,fort-worth,TX,Texas,1008106,32.75639,-97.33250,America/Chicago,wikidata,13
+4805000,Austin,austin,TX,Texas,993588,30.30000,-97.73333,America/Chicago,wikidata,12
+4824000,El Paso,el-paso,TX,Texas,681723,31.75917,-106.48861,America/Denver,wikidata,11
+4804000,Arlington,arlington,TX,Texas,403672,32.70503,-97.12284,America/Chicago,wikidata,8
+4817000,Corpus Christi,corpus-christi,TX,Texas,317317,27.74278,-97.40194,America/Chicago,wikidata,9
+4858016,Plano,plano,TX,Texas,293286,33.05000,-96.75000,America/Chicago,wikidata,8
+4845000,Lubbock,lubbock,TX,Texas,272086,33.58500,-101.84500,America/Chicago,wikidata,9
+4841464,Laredo,laredo,TX,Texas,261260,27.50611,-99.50722,America/Chicago,wikidata,8
+4837000,Irving,irving,TX,Texas,258060,32.81167,-96.95083,America/Chicago,wikidata,8
+4829000,Garland,garland,TX,Texas,250431,32.90667,-96.63500,America/Chicago,wikidata,8
+4827684,Frisco,frisco,TX,Texas,235208,33.14140,-96.81310,America/Chicago,wikidata,8
+4845744,McKinney,mckinney,TX,Texas,227526,33.20000,-96.63333,America/Chicago,wikidata,8
+4830464,Grand Prairie,grand-prairie,TX,Texas,207331,32.71528,-97.01694,America/Chicago,wikidata,8
+4803000,Amarillo,amarillo,TX,Texas,203729,35.19917,-101.84528,America/Chicago,wikidata,8
+4810768,Brownsville,brownsville,TX,Texas,191967,25.93028,-97.48444,America/Chicago,wikidata,9
+4819972,Denton,denton,TX,Texas,165998,33.21667,-97.13333,America/Chicago,wikidata,8
+4839148,Killeen,killeen,TX,Texas,160616,31.10556,-97.72667,America/Chicago,wikidata,8
+4847892,Mesquite,mesquite,TX,Texas,150140,32.78278,-96.60972,America/Chicago,wikidata,8
+4856000,Pasadena,pasadena,TX,Texas,149617,29.67611,-95.17389,America/Chicago,wikidata,8
+4845384,McAllen,mcallen,TX,Texas,148782,26.21639,-98.23639,America/Chicago,wikidata,8
+4876000,Waco,waco,TX,Texas,146608,31.54917,-97.14722,America/Chicago,wikidata,8
+4848072,Midland,midland,TX,Texas,143687,32.00500,-102.09917,America/Chicago,wikidata,8
+4842508,Lewisville,lewisville,TX,Texas,135983,33.03830,-97.00610,America/Chicago,wikidata,8
+4813024,Carrollton,carrollton,TX,Texas,135456,32.99000,-96.89333,America/Chicago,wikidata,8
+4863500,Round Rock,round-rock,TX,Texas,135359,30.51500,-97.67250,America/Chicago,wikidata,8
+4801000,Abilene,abilene,TX,Texas,130501,32.44639,-99.74556,America/Chicago,wikidata,8
+4856348,Pearland,pearland,TX,Texas,129620,29.55440,-95.29580,America/Chicago,wikidata,8
+4815976,College Station,college-station,TX,Texas,128023,30.60139,-96.31444,America/Chicago,wikidata,8
+4853388,Odessa,odessa,TX,Texas,119748,31.86333,-102.36556,America/Chicago,wikidata,8
+4841980,League City,league-city,TX,Texas,118456,29.49972,-95.08972,America/Chicago,wikidata,8
+4861796,Richardson,richardson,TX,Texas,118221,32.94833,-96.72972,America/Chicago,wikidata,8
+4850820,New Braunfels,new-braunfels,TX,Texas,116477,29.70000,-98.11667,America/Chicago,wikidata,8
+4816432,Conroe,conroe,TX,Texas,114581,30.31610,-95.45890,America/Chicago,wikidata,8
+4801924,Allen,allen,TX,Texas,113746,33.09972,-96.66306,America/Chicago,wikidata,8
+4807000,Beaumont,beaumont,TX,Texas,112893,30.08000,-94.12667,America/Chicago,wikidata,8
+4874144,Tyler,tyler,TX,Texas,112219,32.35083,-95.30056,America/Chicago,wikidata,8
+4870808,Sugar Land,sugar-land,TX,Texas,109851,29.59944,-95.61417,America/Chicago,wikidata,8
+4822660,Edinburg,edinburg,TX,Texas,108733,26.30420,-98.16390,America/Chicago,wikidata,8
+4879000,Wichita Falls,wichita-falls,TX,Texas,102372,33.89694,-98.51500,America/Chicago,wikidata,8
+4829336,Georgetown,georgetown,TX,Texas,101344,30.65110,-97.68140,America/Chicago,wikidata,8
+4864472,San Angelo,san-angelo,TX,Texas,100159,31.45000,-100.45000,America/Chicago,wikidata,8
+4872176,Temple,temple,TX,Texas,96267,31.09823,-97.34278,America/Chicago,wikidata,8
+4810912,Bryan,bryan,TX,Texas,91541,30.66560,-96.36670,America/Chicago,wikidata,8
+4848768,Mission,mission,TX,Texas,88574,26.21139,-98.32111,America/Chicago,wikidata,8
+4842016,Leander,leander,TX,Texas,87511,30.56111,-97.86028,America/Chicago,wikidata,8
+4806128,Baytown,baytown,TX,Texas,86004,29.74389,-94.96583,America/Chicago,wikidata,8
+4843888,Longview,longview,TX,Texas,83668,32.50920,-94.75390,America/Chicago,wikidata,8
+4857200,Pharr,pharr,TX,Texas,81142,26.20639,-98.18528,America/Chicago,wikidata,8
+4846452,Mansfield,mansfield,TX,Texas,80803,32.57694,-97.12667,America/Chicago,wikidata,8
+4826232,Flower Mound,flower-mound,TX,Texas,79990,33.03167,-97.07889,America/Chicago,wikidata,8
+4848804,Missouri City,missouri-city,TX,Texas,78582,29.58278,-95.53917,America/Chicago,wikidata,8
+4813552,Cedar Park,cedar-park,TX,Texas,78380,30.50670,-97.83030,America/Chicago,wikidata,8
+4865600,San Marcos,san-marcos,TX,Texas,74316,29.87944,-97.93889,America/Chicago,wikidata,8
+4832372,Harlingen,harlingen,TX,Texas,72234,26.20000,-97.70000,America/Chicago,wikidata,8
+4852356,North Richland Hills,north-richland-hills,TX,Texas,71436,32.85556,-97.21806,America/Chicago,wikidata,8
+4863572,Rowlett,rowlett,TX,Texas,68123,32.90690,-96.54750,America/Chicago,wikidata,8
+4857176,Pflugerville,pflugerville,TX,Texas,66819,30.44611,-97.62389,America/Chicago,wikidata,8
+4875428,Victoria,victoria,TX,Texas,66020,28.81694,-96.99333,America/Chicago,wikidata,8
+4839952,Kyle,kyle,TX,Texas,65833,29.98920,-97.87580,America/Chicago,wikidata,8
+4880356,Wylie,wylie,TX,Texas,62954,33.01861,-96.52889,America/Chicago,wikidata,8
+4843012,Little Elm,little-elm,TX,Texas,61219,33.16390,-96.93030,America/Chicago,wikidata,8
+4824768,Euless,euless,TX,Texas,60010,32.84833,-97.09167,America/Chicago,wikidata,8
+4872392,Texas City,texas-city,TX,Texas,57875,29.40000,-94.93390,America/Chicago,wikidata,8
+4820092,DeSoto,desoto,TX,Texas,56711,32.59920,-96.85890,America/Chicago,wikidata,8
+4811428,Burleson,burleson,TX,Texas,56253,32.53580,-97.32720,America/Chicago,wikidata,8
+4858820,Port Arthur,port-arthur,TX,Texas,55799,29.88500,-93.94000,America/Chicago,wikidata,8
+4827876,Fulshear,fulshear,TX,Texas,54629,29.69083,-95.89056,America/Chicago,wikidata,8
+4862828,Rockwall,rockwall,TX,Texas,53547,32.92000,-96.45972,America/Chicago,wikidata,8
+4828068,Galveston,galveston,TX,Texas,53538,29.30139,-94.79500,America/Chicago,wikidata,8
+4813684,Celina,celina,TX,Texas,51661,33.31970,-96.78280,America/Chicago,wikidata,8
+4830644,Grapevine,grapevine,TX,Texas,51320,32.93500,-97.08580,America/Chicago,wikidata,8
+4867496,Sherman,sherman,TX,Texas,50229,33.64110,-96.61000,America/Chicago,wikidata,8
+4967000,Salt Lake City,salt-lake-city,UT,Utah,217783,40.75000,-111.88333,America/Denver,wikidata,8
+4983470,West Valley City,west-valley-city,UT,Utah,138144,40.68917,-111.99389,America/Denver,wikidata,8
+4982950,West Jordan,west-jordan,UT,Utah,116688,40.60639,-111.97611,America/Denver,wikidata,8
+4962470,Provo,provo,UT,Utah,115479,40.23389,-111.65861,America/Denver,wikidata,8
+4965330,St. George,st-george,UT,Utah,106288,37.09528,-113.57806,America/Denver,wikidata,8
+4957300,Orem,orem,UT,Utah,96646,40.29875,-111.69649,America/Denver,wikidata,8
+4944320,Lehi,lehi,UT,Utah,93446,40.38844,-111.83639,America/Denver,wikidata,8
+4967440,Sandy,sandy,UT,Utah,92840,40.56650,-111.83892,America/Denver,wikidata,8
+4955980,Ogden,ogden,UT,Utah,88656,41.22778,-111.96111,America/Denver,wikidata,8
+4970850,South Jordan,south-jordan,UT,Utah,86156,40.56167,-111.96083,America/Denver,wikidata,8
+4943660,Layton,layton,UT,Utah,84348,41.07806,-111.95528,America/Denver,wikidata,8
+4950150,Millcreek,millcreek,UT,Utah,64217,40.68611,-111.86389,America/Denver,wikidata,8
+4934970,Herriman,herriman,UT,Utah,62352,40.50667,-112.03083,America/Denver,wikidata,8
+4920810,Eagle Mountain,eagle-mountain,UT,Utah,60575,40.30611,-112.00972,America/Denver,wikidata,8
+4975360,Taylorsville,taylorsville,UT,Utah,57819,40.66772,-111.93858,America/Denver,wikidata,8
+4967825,Saratoga Springs,saratoga-springs,UT,Utah,57411,40.32889,-111.90306,America/Denver,wikidata,8
+4945860,Logan,logan,UT,Utah,56770,41.73778,-111.83083,America/Denver,wikidata,8
+4953230,Murray,murray,UT,Utah,50817,40.65250,-111.89333,America/Denver,wikidata,8
+4920120,Draper,draper,UT,Utah,50166,40.51472,-111.87306,America/Denver,wikidata,8
+5182000,Virginia Beach,virginia-beach,VA,Virginia,454808,36.85060,-75.97790,America/New_York,wikidata,11
+5116000,Chesapeake,chesapeake,VA,Virginia,254997,36.76740,-76.28741,America/New_York,wikidata,12
+5167000,Richmond,richmond,VA,Virginia,233655,37.54083,-77.43667,America/New_York,wikidata,8
+5157000,Norfolk,norfolk,VA,Virginia,231105,36.84694,-76.28528,America/New_York,wikidata,8
+5156000,Newport News,newport-news,VA,Virginia,183056,37.07083,-76.48444,America/New_York,wikidata,8
+5101000,Alexandria,alexandria,VA,Virginia,159102,38.80472,-77.04722,America/New_York,wikidata,8
+5135000,Hampton,hampton,VA,Virginia,137596,37.02639,-76.34444,America/New_York,wikidata,8
+5176432,Suffolk,suffolk,VA,Virginia,103105,36.72819,-76.58319,America/New_York,wikidata,13
+5168000,Roanoke,roanoke,VA,Virginia,97912,37.27056,-79.94250,America/New_York,wikidata,8
+5164000,Portsmouth,portsmouth,VA,Virginia,96482,36.83543,-76.29827,America/New_York,wikidata,8
+5147672,Lynchburg,lynchburg,VA,Virginia,80301,37.40367,-79.17020,America/New_York,wikidata,8
+5135624,Harrisonburg,harrisonburg,VA,Virginia,51164,38.44940,-78.86890,America/New_York,wikidata,8
+5363000,Seattle,seattle,WA,Washington,780995,47.60500,-122.33000,America/Los_Angeles,wikidata,8
+5367000,Spokane,spokane,WA,Washington,230609,47.65719,-117.42350,America/Los_Angeles,wikidata,8
+5370000,Tacoma,tacoma,WA,Washington,228202,47.25250,-122.44750,America/Los_Angeles,wikidata,8
+5374060,Vancouver,vancouver,WA,Washington,198992,45.63111,-122.67167,America/Los_Angeles,wikidata,8
+5305210,Bellevue,bellevue,WA,Washington,154377,47.61444,-122.19250,America/Los_Angeles,wikidata,8
+5335415,Kent,kent,WA,Washington,136588,47.38278,-122.22694,America/Los_Angeles,wikidata,8
+5322640,Everett,everett,WA,Washington,113011,47.96333,-122.20056,America/Los_Angeles,wikidata,8
+5367167,Spokane Valley,spokane-valley,WA,Washington,108267,47.67330,-117.23900,America/Los_Angeles,wikidata,8
+5357745,Renton,renton,WA,Washington,105543,47.47992,-122.20344,America/Los_Angeles,wikidata,8
+5323515,Federal Way,federal-way,WA,Washington,100252,47.31500,-122.34000,America/Los_Angeles,wikidata,8
+5380010,Yakima,yakima,WA,Washington,97390,46.60194,-120.50778,America/Los_Angeles,wikidata,8
+5305280,Bellingham,bellingham,WA,Washington,95860,48.75439,-122.47883,America/Los_Angeles,wikidata,8
+5335940,Kirkland,kirkland,WA,Washington,95499,47.68583,-122.19167,America/Los_Angeles,wikidata,8
+5335275,Kennewick,kennewick,WA,Washington,86728,46.20347,-119.15927,America/Los_Angeles,wikidata,8
+5303180,Auburn,auburn,WA,Washington,85513,47.30222,-122.21472,America/Los_Angeles,wikidata,8
+5357535,Redmond,redmond,WA,Washington,82195,47.66944,-122.12389,America/Los_Angeles,wikidata,8
+5353545,Pasco,pasco,WA,Washington,81724,46.23861,-119.10861,America/Los_Angeles,wikidata,8
+5343955,Marysville,marysville,WA,Washington,76209,48.06278,-122.16333,America/Los_Angeles,wikidata,8
+5361115,Sammamish,sammamish,WA,Washington,66474,47.60890,-122.04200,America/Los_Angeles,wikidata,8
+5363960,Shoreline,shoreline,WA,Washington,66251,47.75639,-122.33972,America/Los_Angeles,wikidata,8
+5358235,Richland,richland,WA,Washington,64372,46.28028,-119.27528,America/Los_Angeles,wikidata,8
+5338038,Lakewood,lakewood,WA,Washington,62709,47.16667,-122.52611,America/Los_Angeles,wikidata,8
+5336745,Lacey,lacey,WA,Washington,58644,47.02639,-122.80722,America/Los_Angeles,wikidata,8
+5351300,Olympia,olympia,WA,Washington,56271,47.04250,-122.89306,America/Los_Angeles,wikidata,8
+5308850,Burien,burien,WA,Washington,52046,47.46833,-122.34556,America/Los_Angeles,wikidata,8
+5307380,Bothell,bothell,WA,Washington,51770,47.77167,-122.20444,America/Los_Angeles,wikidata,8
+5553000,Milwaukee,milwaukee,WI,Wisconsin,563531,43.05000,-87.95000,America/Chicago,wikidata,8
+5548000,Madison,madison,WI,Wisconsin,285300,43.07472,-89.38417,America/Chicago,wikidata,8
+5531000,Green Bay,green-bay,WI,Wisconsin,106311,44.51333,-88.01333,America/Chicago,wikidata,8
+5539225,Kenosha,kenosha,WI,Wisconsin,99578,42.58222,-87.84556,America/Chicago,wikidata,8
+5566000,Racine,racine,WI,Wisconsin,78057,42.72611,-87.80583,America/Chicago,wikidata,8
+5502375,Appleton,appleton,WI,Wisconsin,75344,44.28222,-88.41833,America/Chicago,wikidata,8
+5522300,Eau Claire,eau-claire,WI,Wisconsin,72331,44.81472,-91.49278,America/Chicago,wikidata,8
+5584250,Waukesha,waukesha,WI,Wisconsin,71461,43.01167,-88.23167,America/Chicago,wikidata,8
+5560500,Oshkosh,oshkosh,WI,Wisconsin,67242,44.02417,-88.56111,America/Chicago,wikidata,8
+5537825,Janesville,janesville,WI,Wisconsin,66428,42.68547,-89.01363,America/Chicago,wikidata,8
+5585300,West Allis,west-allis,WI,Wisconsin,59784,43.00806,-88.01833,America/Chicago,wikidata,8
+5540775,La Crosse,la-crosse,WI,Wisconsin,51049,43.81333,-91.23306,America/Chicago,wikidata,8
+5613900,Cheyenne,cheyenne,WY,Wyoming,65704,41.14556,-104.80194,America/Denver,wikidata,8
+5613150,Casper,casper,WY,Wyoming,58823,42.83472,-106.32500,America/Denver,wikidata,8

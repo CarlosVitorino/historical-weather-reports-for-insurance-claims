@@ -52,9 +52,11 @@ def article(base: str, page: Page) -> list[dict]:
             breadcrumbs(base, trail)]
 
 
-def sitemap(base: str) -> str:
+def sitemap(base: str, extra: list[tuple[str, date]] = ()) -> str:
+    """extra: generated pages (Storm Reports) with their last change."""
     entries = [("/", SITE_UPDATED), ("/order", SITE_UPDATED), ("/guides", max(g.updated for g in GUIDES)),
-               *((p.path, p.updated) for p in PAGES.values()), *((p, LEGAL_UPDATED) for p in LEGAL_PATHS), ("/static/sample-report.pdf", SITE_UPDATED)]
+               *((p.path, p.updated) for p in PAGES.values()), *((p, LEGAL_UPDATED) for p in LEGAL_PATHS),
+               ("/static/sample-report.pdf", SITE_UPDATED), *extra]
     urls = "".join(f"<url><loc>{xml_escape(base + path)}</loc><lastmod>{d.isoformat()}</lastmod></url>"
                    for path, d in entries)
     return ('<?xml version="1.0" encoding="UTF-8"?>'

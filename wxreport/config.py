@@ -46,6 +46,8 @@ class Settings:
     alert_email: str = ""        # where failures and new orders are reported; empty: SUPPORT_EMAIL
     backup_keep: int = 14        # nightly database copies kept in DATA_DIR/backups
     draft_ttl_hours: int = 24    # unpaid drafts older than this are deleted with their snapshots
+    storm_sync: bool = True      # keep Storm Reports current from inside the server (STORM_SYNC=0 to turn off)
+    umami_website_id: str = ""  # Umami (stats.huntingapps.io) website id; empty: no tracker, e.g. in development
 
     @property
     def payments_ready(self) -> bool:
@@ -83,4 +85,6 @@ def load() -> Settings:
         alert_email=os.environ.get("ALERT_EMAIL", "").strip(),
         backup_keep=int(os.environ.get("BACKUP_KEEP", "14")),
         draft_ttl_hours=int(os.environ.get("DRAFT_TTL_HOURS", "24")),
+        storm_sync=os.environ.get("STORM_SYNC", "1").strip() not in ("0", "false", "no", ""),
+        umami_website_id=os.environ.get("UMAMI_WEBSITE_ID", "").strip(),
     )

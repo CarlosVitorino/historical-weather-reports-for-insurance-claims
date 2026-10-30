@@ -13,7 +13,7 @@ from . import BRAND, DOMAIN, SUPPORT_EMAIL
 from .config import Settings
 from .content import Page
 
-UPDATED = date(2026, 10, 15)
+UPDATED = date(2026, 10, 30)
 PATHS = ("/terms", "/privacy", "/refunds", "/imprint")
 MAIL = f'<a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a>'
 
@@ -120,6 +120,12 @@ in running and improving the site.</p>
 <h2>Cookies</h2>
 <p>One first-party cookie holding a random visitor id, kept for a year, so we can count visits and connect an order
 to the visit it came from. No advertising or third-party tracking cookies.</p>
+
+<h2>Visit statistics</h2>
+<p>We count visits to our public pages with Umami, which we run on our own server. It sets no cookies and does not
+store your network (IP) address. It records the page, the site that sent you, your browser, device type and country,
+and a few clicks such as opening the order page. It never sees your address, email or order: order pages are not
+counted, and anything typed into a link is removed before it is sent.</p>
 
 <h2>Who else sees your data</h2>
 <ul>

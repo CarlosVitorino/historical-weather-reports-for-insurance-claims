@@ -128,4 +128,37 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
 <div class="wrap"><table><tr><th>Created (UTC)</th><th>Status</th><th>Location</th><th>Loss date</th><th>Email</th>
 <th>Paid</th><th>Report ID</th><th>Email</th><th></th></tr>{orders}</table></div>
 <p class="muted">Visitors are counted by an anonymous first-party cookie; no IP addresses are stored.</p>
+{NO_STATS}
 </main></body></html>"""
+
+
+# The owner's own visits, left out of both counts: Umami's tracker sends nothing when localStorage has
+# umami.disabled, and log_view() skips a browser with the nostats cookie. Per browser and device; works on any
+# network, because it is this browser that is marked, not an address.
+NO_STATS = """<h2 id="this-browser">This browser</h2><div class="kpi" style="max-width:34rem">
+<p style="margin:0 0 .6rem">Your own visits shouldn't count. Switch this browser off once on each device you use (laptop,
+phone): it is then left out of Umami and of the numbers above.</p>
+<p style="margin:0 0 .8rem"><b id="ns-state" style="font-size:1rem;display:inline">…</b></p>
+<button type="button" id="ns-off">Don't count this browser</button>
+<button type="button" id="ns-on">Count it again</button></div>
+<script>
+(function () {
+  var state = document.getElementById("ns-state");
+  function show() {
+    var off = localStorage.getItem("umami.disabled") === "1" && /(?:^|; )nostats=1/.test(document.cookie);
+    state.textContent = off ? "This browser is not counted." : "This browser is counted.";
+    state.style.color = off ? "var(--good)" : "var(--muted)";
+  }
+  document.getElementById("ns-off").onclick = function () {
+    localStorage.setItem("umami.disabled", "1");
+    document.cookie = "nostats=1; path=/; max-age=" + 5 * 365 * 86400 + "; samesite=lax";
+    show();
+  };
+  document.getElementById("ns-on").onclick = function () {
+    localStorage.removeItem("umami.disabled");
+    document.cookie = "nostats=; path=/; max-age=0; samesite=lax";
+    show();
+  };
+  show();
+})();
+</script>"""

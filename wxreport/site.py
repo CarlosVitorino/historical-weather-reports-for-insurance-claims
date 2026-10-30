@@ -5,6 +5,7 @@ Principles: say each thing once, in plain words; show the product with real data
 chart are drawn from the sample report by scripts/make_site_map.py); put the order form where people land.
 """
 import json
+import re
 from datetime import date, timedelta
 from html import escape
 from pathlib import Path
@@ -36,7 +37,8 @@ FONT_FACES = """
 FONTS = '<link rel="preload" href="/static/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>'
 MAP_ASSETS = ('<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">'
               '<script defer src="/static/vendor/leaflet/leaflet.js"></script>'
-              '<script defer src="/static/order.js"></script><script defer src="/static/hero.js"></script>')
+              '<script defer src="/static/order.js"></script><script defer src="/static/hero.js"></script>'
+              '<script defer src="/static/storms.js"></script>')
 
 CSS = FONT_FACES + """
 :root{
@@ -76,6 +78,25 @@ h3{font-size:1.1rem;font-weight:600;letter-spacing:-.015em;line-height:1.3}
 .top nav a:hover{color:#fff}
 .top nav a.btn-amber,.top nav a.btn-amber:hover{color:#1b1205}
 @media (max-width:760px){.top nav a.hide-sm{display:none}}
+.mnav{display:none}
+@media (max-width:760px){
+  .top nav{gap:12px}
+  .mnav{display:block}
+  .mnav summary{list-style:none;cursor:pointer;width:40px;height:40px;display:grid;place-content:center;gap:5px;border-radius:9px;
+    border:1px solid rgba(255,255,255,.18)}
+  .mnav summary::-webkit-details-marker{display:none}
+  .mnav summary span{display:block;width:18px;height:2px;border-radius:1px;background:#e4ebf3;transition:transform .15s,opacity .15s}
+  .mnav[open] summary span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .mnav[open] summary span:nth-child(2){opacity:0}
+  .mnav[open] summary span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .mnav-panel{position:fixed;top:62px;left:0;right:0;display:flex;flex-direction:column;padding:8px 16px 18px;
+    background:var(--navy-900);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 18px 40px rgba(7,17,31,.35);
+    max-height:calc(100vh - 62px);overflow:auto}
+  .top nav .mnav-panel a{color:#e4ebf3;font-size:1rem;padding:13px 4px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .top nav .mnav-panel a:hover{color:#fff}
+  .top nav .mnav-panel a:last-child{border-bottom:0}
+}
+@media (max-width:420px){.top .btn{padding:8px 11px;font-size:.84rem}}
 @media (max-width:420px){.top .brand{font-size:.95rem}.top .wrap{padding:0 16px}}
 
 /* buttons */
@@ -249,15 +270,21 @@ form input:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px 
 .yes:before{content:"";width:18px;height:18px;border-radius:50%;flex:none;background:var(--green-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.3l2.6 2.6 5.4-5.6' fill='none' stroke='%231f7a4d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px}
 .no{color:var(--faint)}
 .no:before{content:"";width:18px;height:2px;background:#cfd6de;flex:none;margin:0 0 0 0}
+.cmp-cards{display:none}
 @media (max-width:700px){
-  .compare,.compare tbody,.compare tr,.compare td{display:block;width:100%!important}
-  .compare thead{display:none}
-  .compare tr{border-bottom:1px solid var(--rule);padding:14px 16px}
-  .compare tr:last-child{border-bottom:0}
-  .compare td{border:0;padding:4px 0;display:flex;justify-content:space-between;gap:12px;background:none!important}
-  .compare td:first-child{font-weight:600;padding-bottom:8px}
-  .compare td[data-label]:before{content:attr(data-label);color:var(--muted);font-weight:400}
-  .compare td.us:before{color:var(--ink);font-weight:600}
+  .compare{display:none}
+  .cmp-cards{display:grid;gap:14px}
+  .cmp-card{background:#fff;border:1px solid var(--rule);border-radius:16px;overflow:hidden}
+  .cmp-card h3{margin:0;padding:14px 16px;font-size:1rem;background:var(--paper);border-bottom:1px solid var(--rule)}
+  .cmp-card.us{border-color:var(--navy-900);box-shadow:0 0 0 1px var(--navy-900)}
+  .cmp-card.us h3{background:var(--navy-900);color:#fff}
+  .cmp-card ul{list-style:none;margin:0;padding:4px 16px}
+  .cmp-card li{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 0;
+    border-bottom:1px solid var(--rule);font-size:.93rem}
+  .cmp-card li:last-child{border-bottom:0}
+  .cmp-card .k{color:var(--muted)}
+  .cmp-card .v{text-align:right;color:var(--ink);font-weight:550;flex:none;max-width:48%}
+  .cmp-card.us .v{font-weight:600}
 }
 
 /* steps */
@@ -345,6 +372,257 @@ footer .links{display:flex;gap:18px;flex-wrap:wrap}
 .glist span{font-size:.92rem;line-height:1.55}
 .more{margin:48px 0 0;padding:28px 0 0;border-top:1px solid var(--rule)}
 .more h2{margin-top:0}
+/* storm reports */
+.sr-wrap{max-width:960px;margin:0 auto;padding:44px 24px 96px}
+.sr-wrap section{padding:0}
+.sr-intro h1{font-size:clamp(1.9rem,4vw,2.6rem);line-height:1.12;letter-spacing:-.035em;margin:10px 0 14px}
+.sr-intro .lede{max-width:46rem;margin:0 0 22px}
+.sr-checked{font:500 .76rem/1.4 var(--mono);color:var(--faint);margin:-6px 0 12px}
+.sr-block{margin:48px 0 0}
+.sr-block h2{font-size:1.35rem;letter-spacing:-.02em;margin:0 0 14px}
+.sr-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+.sr-head h2{margin:0}
+.sr-note{color:var(--muted);font-size:.92rem;margin:-6px 0 16px;max-width:44rem}
+.sr-badge{display:inline-block;flex:none;font:600 .66rem/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  border-radius:999px;padding:5px 8px;white-space:nowrap}
+.sr-badge.pre{background:var(--amber-50);color:var(--amber-ink);border:1px solid #f0cf9c}
+.sr-badge.rev{background:var(--green-50);color:var(--green);border:1px solid #bfe0cd}
+.sr-wide{max-width:1040px}
+.sr-tbl{margin-top:28px}
+.sr-filters{display:grid;grid-template-columns:minmax(220px,1.6fr) repeat(3,minmax(130px,1fr)) auto;gap:12px;align-items:end;
+  padding:16px;background:#fff;border:1px solid var(--rule);border-radius:14px}
+.sr-filters.js{grid-template-columns:minmax(220px,1.6fr) repeat(3,minmax(130px,1fr))}
+.sr-fsheet{display:contents}
+.sr-filters .sr-fsh,.sr-filters .sr-fsort,.sr-factions .btn-ghost,.sr-filters .sr-fbtn{display:none}
+.sr-filters.js .sr-factions{display:none}
+.sr-factions{display:flex;gap:10px}
+.sr-f{display:flex;flex-direction:column;gap:5px;margin:0;font-weight:400}
+.sr-f span{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.sr-f input,.sr-f select{width:100%;margin:0;padding:10px 12px;font:inherit;font-size:.95rem;color:var(--ink);background:#fff;
+  border:1px solid #c3ccd7;border-radius:9px;min-height:44px}
+.sr-f select{appearance:none;padding-right:30px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%235d6b7c' stroke-width='1.5'/%3E%3C/svg%3E") right 12px center no-repeat}
+.sr-f input:focus,.sr-f select:focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(28,53,84,.14)}
+.sr-filters .btn{min-height:44px;padding:10px 18px}
+.sr-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sr-backdrop{position:fixed;inset:0;z-index:1500;background:rgba(7,17,31,.45)}
+.sr-fclose{border:0;background:none;font-size:1.6rem;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+@media (max-width:820px){.sr-filters,.sr-filters.js{grid-template-columns:1fr 1fr}.sr-fq{grid-column:1/-1}
+  .sr-factions{grid-column:1/-1}}
+/* phones with JavaScript: search + filter button; the other filters open as a bottom sheet */
+@media (max-width:640px){
+  .sr-filters.js{grid-template-columns:1fr auto;padding:0;background:none;border:0;align-items:end}
+  .sr-filters.js .sr-fq{grid-column:1}.sr-filters.js .sr-fq span{display:none}
+  .sr-filters.js .sr-fbtn{display:inline-flex;position:relative;align-items:center;justify-content:center;width:48px;height:44px;
+    border:1px solid #c3ccd7;border-radius:9px;background:#fff;color:var(--ink);cursor:pointer}
+  .sr-fcount{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--navy-800);
+    color:#fff;font:600 .68rem/18px var(--sans);text-align:center;padding:0 4px}
+  .sr-filters.js .sr-fsheet{display:none}
+  .sr-filters.js.open .sr-fsheet{display:grid;gap:14px;position:fixed;left:0;right:0;bottom:0;z-index:1600;background:#fff;
+    padding:16px 18px calc(18px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(7,17,31,.25)}
+  .sr-filters.js.open .sr-fsh{display:flex;justify-content:space-between;align-items:center}
+  .sr-filters.js.open .sr-f.sr-fsort{display:flex}
+  .sr-filters.js.open .sr-factions{display:flex}.sr-filters.js.open .sr-factions .btn{flex:1;display:inline-flex}
+}
+.sr-count{margin:14px 2px 10px;font-size:.88rem;color:var(--muted)}
+.sr-count a{font-weight:550}
+.sr-tw{background:#fff;border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+.sr-table{width:100%;border-collapse:collapse;font-size:.94rem}
+.sr-table th{text-align:left;font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
+  padding:12px 16px;background:var(--paper);border-bottom:1px solid var(--rule);white-space:nowrap}
+.sr-table th a{color:inherit;text-decoration:none}.sr-table th a:hover,.sr-table th a.on{color:var(--ink)}
+.sr-table td{padding:12px 16px;border-bottom:1px solid var(--rule);vertical-align:middle}
+.sr-table tr:last-child td{border-bottom:0}
+.sr-table .sr-cn{text-align:right;white-space:nowrap}
+.sr-table td.sr-cn b{display:block;color:var(--ink);font-weight:600}
+.sr-table td.sr-cn small{display:block;color:var(--faint);font-size:.76rem}
+.sr-table tbody tr{position:relative}
+.sr-rl{color:var(--ink);font-weight:600;text-decoration:none}
+.sr-rl:after{content:"";position:absolute;inset:0}
+.sr-rl:focus-visible{outline:none}.sr-table tbody tr:focus-within{box-shadow:inset 3px 0 0 var(--navy-700)}
+.sr-table tbody tr:hover{background:#f7f9fb;cursor:pointer}.sr-table tbody tr:hover .sr-rl{color:var(--navy-700)}
+.sr-table tr.sr-on{background:var(--navy-100)}.sr-table tr.sr-on .sr-rl{color:var(--navy-800)}
+.sr-table tr.sr-on td:first-child{box-shadow:inset 3px 0 0 var(--navy-700)}
+.sr-cd{white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+.sr-cc .sr-tag,.sr-cc .sr-badge{margin-left:8px}
+.sr-table tr.sr-yr th{background:var(--paper);color:var(--ink);font:600 .9rem/1.3 var(--sans);letter-spacing:0;text-transform:none;
+  padding:10px 16px}
+.sr-table tr.sr-yr th span{color:var(--faint);font-weight:400;font-size:.82rem;margin-left:6px}
+/* city page: the city's record (fixed), then the workspace: storm card + list of storm days */
+.sr-wrap .sr-record{margin:26px 0 0;padding:14px 16px 16px;background:var(--navy-100);border-radius:16px}
+.sr-rk{margin:0 0 10px;font:500 .7rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--navy-700)}
+.sr-record .sr-tiles{margin:0;border-color:#d3dde8}
+.sr-work{display:grid;grid-template-columns:280px minmax(0,1fr);grid-template-areas:"days storm";gap:24px;
+  align-items:start;margin:36px 0 0}
+.sr-panel{grid-area:storm;background:#fff;border:1px solid var(--rule);border-radius:18px;box-shadow:var(--shadow);
+  overflow:hidden;scroll-margin-top:80px;outline:none}
+.sr-panel[aria-busy=true]{opacity:.55;transition:opacity .15s}
+.sr-ph{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 14px;padding:18px 22px;background:var(--navy-900);color:#fff}
+.sr-pk{flex-basis:100%;margin:0;font:500 .7rem/1.3 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--amber)}
+.sr-ph h2{color:#fff;font-size:1.45rem;letter-spacing:-.025em;margin:0}
+.sr-pills{display:flex;gap:6px;margin-left:auto}
+.sr-pill{display:inline-block;font:600 .66rem/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;border-radius:999px;
+  padding:5px 8px;background:var(--amber);color:#1b1205}
+.sr-ph .sr-tag{background:#fbeae7}
+.sr-tolatest{color:#cfd9e4;font-size:.85rem;font-weight:550;text-decoration:none;align-self:center}
+.sr-tolatest:hover{color:#fff}
+.sr-pb{padding:20px 22px 6px}
+.sr-pb .sr-tiles{margin:0 0 16px}
+.sr-pt{font-size:1rem;margin:20px 0 10px}
+.sr-pb .sr-block{margin-top:28px}.sr-pb .sr-block h2{font-size:1.1rem}
+.sr-pf{display:grid;grid-template-columns:1fr auto;gap:12px 20px;align-items:center;margin-top:18px;padding:18px 22px;
+  background:var(--paper);border-top:1px solid var(--rule)}
+.sr-porder b{display:block;color:var(--ink);font-size:.98rem}.sr-porder span{color:var(--muted);font-size:.88rem;line-height:1.5}
+.sr-pf .sr-pager{grid-column:1/-1;margin:0;padding-top:12px;border-top:1px solid var(--rule)}
+.sr-pf .sr-pager a{color:var(--navy-700)}
+.sr-dlist{grid-area:days;position:sticky;top:80px;background:#fff;border:1px solid var(--rule);border-radius:16px;overflow:hidden}
+.sr-dlist h2{font-size:1rem;margin:0;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.sr-dlist h2 span{color:var(--faint);font-weight:400;font-size:.88rem;margin-left:4px}
+.sr-dscroll{position:relative;max-height:calc(100vh - 160px);overflow:auto;overscroll-behavior:contain}
+.sr-dlist h3{position:sticky;top:0;z-index:1;margin:0;padding:8px 16px;background:var(--paper);font-size:.82rem;
+  border-bottom:1px solid var(--rule)}
+.sr-dlist h3 span{color:var(--faint);font-weight:400;margin-left:4px}
+.sr-dlist ul{list-style:none;margin:0;padding:0}
+.sr-dlist li+li{border-top:1px solid var(--rule)}
+.sr-dlist a{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:10px 16px;text-decoration:none;color:var(--body)}
+.sr-dlist a:hover{background:#f7f9fb}
+.sr-dlist a[aria-current]{background:var(--navy-100);box-shadow:inset 3px 0 0 var(--navy-700)}
+.sr-ld{color:var(--ink);font-weight:600;font-size:.9rem}
+.sr-ls{grid-column:1/-1;color:var(--muted);font-size:.82rem}
+.sr-dlist .sr-tag{grid-column:2;grid-row:1;align-self:center;font-size:.6rem;padding:4px 6px}
+/* the day strip (phones and tablets): chips that scroll sideways, plus "All days" for the full list */
+.sr-strip{display:none}
+@media (max-width:900px){
+  .sr-work{grid-template-columns:1fr;grid-template-areas:"storm" "days";gap:20px;margin-top:24px}
+  .sr-dlist{position:static}.sr-dscroll{max-height:none}
+  .sr-ph{padding:14px 16px}.sr-ph h2{font-size:1.2rem}.sr-pb{padding:14px 16px 4px}
+  .sr-pf{grid-template-columns:1fr;padding:14px 16px}.sr-pf .btn{justify-self:start}
+  .sr-strip{display:flex;align-items:center;gap:8px;padding:10px 0 10px 16px;background:var(--navy-800);
+    border-top:1px solid rgba(255,255,255,.08)}
+  .sr-chips-x{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;flex:1;min-width:0}
+  .sr-chips-x::-webkit-scrollbar{display:none}
+  .sr-chip{flex:none;scroll-snap-align:center;display:flex;flex-direction:column;gap:1px;padding:7px 11px;border-radius:10px;
+    background:rgba(255,255,255,.08);color:#cfd9e4;text-decoration:none;font-size:.72rem;line-height:1.25}
+  .sr-chip b{color:#fff;font-size:.84rem;font-weight:600;white-space:nowrap}
+  .sr-chip span{white-space:nowrap}
+  .sr-chip.major b:after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#f07a68;
+    margin-left:6px;vertical-align:2px}
+  .sr-chip[aria-current]{background:var(--amber);color:#3a2604}.sr-chip[aria-current] b{color:#1b1205}
+  .sr-all{flex:none;margin-right:12px;padding:9px 11px;border-radius:10px;border:1px solid rgba(255,255,255,.25);color:#fff;
+    font-size:.78rem;font-weight:600;text-decoration:none;white-space:nowrap}
+  /* with JavaScript the full list is a bottom sheet, opened from "All days" */
+  .sr-js .sr-dlist{display:none}
+  .sr-js .sr-sheet-open .sr-dlist{display:block;position:fixed;top:auto;left:0;right:0;bottom:0;z-index:1600;max-height:80vh;
+    padding-bottom:env(safe-area-inset-bottom);
+    border-radius:18px 18px 0 0;border:0;box-shadow:0 -10px 40px rgba(7,17,31,.25)}
+  .sr-js .sr-sheet-open .sr-dscroll{max-height:calc(80vh - 52px)}
+  .sr-dlist h2{display:flex;align-items:center;gap:6px}.sr-dlist h2 .sr-fclose{margin-left:auto}
+}
+@media (max-width:640px){
+  .sr-intro .lede{font-size:1rem}
+  .sr-wrap .sr-record{margin-top:18px;padding:10px 10px 10px}.sr-rk{margin:0 4px 8px}
+  .sr-rk span{display:none}
+  .sr-wrap .sr-record .sr-tiles,.sr-wrap .sr-pb .sr-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .sr-wrap .sr-record .sr-tiles div,.sr-wrap .sr-pb .sr-tiles div{padding:9px 8px;border-bottom:0;border-right:1px solid var(--rule)}
+  .sr-wrap .sr-record .sr-tiles div:last-child,.sr-wrap .sr-pb .sr-tiles div:last-child{border-right:0}
+  .sr-wrap .sr-record .sr-tiles dt,.sr-wrap .sr-pb .sr-tiles dt{font-size:.54rem;letter-spacing:.02em;min-height:2.6em}
+  .sr-wrap .sr-record .sr-tiles dd b,.sr-wrap .sr-pb .sr-tiles dd b{font-size:1.02rem;white-space:nowrap}
+  .sr-wrap .sr-record .sr-tiles dd span,.sr-wrap .sr-pb .sr-tiles dd span{display:none}
+  .sr-pb .sr-tiles{margin-bottom:12px}
+  .sr-pt{margin:14px 0 8px}
+}
+.sr-st{color:var(--faint);font-size:.82rem;margin:0 8px 0 6px}
+.sr-none{color:#c3ccd7}
+.sr-empty{padding:28px;text-align:center;background:#fff;border:1px solid var(--rule);border-radius:14px;color:var(--muted)}
+.sr-pager{display:flex;justify-content:space-between;align-items:center;margin:14px 2px 0;font-size:.9rem;color:var(--muted)}
+.sr-pager a{font-weight:550;text-decoration:none}
+/* phones: each row becomes its own card, with space between cards: date and tag, the city, then the figures */
+@media (max-width:640px){
+  .sr-tw{background:none;border:0;border-radius:0;overflow:visible}
+  .sr-table thead{display:none}
+  .sr-table{display:block}
+  .sr-table tbody{display:grid;gap:12px}
+  .sr-table tbody tr{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid var(--rule);
+    border-radius:14px;box-shadow:0 1px 2px rgba(7,17,31,.04),0 4px 14px rgba(7,17,31,.05);overflow:hidden}
+  .sr-table td{display:block;padding:0;border:0}
+  .sr-table td.sr-cd{grid-column:1/-1;grid-row:1;padding:14px 16px 0;font:500 .68rem/1.4 var(--mono);letter-spacing:.05em;
+    text-transform:uppercase;color:var(--faint)}
+  .sr-table td.sr-cc{grid-column:1/-1;grid-row:2;padding:2px 16px 12px;font-size:1.12rem;letter-spacing:-.015em}
+  .sr-cc .sr-st{margin-left:5px;font-size:.85rem}
+  .sr-cc .sr-tag{position:absolute;top:12px;right:14px;margin:0;font-size:.58rem;padding:3px 6px}
+  /* the figures: smaller than the header, inside the same card, under a short inset rule */
+  .sr-table td.sr-cn{grid-row:3;text-align:left;padding:10px 0 14px 16px;position:relative}
+  .sr-table td.sr-cn:nth-of-type(3):after{content:"";position:absolute;top:0;left:16px;width:calc(300% - 32px);height:1px;
+    background:var(--rule)}
+  .sr-table td.sr-cn:last-child{padding-right:16px}
+  .sr-table td.sr-cn b{font-size:.9rem;font-weight:600}
+  .sr-table td.sr-cn small{font-size:.7rem}
+  .sr-table td.sr-cn:before{content:attr(data-label);display:block;font:500 .56rem/1.3 var(--mono);letter-spacing:.05em;
+    text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+  .sr-table tbody tr:hover{background:#fff}.sr-table tbody tr:active{background:#f7f9fb}
+}
+.sr-tag{display:inline-block;flex:none;font:600 .66rem/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  border-radius:999px;padding:5px 8px;white-space:nowrap;background:#fbeae7;color:var(--red);border:1px solid #efc4bc}
+.sr-chips{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.sr-chips a{display:inline-flex;gap:6px;align-items:center;padding:7px 12px;background:#fff;border:1px solid var(--rule);
+  border-radius:999px;font-size:.88rem;text-decoration:none;color:var(--ink)}
+.sr-chips a:hover{border-color:var(--navy-700)}
+.sr-chips span{color:var(--faint);font-size:.8rem}
+.sr-status{padding:9px 12px;border-radius:10px;margin:0 0 14px;font-size:.84rem}
+.sr-status summary{display:flex;gap:10px;align-items:center;cursor:pointer;list-style:none;color:var(--amber-ink)}
+.sr-status summary::-webkit-details-marker{display:none}
+.sr-status summary:after{content:"i";flex:none;margin-left:auto;display:grid;place-items:center;width:18px;height:18px;
+  border:1.4px solid currentColor;border-radius:50%;font:700 .68rem/1 Georgia,serif;opacity:.75}
+.sr-status p{margin:8px 0 0;color:var(--body);line-height:1.5}
+.sr-status.pre{background:var(--amber-50);border:1px solid #f0cf9c}
+.sr-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 0 8px;background:#fff;border:1px solid var(--rule);
+  border-radius:14px;overflow:hidden}
+.sr-tiles div{padding:14px 16px;border-right:1px solid var(--rule)}
+.sr-tiles div:last-child{border-right:0}
+.sr-tiles dt{font:500 .66rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.sr-tiles dd{margin:4px 0 0;color:var(--muted);font-size:.82rem;line-height:1.35}
+.sr-tiles dd b{display:block;color:var(--ink);font-size:1.35rem;font-weight:650;letter-spacing:-.03em}
+.sr-tiles dd span{display:block}
+@media (max-width:700px){.sr-tiles{grid-template-columns:1fr 1fr}.sr-tiles div:nth-child(2){border-right:0}
+  .sr-tiles div:nth-child(-n+2){border-bottom:1px solid var(--rule)}}
+.sr-map{margin:0 0 16px;background:#fff;border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+#storm-map{height:400px;background:#e8eef5}
+#storm-map .leaflet-tile-pane{filter:grayscale(1) contrast(.92) brightness(1.06)}
+#storm-map .leaflet-tooltip{font:500 .76rem/1.35 var(--sans);color:var(--ink);border-radius:6px;padding:4px 7px;
+  border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+@media (max-width:700px){#storm-map{height:240px}}
+.sr-mleg{display:flex;flex-wrap:wrap;gap:6px 16px;padding:9px 16px;font-size:.78rem;color:var(--muted);
+  border-top:1px solid var(--rule)}
+.sr-mleg span{display:inline-flex;align-items:center;gap:6px}
+.lg-ring{width:14px;height:14px;border-radius:50%;border:1.4px dashed #4b5868}
+.sr-panel .sr-list,.sr-group .sr-list{background:#fff;border:1px solid var(--rule);border-radius:12px}
+.sr-group{margin:0 0 18px;scroll-margin-top:80px}
+.sr-gh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+.sr-gh h3{font-size:1.02rem}
+.sr-list{list-style:none;margin:0;padding:0 18px}
+.sr-list li{display:grid;grid-template-columns:5.4rem 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.sr-list li:last-child{border-bottom:0}
+.sr-t{font:500 .82rem/1.55 var(--mono);color:var(--muted);white-space:nowrap}
+.sr-list b{color:var(--ink);font-weight:600;display:block;padding-left:16px;position:relative}
+.sr-list b:before{content:"";position:absolute;left:0;top:.45em;width:8px;height:8px}
+.k-hail b:before{background:var(--sky);transform:rotate(45deg)}
+.k-wind b:before{background:#6b4fa0;border-radius:50%}
+.k-tornado b:before{background:#d9442e}
+.sr-pl{display:block;font-size:.9rem;color:var(--ink);padding-left:16px}
+.sr-ml{display:block;font-size:.8rem;color:var(--faint);padding-left:16px}
+.sr-remark{margin:6px 0 0 16px;font-size:.86rem;color:var(--body);line-height:1.55}
+@media (max-width:520px){.sr-list li{grid-template-columns:1fr;gap:2px}.sr-list{padding:0 14px}}
+.sr-more{margin:8px 0 0}
+.sr-more summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;list-style:none;font-weight:550;
+  font-size:.9rem;color:var(--navy-700);padding:6px 2px}
+.sr-more summary::-webkit-details-marker{display:none}
+.sr-more summary:before{content:"+";font-weight:400;font-size:1.1rem;line-height:1}
+.sr-more[open] summary:before{content:"–"}
+.sr-more[open] summary{margin-bottom:8px}
+.sr-also{margin:12px 0 0;font-size:.9rem}.sr-also a{font-weight:550;text-decoration:none}
+.sr-quote p{margin:0 0 10px}.sr-quote p:last-child{margin:0}.sr-quote .sr-more{margin:6px 0 0}
+.sr-quote{margin:0 0 12px;padding:14px 18px;background:#fff;border-left:3px solid var(--navy-700);border-radius:0 10px 10px 0;
+  color:var(--body);font-size:.93rem;line-height:1.65}
+.sr-src{margin-top:32px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
 """
 
@@ -365,10 +643,26 @@ WARNING_VIS = """<svg viewBox="0 0 300 150" role="img" aria-label="A property in
 </svg>"""
 
 
+# Umami (self-hosted at stats.huntingapps.io, cookieless). The edge Caddy serves it on our own origin at /u/script.js
+# and /u/api/send. Set once at start-up by configure_analytics(); empty means no tracker (development, tests).
+# analytics.js loads first: it holds the scrub that runs on every payload, and the click events.
+ANALYTICS = ""
+
+
+def configure_analytics(website_id: str, base_url: str) -> None:
+    global ANALYTICS
+    host = base_url.split("//", 1)[-1].split("/", 1)[0].split(":", 1)[0]
+    ANALYTICS = "" if not re.fullmatch(r"[0-9a-f-]{36}", website_id or "") else (
+        '<script defer src="/static/analytics.js"></script>'
+        f'<script defer src="/u/script.js" data-website-id="{website_id}" data-domains="{escape(host, quote=True)}" '
+        'data-exclude-hash="true" data-before-send="weScrub"></script>')
+
+
 def layout(title: str, body: str, refresh: int | None = None, description: str = "", map_assets: bool = False,
            url: str = "", index: bool = False, jsonld: list | None = None) -> str:
     """url: the page's canonical absolute URL (public pages only). index=False marks the page noindex, which is the
-    default so personal pages (orders, status) never reach a search index."""
+    default so personal pages (orders, status) never reach a search index. Only public pages (with a url) carry the
+    analytics tracker: order and status pages hold the order token in their address."""
     meta = f'<meta http-equiv="refresh" content="{refresh}">' if refresh else ""
     if url:
         origin = url[:url.index("/", url.index("//") + 2)] if url.count("/") > 2 else url
@@ -388,19 +682,31 @@ def layout(title: str, body: str, refresh: int | None = None, description: str =
 <meta property="og:type" content="website"><meta property="og:site_name" content="{BRAND}">
 <meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0b1a2e">
 <link rel="icon" href="{FAVICON}"><link rel="apple-touch-icon" href="/static/apple-touch-icon.png">{FONTS}
-{MAP_ASSETS if map_assets else ""}<style>{CSS}</style></head><body>
+{MAP_ASSETS if map_assets else ""}{ANALYTICS if url else ""}<style>{CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="brand" href="/">{LOGO}<span>{BRAND}</span></a>
-<nav><a class="hide-sm" href="/#report">What you get</a><a class="hide-sm" href="/#compare">Compare</a>
-<a class="hide-sm" href="/#sample">Sample report</a><a class="hide-sm" href="/guides">Guides</a>
-<a class="btn btn-amber" href="/order">Order · {PRICE}</a></nav></div></header>
+<nav>{NAV_LINKS.replace("<a ", '<a class="hide-sm" ')}<a class="btn btn-amber" href="/order">Order · {PRICE}</a>
+{MOBILE_MENU}</nav></div></header>
 <main>{body}</main>{FOOTER}</body></html>"""
 
+
+# The site's pages, in the header and the phone menu alike. Only pages: the landing page's own sections are reached
+# by scrolling it, not from the navigation.
+NAV_LINKS = ('<a href="/storm-reports">Storm Reports</a><a href="/guides">Guides</a>'
+             '<a href="/methodology">How it\'s built</a><a href="/static/sample-report.pdf">Sample report</a>')
+# Phones: the header links don't fit, so they live in a menu. <details> opens and closes without JavaScript.
+MOBILE_MENU = """<details class="mnav"><summary aria-label="Menu"><span></span><span></span><span></span></summary>
+<div class="mnav-panel">""" + NAV_LINKS + """</div></details>
+<script>document.addEventListener("click",function(e){var m=document.querySelector(".mnav[open]");
+if(m&&(!m.contains(e.target)||e.target.closest(".mnav-panel a")))m.removeAttribute("open")});
+document.addEventListener("keydown",function(e){var m=document.querySelector(".mnav[open]");
+if(m&&e.key==="Escape"){m.removeAttribute("open");m.querySelector("summary").focus()}});</script>"""
 
 FOOTER = f"""<footer><div class="wrap"><div><a class="brand" href="/" style="margin-bottom:14px">{LOGO}<span>{BRAND}</span></a>
 <p>Not affiliated with NOAA, the National Weather Service or any government agency. Reports compile public records;
 they are not certified records or expert opinions.</p></div>
 <div><p class="links"><a href="/#sample">Sample report</a><a href="/methodology">How it's built</a>
-<a href="/certified-weather-records">Certified records</a><a href="/guides">Guides</a><a href="/#faq">FAQ</a>
+<a href="/certified-weather-records">Certified records</a><a href="/storm-reports">Storm Reports</a>
+<a href="/guides">Guides</a><a href="/#faq">FAQ</a>
 <a href="/order">Order</a></p>
 <p class="links"><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="/refunds">Refunds</a><a href="/imprint">Imprint</a></p>
 <p>Support: <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a></p>
@@ -503,12 +809,19 @@ hashes for verification</span></div>
     body = "".join(f"<tr><td>{a}</td><td data-label='Free sites'>{cell(b)}</td>"
                    f"<td class='us' data-label='{BRAND}'>{cell(c)}</td><td data-label='Expert'>{cell(d)}</td></tr>"
                    for a, b, c, d in rows)
+    # Mobile: one card per solution, features listed inside it (the table is hidden at <=700px).
+    def card(idx, title, us=False):
+        items = "".join(f"<li><span class='k'>{r[0]}</span><span class='v'>{cell(r[idx])}</span></li>" for r in rows)
+        return f"<article class='cmp-card{' us' if us else ''}'><h3>{title}</h3><ul>{items}</ul></article>"
+
+    cards = (card(1, "Free weather sites") + card(2, BRAND, us=True) + card(3, "Forensic meteorologist"))
     compare = f"""<section class="alt" id="compare"><div class="wrap">
 <div class="section-head"><p class="eyebrow">Compare</p><h2>Between a free weather site and an expert.</h2>
 <p class="lede">Detailed enough for a claim file, priced for every claim. If you later need an expert, the report
 gives them every source to start from.</p></div>
 <div><table class="compare"><thead><tr><th></th><th>Free weather sites</th><th class="us">{BRAND}</th>
-<th>Forensic meteorologist</th></tr></thead><tbody>{body}</tbody></table></div>
+<th>Forensic meteorologist</th></tr></thead><tbody>{body}</tbody></table>
+<div class="cmp-cards">{cards}</div></div>
 </div></section>"""
 
     pages = [("1", "Map & key facts"), ("3", "Station measurements"), ("5", "Warnings & storm reports"),
