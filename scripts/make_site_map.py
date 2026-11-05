@@ -1,4 +1,4 @@
-"""Build the landing page's data graphics from the real sample report (the trimmed Bloomington fixture).
+"""Build the landing page's data graphics from the real sample report (Downers Grove, IL, July 27, 2026).
 
     .venv/bin/python scripts/make_site_map.py
       → wxreport/static/site-map.json   records for the live hero map (static/hero.js)
@@ -16,8 +16,7 @@ from wxreport.report import gather  # noqa: E402
 
 
 def main():
-    ctx = gather("401 N College Ave, Bloomington, IN", "2026-02-19",
-                 root=ROOT / "tests/fixtures/snapshots", offline=True)
+    ctx = gather("850 Curtiss St, Downers Grove, IL 60515", "2026-07-27", root=ROOT / "data/snapshots", offline=True)
     wind_chart(ctx)
     map_data(ctx)
 
