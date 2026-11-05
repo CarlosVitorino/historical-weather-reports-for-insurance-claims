@@ -18,11 +18,11 @@ from .report import MIN_DATE
 PRICE = "$9.99"
 STATIC = Path(__file__).parent / "static"
 SAMPLE = {
-    "place": "Downers Grove, IL",
-    "date": "July 27, 2026",
-    "pages": 95,
+    "place": "Omaha, NE",
+    "date": "April 26, 2024",
+    "pages": 53,
     "pdf": "/static/sample-report.pdf",
-    "id": "WE-2026-07-27-CA19DE53B808",
+    "id": "WE-2024-04-26-3BF16776DB95",
 }
 WIND_CHART = (STATIC / "wind-chart.svg").read_text()
 SAMPLE_PAGE1 = json.loads((STATIC / "site-map.json").read_text())   # built from the sample report's page 1
@@ -774,17 +774,17 @@ Service</b><b>NEXRAD radar</b><b>US Census Bureau</b></div></div>
     questions = f"""<section id="report"><div class="wrap">
 <div class="section-head"><p class="eyebrow">What you get</p><h2>Answers to the three questions every weather claim asks.</h2></div>
 <div class="grid3">
-<article class="q"><div class="vis">{WIND_CHART}<div class="vis-cap">AIRPORT STATION KORD · 12.1 MI FROM THE PROPERTY</div></div>
+<article class="q"><div class="vis">{WIND_CHART}<div class="vis-cap">AIRPORT STATION KOMA · 4.2 MI FROM THE PROPERTY</div></div>
 <h3>How strong was the wind?</h3><p>Gusts, sustained wind, rain and temperature measured at the nearest weather
 stations through the day. Each reading names its station and how far away it is.</p></article>
 <article class="q"><div class="vis">{WARNING_VIS}<span class="inside">✓ Inside the warning area</span></div>
 <h3>Was the property under a warning?</h3><p>Every National Weather Service watch and warning for that day,
 with the property's location checked against each warning's official area.</p></article>
 <article class="q"><div class="vis"><div class="rows">
-<div class="rowi"><span><b>2.5 in hail</b> · ground report</span><span class="chip">0.9 mi ENE</span></div>
-<div class="rowi"><span><b>EF0 tornado</b> · path</span><span class="chip">0.6 mi WSW</span></div>
-<div class="rowi"><span><b>64 mph gust</b> · airport</span><span class="chip">12.1 mi NNE</span></div>
-<div class="rowi"><span><b>4 in hail</b> · radar</span><span class="chip">4.7 mi S</span></div></div></div>
+<div class="rowi"><span><b>1.75 in hail</b> · ground report</span><span class="chip">2.7 mi NE</span></div>
+<div class="rowi"><span><b>EF1 tornado</b> · path</span><span class="chip">2.1 mi E</span></div>
+<div class="rowi"><span><b>61 mph gust</b> · airport</span><span class="chip">4.2 mi NNE</span></div>
+<div class="rowi"><span><b>2.5 in hail</b> · radar</span><span class="chip">2.6 mi NW</span></div></div></div>
 <h3>What was reported nearby?</h3><p>Storm reports, NOAA's reviewed Storm Events records and radar hail detections,
 sorted by distance and direction from the property.</p></article>
 </div>
