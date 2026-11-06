@@ -43,6 +43,13 @@ def P(text: str, style: str = "body") -> Paragraph:
     return Paragraph(text, STYLES[style])
 
 
+MONO = ParagraphStyle("mono", parent=STYLES["cell"], fontName="Courier", fontSize=7, leading=8.6)
+
+
+def mono(text: str) -> Paragraph:
+    return Paragraph(esc(text).replace("\n", "<br/>").replace("  ", "&nbsp; "), MONO)
+
+
 def esc(s) -> str:
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
@@ -64,6 +71,29 @@ def table(rows: list[list], col_widths: list[float] | None = None, header: bool 
             style.append(("BACKGROUND", (0, i), (-1, i), colors.HexColor("#f8fafc")))
     t.setStyle(TableStyle(style))
     return t
+
+
+class Badge(Flowable):
+    """A small label at the right of a table cell. Shorter than a row, so it never makes a row taller."""
+    HEIGHT, SIZE = 8.0, 5.3
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.text = text.upper()
+
+    def wrap(self, avail_width, avail_height):
+        self.cell_width = avail_width
+        return avail_width, self.HEIGHT
+
+    def draw(self):
+        c = self.canv
+        width = c.stringWidth(self.text, "Helvetica-Bold", self.SIZE) + 7
+        x = self.cell_width - width
+        c.setFillColor(colors.HexColor("#fbe3bd"))
+        c.roundRect(x, 0, width, self.HEIGHT, 2, stroke=0, fill=1)
+        c.setFillColor(colors.HexColor("#7a4f09"))
+        c.setFont("Helvetica-Bold", self.SIZE)
+        c.drawString(x + 3.5, 2.2, self.text)
 
 
 def _numbered_canvas(report_id: str):

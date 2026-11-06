@@ -23,7 +23,8 @@ def create_checkout(cfg: Settings, order: dict) -> dict:
         "request_id": order["id"],
         "success_url": f"{cfg.base_url}/orders/{order['id']}/{order['token']}",
         "customer": {"email": order["email"]},
-        "metadata": {"order_id": order["id"], "loss_date": order["loss_date"]},
+        "metadata": {"order_id": order["id"], "loss_date": order["loss_date"],
+                     "report_type": order.get("report_type") or "property"},
     }
     try:
         r = requests.post(f"{cfg.creem_api_base}/v1/checkouts", json=body, timeout=30,

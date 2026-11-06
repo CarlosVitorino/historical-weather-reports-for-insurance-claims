@@ -7,4 +7,4 @@ SUPPORT_EMAIL = "support@weatherevidence.com"   # shown on every page; must matc
 ID_PREFIX = "WE"                           # report IDs: WE-<loss date>-<12 hex>
 
 # Bump whenever report content or layout changes: it is part of the report ID, so one ID is one exact PDF.
-RENDER_VERSION = "6"
+RENDER_VERSION = "7"

@@ -7,6 +7,7 @@ from pathlib import Path
 from . import mailer
 from .config import Settings
 from .report import build_pdf, gather
+from .reporttypes import DEFAULT
 from .store import Store, now
 
 log = logging.getLogger("wxreport.fulfil")
@@ -36,7 +37,8 @@ class Fulfiller:
         o = self.store.get(oid)
         try:
             ctx = gather(o["address"], o["loss_date"], lat=o["lat"], lon=o["lon"],
-                         root=order_dir(self.cfg, oid) / "snapshots")
+                         root=order_dir(self.cfg, oid) / "snapshots", report_type=o["report_type"] or DEFAULT,
+                         event_time=o["event_time"])
             pdf = build_pdf(ctx)
             path = order_dir(self.cfg, oid) / f"{ctx.report_id}.pdf"
             path.write_bytes(pdf)

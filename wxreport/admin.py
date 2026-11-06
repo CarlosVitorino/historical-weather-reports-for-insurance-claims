@@ -105,7 +105,8 @@ def render_admin(cfg: Settings, store: Store, days: int) -> str:
         rows.append(
             f"<tr><td>{_ts(o['created_at'])}</td><td class=\"s-{o['status']}\">{o['status']}{err}</td>"
             f"<td class=\"wrapok\">{escape(o['matched_address'] or o['address'])}"
-            f"<br><span class=\"muted\">{escape(o['county'] or '')}</span></td><td>{o['loss_date']}</td>"
+            f"<br><span class=\"muted\">{escape(o['county'] or '')}</span></td><td>{o['loss_date']}{' ' + o['event_time'] if o.get('event_time') else ''}"
+            f"<br><span class=\"muted\">{escape(o.get('report_type') or 'property')}</span></td>"
             f"<td>{escape(o['email'])}</td><td>{_money(o['amount_cents']) if o['amount_cents'] else ''}</td>"
             f"<td>{o['report_id'] or ''}</td><td>{o['email_status'] or ''}</td><td>{act}</td></tr>")
     orders = "".join(rows) or '<tr><td colspan="9" class="muted">No orders yet.</td></tr>'

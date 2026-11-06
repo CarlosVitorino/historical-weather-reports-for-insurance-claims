@@ -14,6 +14,8 @@ from . import BRAND, DOMAIN, SUPPORT_EMAIL
 from .brand import FAVICON, mark_svg
 from .geocode import _pretty
 from .report import MIN_DATE
+from .report_pages import CARDS as REPORT_CARDS, MENU as REPORT_MENU, SPECS as REPORT_SPECS, credits
+from .reporttypes import TYPES, get as report_type
 
 PRICE = "$9.99"
 STATIC = Path(__file__).parent / "static"
@@ -22,7 +24,7 @@ SAMPLE = {
     "date": "April 26, 2024",
     "pages": 53,
     "pdf": "/static/sample-report.pdf",
-    "id": "WE-2024-04-26-3BF16776DB95",
+    "id": "WE-2024-04-26-C02A5DE5F85F",
 }
 WIND_CHART = (STATIC / "wind-chart.svg").read_text()
 SAMPLE_PAGE1 = json.loads((STATIC / "site-map.json").read_text())   # built from the sample report's page 1
@@ -77,7 +79,104 @@ h3{font-size:1.1rem;font-weight:600;letter-spacing:-.015em;line-height:1.3}
 .top nav a{color:#c3cfdc;text-decoration:none;font-size:.93rem}
 .top nav a:hover{color:#fff}
 .top nav a.btn-amber,.top nav a.btn-amber:hover{color:#1b1205}
-@media (max-width:760px){.top nav a.hide-sm{display:none}}
+@media (max-width:760px){.top nav a.hide-sm,.ndrop{display:none}}
+.ndrop{position:relative}
+.ndrop summary{list-style:none;cursor:pointer;color:#c3cfdc;font-size:.93rem;display:inline-flex;align-items:center;gap:6px}
+.ndrop summary::-webkit-details-marker{display:none}
+.ndrop summary:hover,.ndrop[open] summary{color:#fff}
+.ndrop[open] summary svg{transform:rotate(180deg)}
+.ndrop-panel{position:absolute;top:calc(100% + 14px);left:-14px;min-width:290px;padding:8px;background:#fff;
+  border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow);display:grid}
+.top nav .ndrop-panel a{color:var(--ink);padding:9px 12px;border-radius:8px}
+.top nav .ndrop-panel a:hover{background:var(--navy-100);color:var(--ink)}
+.top nav .ndrop-panel a.ndrop-all{border-top:1px solid var(--rule);border-radius:0 0 8px 8px;margin-top:4px;color:var(--muted)}
+.top nav .ndrop-panel a small{display:block;color:var(--muted);font-size:.8rem;line-height:1.3;margin-top:1px}
+.top nav .ndrop-panel a b{font-weight:550}
+.mnav-h{margin:12px 0 4px;font:500 .7rem/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#8a9bb0}
+.mnav-h:first-child{margin-top:0}
+/* report cards: one toned photo each, then a real figure from that report's sample */
+.rt-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.rt-three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1040px){.rt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.rt-grid,.rt-three{grid-template-columns:1fr}}
+.rt-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--rule);border-radius:16px;overflow:hidden;
+  text-decoration:none;color:var(--body);box-shadow:0 1px 2px rgba(7,17,31,.04);transition:transform .15s,box-shadow .15s,border-color .15s}
+.rt-card:hover{transform:translateY(-3px);border-color:#c6d0db;box-shadow:0 2px 4px rgba(7,17,31,.06),0 18px 40px rgba(7,17,31,.13)}
+.rt-card:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.rt-ph{position:relative;display:block;aspect-ratio:8/5;background:var(--navy-800);overflow:hidden}
+.rt-ph img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.rt-card:hover .rt-ph img{transform:scale(1.04)}
+.rt-ph:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,17,31,0) 42%,rgba(7,17,31,.82) 100%)}
+.rt-ph b{position:absolute;z-index:1;left:16px;right:16px;bottom:12px;color:#fff;font-size:1.12rem;font-weight:600;letter-spacing:-.02em}
+.rt-body{flex:1;display:flex;flex-direction:column;gap:12px;padding:16px;font-size:.93rem;line-height:1.5}
+.rt-text{color:var(--ink);font-weight:550;min-height:3em}
+.rt-when{flex:1}
+.rt-when{list-style:none;margin:0;padding:12px 0 0;display:grid;gap:7px;align-content:start;border-top:1px solid var(--rule);color:var(--ink);font-size:.87rem;line-height:1.35}
+.rt-when li{position:relative;padding-left:14px}
+.rt-when li:before{content:"";position:absolute;left:0;top:.48em;width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.rt-link{color:var(--navy-700);font-weight:550;font-size:.9rem}
+.rt-link i{font-style:normal;display:inline-block;transition:transform .15s}.rt-card:hover .rt-link i{transform:translateX(3px)}
+.rt-credit{margin:16px 0 0;font-size:.74rem;line-height:1.5;color:var(--faint)}.rt-credit a{color:inherit}
+.rt-more{margin:22px 0 0}
+/* a report's own page */
+.rh{min-height:0}
+.rh-main{display:grid;width:100%;grid-template-columns:minmax(0,1fr) minmax(360px,500px);gap:clamp(32px,5vw,72px);align-items:center;padding-top:clamp(36px,6vh,64px);padding-bottom:clamp(44px,7vh,76px)}
+.rh h1{font-size:clamp(2.2rem,4.4vw,3.4rem)}
+.rh .crumbs,.rh .crumbs a{color:#8fa3b8}
+.rh-up{margin:14px 0 0;font-size:.78rem;color:#7f93a8}
+.rp.rp-auto{height:auto}
+.rp-chart{margin:0;padding:14px 16px 12px;border-top:0}.rp-chart svg{display:block;width:100%;height:auto}
+.rp-chart .vis-cap{margin-top:6px}
+.rs{padding:80px 0}
+.rs-two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(32px,6vw,80px);align-items:center}
+.rs h2{margin:12px 0 0}
+.rc-list{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:12px}
+.rc-list li{position:relative;padding-left:30px;color:var(--ink)}
+.rc-list li:before{content:"";position:absolute;left:0;top:.14em;width:20px;height:20px;border-radius:50%;background:var(--green-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.3l2.6 2.6 5.4-5.6' fill='none' stroke='%231f7a4d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/20px}
+.rs-more{margin:22px 0 0;color:var(--muted);font-size:.93rem}
+.rs-pages{position:relative;display:block;aspect-ratio:1/1.08}
+.rs-pages a{position:absolute;display:block;width:68%;background:#fff;border:1px solid var(--rule);border-radius:6px;overflow:hidden;
+  box-shadow:0 2px 4px rgba(7,17,31,.08),0 20px 46px rgba(7,17,31,.16);transition:transform .15s}
+.rs-pages img{width:100%;height:auto}
+.rs-pages a:first-child{right:0;top:0;transform:rotate(2deg)}
+.rs-pages a:last-child{left:0;bottom:0;transform:rotate(-2deg)}
+.rs-pages a:hover{transform:rotate(0) translateY(-3px);z-index:2}
+.rs-who{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.rs-who li{padding:20px;background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--navy-700);border-radius:12px}
+.rs-who p{margin:6px 0 0;color:var(--muted);font-size:.93rem;line-height:1.55}
+.rs-lim{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,5vw,64px);align-items:start}
+.rs-lim .lede{margin-top:12px;font-size:1rem}
+.rs-limits{list-style:none;margin:0;padding:6px 22px;background:#fff;border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow)}
+.rs-limits li{position:relative;padding:15px 0 15px 26px;color:var(--ink);line-height:1.55;border-bottom:1px solid var(--rule)}
+.rs-limits li:last-child{border-bottom:0}
+.rs-limits li:before{content:"";position:absolute;left:2px;top:1.45em;width:12px;height:2px;background:var(--amber)}
+.rs-guides{margin-top:40px;padding-top:28px;border-top:1px solid var(--rule)}
+.rs-guides .glist{margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.rs-guides .glist a{height:100%;background:var(--paper)}
+@media (max-width:960px){.rh-main{grid-template-columns:1fr}.rs-two,.rs-lim{grid-template-columns:1fr}.rs{padding:60px 0}
+  .rs-pages{max-width:460px;margin:0 auto;width:100%}}
+/* /reports */
+.rx{padding:clamp(44px,8vh,80px) 0;color:#c9d5e3;background:radial-gradient(1000px 500px at 80% 0,#1f3d63 0%,rgba(31,61,99,0) 65%),var(--navy-900)}
+.rx .crumbs,.rx .crumbs a{color:#8fa3b8}.rx .eyebrow{color:var(--amber)}
+.rx h1{color:#fff;margin:14px 0 14px}.rx .lede{color:#aebdcd}
+.rx-main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(24px,5vw,64px);align-items:center;padding:30px;
+  background:#fff;border:1px solid var(--rule);border-radius:18px;box-shadow:var(--shadow)}
+.rx-main h2{margin:8px 0 10px;font-size:clamp(1.5rem,2.6vw,2rem)}
+.rx-main .lede{font-size:1rem}.rx-main .cta-row{margin-top:20px}
+.rx-main img{width:100%;height:330px;object-fit:cover;object-position:top;border:1px solid var(--rule);border-radius:8px;box-shadow:var(--shadow)}
+@media (max-width:820px){.rx-main{grid-template-columns:1fr;padding:22px}}
+.rs-tbl{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--rule);border-radius:14px;overflow:hidden;font-size:.93rem}
+.rs-tbl th,.rs-tbl td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+.rs-tbl thead th{font:500 .68rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);background:var(--paper)}
+.rs-tbl tr:last-child td,.rs-tbl tr:last-child th{border-bottom:0}.rs-tbl tbody th{font-weight:600;color:var(--ink)}
+.rs-tbl tbody th a{color:inherit}
+@media (max-width:720px){.rs-tbl thead{display:none}.rs-tbl,.rs-tbl tbody,.rs-tbl tr,.rs-tbl td,.rs-tbl th{display:block}
+  .rs-tbl tr{padding:12px 16px;border-bottom:1px solid var(--rule)}.rs-tbl td,.rs-tbl th{padding:2px 0;border:0}
+  .rs-tbl tr:last-child{border-bottom:0}}
+.article h3{font-size:1rem;margin:20px 0 6px}
+.sr-car{display:block;margin-top:10px;font-size:.88rem}
+.fld-time{max-width:48%}
+@media (max-width:600px){.fld-time{max-width:none}}
 .mnav{display:none}
 @media (max-width:760px){
   .top nav{gap:12px}
@@ -684,22 +783,37 @@ def layout(title: str, body: str, refresh: int | None = None, description: str =
 <link rel="icon" href="{FAVICON}"><link rel="apple-touch-icon" href="/static/apple-touch-icon.png">{FONTS}
 {MAP_ASSETS if map_assets else ""}{ANALYTICS if url else ""}<style>{CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="brand" href="/">{LOGO}<span>{BRAND}</span></a>
-<nav>{NAV_LINKS.replace("<a ", '<a class="hide-sm" ')}<a class="btn btn-amber" href="/order">Order · {PRICE}</a>
+<nav>{DESKTOP_NAV}<a class="btn btn-amber" href="/order">Order · {PRICE}</a>
 {MOBILE_MENU}</nav></div></header>
 <main>{body}</main>{FOOTER}</body></html>"""
 
 
 # The site's pages, in the header and the phone menu alike. Only pages: the landing page's own sections are reached
 # by scrolling it, not from the navigation.
-NAV_LINKS = ('<a href="/storm-reports">Storm Reports</a><a href="/guides">Guides</a>'
-             '<a href="/methodology">How it\'s built</a><a href="/static/sample-report.pdf">Sample report</a>')
+REPORT_LINKS = "".join(f'<a href="{t.path}">{t.name}</a>' for t in TYPES.values())
+RESOURCE_LINKS = ('<a href="/guides">Guides</a><a href="/methodology">How it\'s built</a>'
+                  '<a href="/static/sample-report.pdf">Sample report</a>')
+CHEVRON = ('<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5" fill="none" '
+           'stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>')
+
+
+def _dropdown(name: str, links: str) -> str:
+    """<details>, like the phone menu: opens and closes without JavaScript."""
+    return f'<details class="ndrop"><summary>{name}{CHEVRON}</summary><div class="ndrop-panel">{links}</div></details>'
+
+
+REPORT_PANEL = "".join(f'<a href="{path}"><b>{name}</b><small>{text}</small></a>' for name, path, text in
+                       [(TYPES["property"].name, "/", "For a home or building, our standard report"), *REPORT_MENU])
+DESKTOP_NAV = (_dropdown("Reports", REPORT_PANEL + '<a class="ndrop-all" href="/reports">All reports</a>') +
+               '<a class="hide-sm" href="/storm-reports">Storm Reports</a>' + _dropdown("Resources", RESOURCE_LINKS))
 # Phones: the header links don't fit, so they live in a menu. <details> opens and closes without JavaScript.
 MOBILE_MENU = """<details class="mnav"><summary aria-label="Menu"><span></span><span></span><span></span></summary>
-<div class="mnav-panel">""" + NAV_LINKS + """</div></details>
-<script>document.addEventListener("click",function(e){var m=document.querySelector(".mnav[open]");
-if(m&&(!m.contains(e.target)||e.target.closest(".mnav-panel a")))m.removeAttribute("open")});
-document.addEventListener("keydown",function(e){var m=document.querySelector(".mnav[open]");
-if(m&&e.key==="Escape"){m.removeAttribute("open");m.querySelector("summary").focus()}});</script>"""
+<div class="mnav-panel"><p class="mnav-h">Reports</p>""" + REPORT_LINKS + """<p class="mnav-h">More</p>
+<a href="/storm-reports">Storm Reports</a>""" + RESOURCE_LINKS + """</div></details>
+<script>document.addEventListener("click",function(e){document.querySelectorAll(".mnav[open],.ndrop[open]").forEach(
+function(m){if(!m.contains(e.target)||e.target.closest("a"))m.removeAttribute("open")})});
+document.addEventListener("keydown",function(e){if(e.key!=="Escape")return;var m=document.querySelector(
+".mnav[open],.ndrop[open]");if(m){m.removeAttribute("open");m.querySelector("summary").focus()}});</script>"""
 
 FOOTER = f"""<footer><div class="wrap"><div><a class="brand" href="/" style="margin-bottom:14px">{LOGO}<span>{BRAND}</span></a>
 <p>Not affiliated with NOAA, the National Weather Service or any government agency. Reports compile public records;
@@ -719,9 +833,13 @@ def order_form(v: dict, error: str = "", ask_coords: bool = False, title: str = 
     show_coords = ask_coords or bool(v.get("lat"))
     err = f'<p class="err" role="alert">{escape(error)}</p>' if error else ""
     head = f"<h3>{escape(title)}</h3>" if title else ""
+    kind = report_type(v.get("type"))
+    time_field = (f'<label>{kind.time_label}<input type="time" name="event_time" required '
+                  f'value="{g("event_time")}"></label></div><div class="fld-time">' if kind.time_label else "")
     return f"""<div class="form-card" id="order">{head}{err}
 <form method="post" action="/order" id="order-form" novalidate>
-<label for="address" style="margin-top:0">Property address</label>
+<input type="hidden" name="type" value="{kind.slug}">
+<label for="address" style="margin-top:0">{kind.place_label}</label>
 <div class="ac"><input id="address" name="address" autocomplete="off" value="{g('address')}" role="combobox"
  aria-autocomplete="list" aria-expanded="false" aria-controls="ac-list" placeholder="Start typing an address">
 <ul id="ac-list" role="listbox" hidden></ul></div>
@@ -733,8 +851,8 @@ the map.</p></div>
 <div id="coords" class="row2" {"" if show_coords else "hidden"}><label>Latitude<input name="lat" id="lat" inputmode="decimal"
  value="{g('lat')}" placeholder="39.16955"></label><label>Longitude<input name="lon" id="lon" inputmode="decimal"
  value="{g('lon')}" placeholder="-86.53493"></label></div>
-<div class="row2"><label>Date of loss<input type="date" name="loss_date" required min="{MIN_DATE.isoformat()}"
-max="{yesterday}" value="{g('loss_date')}"></label>
+<div class="row2"><label>{kind.date_label}<input type="date" name="loss_date" required min="{MIN_DATE.isoformat()}"
+max="{yesterday}" value="{g('loss_date')}"></label>{time_field}
 <label>Email for delivery<input type="email" name="email" required autocomplete="email" value="{g('email')}"
 placeholder="you@company.com"></label></div>
 <button class="btn btn-amber btn-block" type="submit">Continue</button>
@@ -815,7 +933,7 @@ hashes for verification</span></div>
         return f"<article class='cmp-card{' us' if us else ''}'><h3>{title}</h3><ul>{items}</ul></article>"
 
     cards = (card(1, "Free weather sites") + card(2, BRAND, us=True) + card(3, "Forensic meteorologist"))
-    compare = f"""<section class="alt" id="compare"><div class="wrap">
+    compare = f"""<section id="compare"><div class="wrap">
 <div class="section-head"><p class="eyebrow">Compare</p><h2>Between a free weather site and an expert.</h2>
 <p class="lede">Detailed enough for a claim file, priced for every claim. If you later need an expert, the report
 gives them every source to start from.</p></div>
@@ -824,19 +942,19 @@ gives them every source to start from.</p></div>
 <div class="cmp-cards">{cards}</div></div>
 </div></section>"""
 
-    pages = [("1", "Map & key facts"), ("3", "Station measurements"), ("5", "Warnings & storm reports"),
-             ("7", "Storm Events"), ("8", "Hail & lightning")]
+    pages = [("1", "Map & key facts"), ("3", "Station measurements"), ("6", "Warnings & storm reports"),
+             ("12", "Storm Events"), ("16", "Hail & lightning")]
     thumbs = "".join(f'<a href="{s["pdf"]}#page={p}" target="_blank" rel="noopener"><div class="thumb">'
                      f'<img loading="lazy" src="/static/sample-p{p}.webp" alt="Sample report page {p}: {t}" '
                      f'width="935" height="1210"></div><span>{t}</span>Page {p}</a>' for p, t in pages)
-    sample = f"""<section id="sample"><div class="wrap">
+    sample = f"""<section class="alt" id="sample"><div class="wrap">
 <div class="section-head"><p class="eyebrow">Sample report</p><h2>Read a real report before you buy.</h2>
 <p class="lede">The full {s['pages']}-page report for {s['place']} on {s['date']}, unedited.</p></div>
 <div class="gallery">{thumbs}</div>
 <div class="actions-row"><a class="btn btn-navy" href="{s['pdf']}" target="_blank" rel="noopener">Open the sample PDF</a></div>
 </div></section>"""
 
-    how = """<section class="alt" id="how"><div class="wrap">
+    how = """<section id="how"><div class="wrap">
 <div class="section-head"><p class="eyebrow">How it works</p><h2>Ordered in a minute, delivered in another.</h2></div>
 <ol class="steps">
 <li><div><b>Enter the address and date</b><span>Pick the address from the suggestions, or place a pin on the map
@@ -857,6 +975,9 @@ email.</span></div></li></ol></div></section>"""
         ("Which dates can I order?",
          f"Any completed day from {MIN_DATE.year} to yesterday. NOAA publishes its Storm Events database a few months "
          "after each month ends; for recent dates the report says so, and includes everything else."),
+        ("What if I'm not sure of the date?",
+         'Look up your city in <a href="/storm-reports?period=all">Storm Reports</a> to see its storm days, or read '
+         '<a href="/guides/date-of-loss-weather">how to check your date of loss</a>.'),
         ("What if the address isn't found?",
          "Place a pin on the map instead. The report notes that the location was set by pin."),
         ("What if the report can't be built?",
@@ -867,23 +988,34 @@ email.</span></div></li></ol></div></section>"""
          f'emails your receipt. Questions about an order: <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a>.'),
     ]
     faq = "".join(f"<details><summary>{escape(q)}</summary><p>{a}</p></details>" for q, a in faq_items)  # trusted HTML
-    faq_html = f"""<section id="faq"><div class="wrap">
+    faq_html = f"""<section class="alt" id="faq"><div class="wrap">
 <div class="section-head center"><p class="eyebrow">FAQ</p><h2>Common questions.</h2></div>
 <div class="faq">{faq}</div></div></section>"""
 
     cta = f"""<section class="cta"><div class="wrap"><h2>Get the weather record for your date of loss.</h2>
 <p>{PRICE} per report. Any US address.</p><a class="btn btn-amber" href="/order">Start your report</a></div></section>"""
-    return hero + questions + compare + sample + how + faq_html + cta
+    reports = f"""<section class="alt" id="reports"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Not a property?</p><h2>A report for your situation.</h2>
+<p class="lede">Short reports that answer one question, from the same public records.</p></div>
+<div class="rt-grid">{REPORT_CARDS}</div>{credits()}
+<p class="rt-more"><a href="/reports">Compare all reports →</a></p></div></section>"""
+    return hero + questions + reports + compare + sample + how + faq_html + cta
 
 
-def order_page(form: str) -> str:
+def order_page(form: str, kind: str | None = None) -> str:
+    rt = report_type(kind)
+    plain = rt.slug == "property"
+    lede = ("Enter the property address or place a pin on the map, then the date of loss." if plain else
+            f"{rt.name} report. Enter the address or place a pin on the map, then the date.")
+    items = (["Station measurements", "Warning-area check", "Storm reports and hail", "PDF in about a minute"] if plain
+             else ["Chart and key facts", "Warnings for the location", "Sources and limits", "PDF in about a minute"])
+    includes = "".join(f"<li>{x}</li>" for x in items)
     return f"""<div class="order-wrap"><ol class="stepper"><li class="on">1 · Location and date</li>
 <li>2 · Confirm and pay</li><li>3 · Download</li></ol>
-<h1>Where and when was the loss?</h1>
-<p class="lede">Enter the property address or place a pin on the map, then the date of loss.</p>
+<h1>{"Where and when was the loss?" if plain else "Where and when did it happen?"}</h1>
+<p class="lede">{lede}</p>
 {form}
-<ul class="includes"><li>Station measurements</li><li>Warning-area check</li><li>Storm reports and hail</li>
-<li>PDF in about a minute</li></ul></div>"""
+<ul class="includes">{includes}</ul></div>"""
 
 
 def inner(body: str) -> str:
@@ -895,11 +1027,13 @@ def status_block(kind: str, title: str, text: str) -> str:
     return f'<div class="status"><span class="dot{dot}"></span><div><p><b>{title}</b></p>{text}</div></div>'
 
 
-def article(page, related: list) -> str:
-    """A content page: breadcrumbs, heading, body, then links to the other guides."""
+def article(page, related: list, extra: str = "") -> str:
+    """A content page: breadcrumbs, heading, body, `extra` (HTML), then links to the other guides."""
     crumbs = '<a href="/">Home</a> / '
     if page.guide:
         crumbs += '<a href="/guides">Guides</a> / '
+    if page.parent:
+        crumbs += f'<a href="{page.parent[1]}">{escape(page.parent[0])}</a> / '
     more = ""
     if related:
         items = "".join(f'<li><a href="{r.path}"><b>{escape(r.h1)}</b><span>{escape(r.description)}</span></a></li>'
@@ -907,7 +1041,34 @@ def article(page, related: list) -> str:
         more = f'<div class="more"><h2>Related</h2><ul class="glist">{items}</ul></div>'
     return f"""<article class="article"><nav class="crumbs" aria-label="Breadcrumb">{crumbs}{escape(page.h1)}</nav>
 <p class="eyebrow">{escape(page.eyebrow)}</p><h1>{escape(page.h1)}</h1>
-<p class="updated">Updated {page.updated:%B} {page.updated.day}, {page.updated.year}</p>{page.body}{more}</article>"""
+<p class="updated">Updated {page.updated:%B} {page.updated.day}, {page.updated.year}</p>{page.body}{extra}{more}</article>"""
+
+
+def reports_index() -> str:
+    rows = [("Property damage", "/", "Address and date", "The day, in local time", "Every record: stations, warnings, storm reports, hail, lightning, map, raw text")]
+    rows += [(TYPES[s.slug].name, TYPES[s.slug].path, "Location, date and time" if TYPES[s.slug].time_label else
+              "Location and date", s.covers, s.leads) for s in REPORT_SPECS]
+    table = "".join(f'<tr><th scope="row"><a href="{p}">{n}</a></th><td>{a}</td><td>{c}</td><td>{x}</td></tr>'
+                    for n, p, a, c, x in rows)
+    return f"""<div class="rx"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Reports</nav>
+<p class="eyebrow">Reports</p><h1>A report for your situation</h1>
+<p class="lede">Every report is built from public NOAA and NWS records. The standard report holds everything for an
+address and date. The others are short and answer one question. {PRICE} for one PDF.</p></div></div>
+<section class="rs"><div class="wrap"><div class="rx-main"><div><p class="eyebrow">Our standard report</p><h2>Property damage</h2>
+<p class="lede">Hail, wind, warnings and lightning for one address and date of loss, each with its distance from the
+property. {SAMPLE["pages"]} pages in the sample.</p>
+<div class="cta-row"><a class="btn btn-amber" href="/order">Get a report — {PRICE}</a>
+<a class="btn btn-ghost" href="/">See this report</a></div></div>
+<a href="{SAMPLE["pdf"]}" target="_blank" rel="noopener"><img src="/static/sample-p1.webp" width="935" height="1210"
+alt="Page 1 of the sample property report"></a></div>
+<div class="section-head" style="margin:64px 0 28px"><p class="eyebrow">For specific cases</p>
+<h2>Four reports built around a question.</h2></div>
+<div class="rt-grid">{REPORT_CARDS}</div>{credits()}</div></section>
+<section class="rs alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Compare</p><h2>What each report asks for and covers.</h2></div>
+<table class="rs-tbl"><thead><tr><th scope="col">Report</th><th scope="col">You enter</th><th scope="col">Period covered</th>
+<th scope="col">What's in it</th></tr></thead><tbody>{table}</tbody></table></div></section>
+<section class="cta"><div class="wrap"><h2>Not sure which one you need?</h2><p>Start with the standard report. It covers the
+whole day at any US address.</p><a class="btn btn-amber" href="/order">Start your report</a></div></section>"""
 
 
 def guides_index(pages: list) -> str:
@@ -916,4 +1077,5 @@ def guides_index(pages: list) -> str:
     return f"""<div class="article"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Guides</nav>
 <p class="eyebrow">Guides</p><h1>Weather records for insurance claims</h1>
 <p class="lede">Plain-language guides to finding and reading public weather records for a property and a date of
-loss.</p><ul class="glist">{items}</ul></div>"""
+loss. Looking for a specific storm? <a href="/storm-reports">Storm Reports</a> list storm days by city.</p>
+<ul class="glist">{items}</ul></div>"""

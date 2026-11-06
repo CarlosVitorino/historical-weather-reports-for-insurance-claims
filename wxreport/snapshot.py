@@ -45,10 +45,10 @@ def _get(url: str, params: dict | None, timeout: float) -> requests.Response:
     raise AssertionError("unreachable")
 
 
-def request_key(address: str, day: str, lat: float | None = None, lon: float | None = None) -> str:
+def request_key(address: str, day: str, lat: float | None = None, lon: float | None = None, kind: str = "") -> str:
     norm = re.sub(r"\s+", " ", address.strip().upper())
     coords = "" if lat is None else f"|{lat:.5f},{lon:.5f}"
-    return hashlib.sha256(f"{norm}|{day}{coords}".encode()).hexdigest()[:16]
+    return hashlib.sha256(f"{norm}|{day}{coords}{kind}".encode()).hexdigest()[:16]
 
 
 @dataclass
@@ -63,7 +63,8 @@ class Snapshot:
     def open(cls, request: dict, root: Path = DEFAULT_ROOT, offline: bool = False,
              refresh: bool = False) -> "Snapshot":
         """Reuse the stored snapshot for this request (deterministic replay), or start over with refresh."""
-        key = request_key(request["address"], request["date"], request.get("lat"), request.get("lon"))
+        kind = f"|{request['report_type']}|{request.get('event_time')}" if request.get("report_type") else ""
+        key = request_key(request["address"], request["date"], request.get("lat"), request.get("lon"), kind)
         path = root / key
         manifest = path / "manifest.json"
         if refresh and not offline and path.exists():

@@ -72,6 +72,23 @@ every query key but the filters, `day`, `loss_date` and `utm_*` before anything 
 `order_cta`, `order_submit`, `sample_report`, `storm_day`, `storm_filter`. To leave your own visits out, open /admin
 on each browser and device and press "Don't count this browser" (Umami's `umami.disabled` plus our `nostats` cookie).
 
+### Report types
+
+One engine, one price. `wxreport/reporttypes.py` lists the kinds: property (the default), car hail damage, car accident,
+slip and fall on ice and frozen pipes. Property holds every record for an address and date. The others are short: each
+answers one question, reads only the records for it (`ReportType.reads`) and has a chart where property has its map
+(`wxreport/focus.py`, `wxreport/charts.py`, with `wxreport/timeline.py` for the station's hours around the date). Car accident
+and slip and fall also ask for a time. A kind other than property is part of the request, so its report has its own ID;
+the property request is unchanged, so its reports keep theirs.
+
+Each kind has a public page at `/reports/<slug>` (`wxreport/report_pages.py`), listed in the Reports menu, on the home
+page and at `/reports`, and orders through `/order?type=<slug>`. Samples are real reports, built with
+`wxreport.cli report --type <slug> [--time HH:MM]` and stored as `static/sample-<slug>.pdf`.
+Each kind's chart (`charts.py`, `focus.figure`) is drawn once for the PDF and the page alike. `scripts/make_report_art.py`
+rebuilds the samples, their page images and the data on each report's page, and
+`scripts/make_report_photos.py` crops and tones the card photos. Their sources and licences are in `report_pages.PHOTOS`
+and are credited wherever the cards appear.
+
 ### Storm Reports
 
 Public pages at `/storm-reports`: an index with a city search and a feed of recent storms, state hubs and city pages

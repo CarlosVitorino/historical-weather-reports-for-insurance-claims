@@ -18,7 +18,10 @@ WIND, GREY = colors.HexColor("#6b4fa0"), colors.HexColor("#5d6b7c")
 # -- key facts ----------------------------------------------------------------------------------------
 def key_facts(ctx: ReportContext) -> list[tuple[str, str, str]]:
     """Four (label, value, detail) facts for page 1, in plain words."""
-    from . import units
+    from . import focus, units
+    own = focus.key_facts(ctx)
+    if own:
+        return own
     t = lambda x: fmt_local(x, ctx.loc.tz)  # noqa: E731
     facts = []
     sd = ctx.primary
@@ -218,11 +221,12 @@ class AreaMap(Flowable):
         c.setLineWidth(1.8)
         c.circle(sx, sy, 4.6, stroke=1, fill=1)
         c.setFont("Helvetica-Bold", 7.5)
-        tw = c.stringWidth("Property", "Helvetica-Bold", 7.5)
+        site_label = ctx.kind.map_label
+        tw = c.stringWidth(site_label, "Helvetica-Bold", 7.5)
         c.setFillColor(colors.white, alpha=0.95)
         c.roundRect(sx + 9, sy + 3, tw + 7, 11, 2.5, stroke=0, fill=1)
         c.setFillColor(pdf.INK, alpha=1)
-        c.drawString(sx + 12.5, sy + 6, "Property")
+        c.drawString(sx + 12.5, sy + 6, site_label)
 
         # north arrow, scale bar, attribution
         c.setFillColor(colors.white, alpha=0.9)
@@ -260,6 +264,10 @@ class Legend(Flowable):
              ("path", "Tornado path"), ("radar", "Radar hail"), ("hail", "Hail report"), ("wind", "Wind report"),
              ("tor", "Tornado report")]
 
+    def __init__(self, site_label: str = "Property"):
+        super().__init__()
+        self.site_label = site_label
+
     def wrap(self, aw, ah):
         return areamap.MAP_W_PT, 14
 
@@ -268,6 +276,7 @@ class Legend(Flowable):
         x, y = 0, 4
         c.setFont("Helvetica", 7)
         for kind, label in self.ITEMS:
+            label = self.site_label if kind == "site" else label
             cx = x + 5
             if kind == "site":
                 c.setFillColor(AMBER); c.setStrokeColor(colors.HexColor("#0b1a2e")); c.setLineWidth(1.2)

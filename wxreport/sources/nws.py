@@ -96,8 +96,11 @@ def _product_time(text: str, near: datetime) -> datetime:
     return min(cands, key=lambda t: abs(t - near)) if cands else near
 
 
+LOOKBACK = timedelta(days=30)   # the archive lists events by issue date: a warning can start long before the date
+
+
 def collect_warnings(snap: Snapshot, lat: float, lon: float, window: LocalDay) -> tuple[list[Warning], str | None]:
-    sd = (window.start_utc - timedelta(days=1)).date().isoformat()
+    sd = (window.start_utc - LOOKBACK).date().isoformat()
     ed = (window.end_utc + timedelta(days=1)).date().isoformat()
     try:
         data = snap.fetch_json("iem_vtec_bypoint", f"{IEM}/json/vtec_events_bypoint.py",

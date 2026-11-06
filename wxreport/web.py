@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Red
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, content, housekeeping, legal, payments, seo, site, storm_pages, storms
+from . import config, content, housekeeping, legal, payments, seo, site, storm_pages, storms, report_pages, reporttypes
 from .fulfil import Fulfiller, order_dir
 from .geo import distance_mi
 from .geocode import AddressNotFound, find, locate, where
@@ -150,9 +150,11 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
     @app.get("/order", response_class=HTMLResponse)
     def order_page(request: Request):
         log_view(request, "order_view")
-        prefill = {k: request.query_params.get(k) for k in ("address", "loss_date", "email", "lat", "lon")}
+        prefill = {k: request.query_params.get(k)
+                   for k in ("address", "loss_date", "email", "lat", "lon", "type", "event_time")}
         return page(f"Order a weather report for an address — {site.BRAND}",
-                    site.order_page(site.order_form(prefill)), map_assets=True, url=f"{base}/order", index=True,
+                    site.order_page(site.order_form(prefill), prefill.get("type")), map_assets=True,
+                    url=f"{base}/order", index=True,
                     description=f"Enter the property address and date of loss. See the exact location before paying "
                                 f"{site.PRICE}; the PDF is ready in about a minute.")
 
@@ -165,11 +167,29 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
                     description="How to find and read public weather records for a property and a date of loss: "
                                 "NOAA data, wind speed, warnings and the date of loss.")
 
+    @app.get("/reports", response_class=HTMLResponse)
+    def reports_index(request: Request):
+        log_view(request)
+        return page(f"Weather reports by situation — {site.BRAND}", site.reports_index(),
+                    url=f"{base}/reports", index=True,
+                    jsonld=[seo.breadcrumbs(base, [("Home", "/"), ("Reports", "/reports")])],
+                    description="Weather reports for a property, a damaged car, a car accident, a fall on ice or a "
+                                f"frozen pipe, from public NOAA and NWS records. {site.PRICE} PDF.")
+
+    def report_page(request: Request):
+        rp = report_pages.PAGES[request.url.path]
+        log_view(request)
+        return page(rp.title, rp.body, url=f"{base}{rp.path}", index=True,
+                    jsonld=seo.article(base, rp), description=rp.description)
+
+    for path in report_pages.PAGES:
+        app.add_api_route(path, report_page, methods=["GET"], response_class=HTMLResponse)
+
     def content_page(request: Request):
         cp = content.PAGES[request.url.path]
         log_view(request)
-        related = [g for g in content.GUIDES if g.path != cp.path][:3]
-        return page(cp.title, site.article(cp, related), url=f"{base}{cp.path}", index=True,
+        storms_block = storm_pages.recent_storms(live_cities()) if cp.recent_storms else ""
+        return page(cp.title, site.article(cp, content.RELATED[cp.path], storms_block), url=f"{base}{cp.path}", index=True,
                     jsonld=seo.article(base, cp), description=cp.description)
 
     for path in content.PAGES:
@@ -306,8 +326,11 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
 
     @app.post("/order", response_class=HTMLResponse)
     def order(request: Request, address: str = Form(""), loss_date: str = Form(""), email: str = Form(""),
-              lat: str = Form(None), lon: str = Form(None)):
-        v = {"address": address.strip(), "loss_date": loss_date, "email": email.strip(), "lat": lat, "lon": lon}
+              lat: str = Form(None), lon: str = Form(None), type: str = Form(reporttypes.DEFAULT),
+              event_time: str = Form("")):
+        kind = reporttypes.get(type)
+        v = {"address": address.strip(), "loss_date": loss_date, "email": email.strip(), "lat": lat, "lon": lon,
+             "type": kind.slug, "event_time": event_time}
 
         created: list[str] = []
 
@@ -316,16 +339,19 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
                 store.delete(oid)
                 shutil.rmtree(order_dir(cfg, oid), ignore_errors=True)
             store.log("form_error", request.state.vid, reason=reason)
-            return page("Check your details", site.order_page(site.order_form(v, msg, ask_coords)), map_assets=True)
+            return page("Check your details", site.order_page(site.order_form(v, msg, ask_coords), kind.slug),
+                        map_assets=True)
 
         if not EMAIL.match(v["email"]):
             return fail("bad_email", "Enter a valid email address — the report is delivered there.")
         try:
             day = date.fromisoformat(loss_date)
         except ValueError:
-            return fail("bad_date", "Enter the loss date.")
+            return fail("bad_date", f"Enter the {kind.date_label.lower()}.")
         if day < MIN_DATE:
             return fail("date_too_old", f"Reports cover loss dates from {MIN_DATE:%B %-d, %Y} onward.")
+        if kind.time_label and not reporttypes.valid_time(event_time):
+            return fail("bad_time", f"Enter the {kind.time_label.lower()}.")
         try:
             flat, flon = _float(lat), _float(lon)
         except ValueError as e:
@@ -338,7 +364,8 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
             v["address"] = f"Map pin at {flat:.5f}, {flon:.5f}"
 
         o = store.create_order(visitor=request.state.vid, email=v["email"], address=v["address"],
-                               loss_date=day.isoformat(), lat=flat, lon=flon)
+                               loss_date=day.isoformat(), lat=flat, lon=flon, report_type=kind.slug,
+                               event_time=event_time if kind.time_label else None)
         created.append(o["id"])
         request_ = {"address": v["address"], "date": day.isoformat(), "lat": flat, "lon": flon}
         snap = Snapshot.open(request_, root=order_dir(cfg, o["id"]) / "snapshots")
@@ -368,8 +395,11 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
         if o["status"] not in ("draft", "checkout"):
             return RedirectResponse(f"/orders/{oid}/{token}", status_code=303)
         d = date.fromisoformat(o["loss_date"])
+        kind = reporttypes.get(o["report_type"])
         back = "/order?" + urlencode({k: o[k] for k in ("address", "loss_date", "email") if o[k]} |
-                                ({"lat": o["lat"], "lon": o["lon"]} if o["lat"] is not None else {}))
+                                ({"lat": o["lat"], "lon": o["lon"]} if o["lat"] is not None else {}) |
+                                {"type": kind.slug} | ({"event_time": o["event_time"]} if o["event_time"] else {}))
+        at = f", {o['event_time']}" if o["event_time"] else ""
         how = (f"map pin at {o['lat']:.5f}, {o['lon']:.5f}" if o["lat"] is not None
                else "US Census Geocoder address match")
         unavailable = "" if (cfg.payments_ready or cfg.fake_payments) else \
@@ -380,7 +410,8 @@ def create_app(cfg: config.Settings | None = None, store: Store | None = None,
                 f'aria-label="Map of the report location"></div>') if lat is not None else ""
         return inner_page("Confirm your report", "Confirm your report", f"""<div class="panel">{cmap}<dl>
 <dt>Location</dt><dd><b>{escape(o['matched_address'])}</b><br><span class="fine">{escape(o['county'] or '')} · {how}</span></dd>
-<dt>Date of loss</dt><dd>{d:%B} {d.day}, {d.year}</dd><dt>Deliver to</dt><dd>{escape(o['email'])}</dd>
+<dt>Report</dt><dd>{escape(kind.name)}</dd>
+<dt>{escape(kind.date_label)}</dt><dd>{d:%B} {d.day}, {d.year}{at}</dd><dt>Deliver to</dt><dd>{escape(o['email'])}</dd>
 <dt>Price</dt><dd><b>{price}</b> · one report, no subscription</dd></dl>{unavailable}
 <div class="actions"><form method="post" action="/order/{oid}/{token}/checkout">
 <button class="btn btn-amber" type="submit">Pay {price} securely</button></form>

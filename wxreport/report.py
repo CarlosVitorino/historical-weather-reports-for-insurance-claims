@@ -1,9 +1,10 @@
 """Assemble one report: locate the site, gather every source into a snapshot, render the PDF."""
-from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from dataclasses import dataclass, field, replace
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
-from . import RENDER_VERSION, areamap
+from . import RENDER_VERSION, areamap, reporttypes, timeline
 from .geocode import Location, locate
 from .snapshot import DEFAULT_ROOT, Snapshot, report_id
 from .sources import ghcnh, nws, stormevents, swdi
@@ -39,6 +40,10 @@ class ReportContext:
     lightning: list[swdi.LightningTile] = field(default_factory=list)
     lightning_note: str | None = None
     area: "areamap.Extent | None" = None
+    kind: reporttypes.ReportType = reporttypes.TYPES[reporttypes.DEFAULT]
+    event_utc: datetime | None = None             # the moment asked about, for kinds that take a time
+    hours: list[timeline.Hour] = field(default_factory=list)   # the primary station around the date
+    history_note: str | None = None
 
     @property
     def primary(self) -> ghcnh.StationDay | None:
@@ -56,7 +61,8 @@ class ReportContext:
 
 def gather(address: str, day_str: str, lat: float | None = None, lon: float | None = None,
            offline: bool = False, refresh: bool = False, root: Path = DEFAULT_ROOT,
-           now: datetime | None = None) -> ReportContext:
+           now: datetime | None = None, report_type: str = reporttypes.DEFAULT,
+           event_time: str | None = None) -> ReportContext:
     try:
         day = date.fromisoformat(day_str)
     except ValueError as e:
@@ -67,7 +73,12 @@ def gather(address: str, day_str: str, lat: float | None = None, lon: float | No
         raise InvalidRequest("Supply both latitude and longitude, or neither.")
     if not address.strip():
         raise InvalidRequest("An address is required.")
+    kind = reporttypes.get(report_type)
+    if kind.time_label and not reporttypes.valid_time(event_time):
+        raise InvalidRequest(f"{kind.name} reports need a time as HH:MM, got {event_time!r}.")
     request = {"address": address.strip(), "date": day.isoformat(), "lat": lat, "lon": lon}
+    if kind.slug != reporttypes.DEFAULT:   # the plain report's request, and so its IDs, stay as they were
+        request |= {"report_type": kind.slug, "event_time": event_time if kind.time_label else None}
     snap = Snapshot.open(request, root=root, offline=offline, refresh=refresh)
     loc = locate(snap, request["address"], lat, lon)
     if loc.method == "operator" and loc.county is None and \
@@ -77,19 +88,52 @@ def gather(address: str, day_str: str, lat: float | None = None, lon: float | No
     if not snap.frozen_at and window.end_utc > (now or datetime.now(timezone.utc)):
         raise InvalidRequest(f"{day} has not ended yet in {loc.tz}; reports cover completed past dates only.")
 
-    ctx = ReportContext(loc, window, snap)
+    ctx = ReportContext(loc, window, snap, kind=kind)
+    if kind.time_label:
+        h, m = map(int, event_time.split(":"))
+        ctx.event_utc = datetime.combine(day, time(h, m), ZoneInfo(loc.tz)).astimezone(timezone.utc)
     ctx.zones, ctx.wfo = nws.zones(snap, loc.lat, loc.lon)
-    ctx.stations, ctx.stations_note = ghcnh.collect(snap, loc.lat, loc.lon, window)
-    ctx.warnings, ctx.warnings_note = nws.collect_warnings(snap, loc.lat, loc.lon, window)
-    ctx.lsrs, ctx.lsrs_note = nws.collect_lsrs(snap, loc.lat, loc.lon, window)
-    ctx.storm_events = stormevents.collect(snap, loc.lat, loc.lon, window, loc.county_fips, ctx.zones)
-    ctx.hail, ctx.hail_note = swdi.collect_hail(snap, loc.lat, loc.lon, window)
-    ctx.lightning, ctx.lightning_note = swdi.collect_lightning(snap, loc.lat, loc.lon, window)
-    near = ctx.primary.station.distance_mi if ctx.primary else None
-    ctx.area = areamap.collect(snap, areamap.plan(loc.lat, loc.lon, near))
+    start, end = _span(ctx)
+    reach = replace(window, start_utc=start, end_utc=end)   # warnings and storm reports cover the kind's whole period
+    if "stations" in kind.reads:
+        ctx.stations, ctx.stations_note = ghcnh.collect(snap, loc.lat, loc.lon, window)
+    ctx.warnings, ctx.warnings_note = nws.collect_warnings(snap, loc.lat, loc.lon, reach)
+    if "lsrs" in kind.reads:
+        ctx.lsrs, ctx.lsrs_note = nws.collect_lsrs(snap, loc.lat, loc.lon, reach)
+    if "storm_events" in kind.reads:
+        ctx.storm_events = stormevents.collect(snap, loc.lat, loc.lon, window, loc.county_fips, ctx.zones)
+    if "hail" in kind.reads:
+        ctx.hail, ctx.hail_note = swdi.collect_hail(snap, loc.lat, loc.lon, window)
+    if "lightning" in kind.reads:
+        ctx.lightning, ctx.lightning_note = swdi.collect_lightning(snap, loc.lat, loc.lon, window)
+    if kind.before or kind.after:
+        _read_hours(ctx)
+    if "map" in kind.reads:
+        near = ctx.primary.station.distance_mi if ctx.primary else None
+        ctx.area = areamap.collect(snap, areamap.plan(loc.lat, loc.lon, near))
     snap.freeze()
     ctx.report_id = report_id(day.isoformat(), snap, RENDER_VERSION)
     return ctx
+
+
+def _span(ctx: ReportContext) -> tuple[datetime, datetime]:
+    """The period a kind covers: the local day, or its hours around the moment or the day."""
+    kind, day = ctx.kind, ctx.day
+    if not (kind.before or kind.after):
+        return day.start_utc, day.end_utc
+    start = (ctx.event_utc or day.start_utc) - kind.before
+    return start, (ctx.event_utc + kind.after + timedelta(hours=1)) if ctx.event_utc else day.end_utc
+
+
+def _read_hours(ctx: ReportContext) -> None:
+    """The primary station's hours around the moment, or around the local day for a kind that takes no time."""
+    sd = ctx.primary
+    if not sd:
+        ctx.history_note = "No station reported on this date, so the hour-by-hour record is empty."
+        return
+    start, end = _span(ctx)
+    obs, ctx.history_note = ghcnh.history(ctx.snap, sd.station, start, end)
+    ctx.hours = timeline.hours(obs, start, end)
 
 
 def build_pdf(ctx: ReportContext) -> bytes:

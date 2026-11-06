@@ -9,6 +9,7 @@ from datetime import date
 
 from . import BRAND
 from .report import MIN_DATE
+from .storms import HISTORY_FROM
 
 PRICE = "$9.99"
 
@@ -23,6 +24,8 @@ class Page:
     updated: date
     body: str
     guide: bool = False
+    recent_storms: bool = False   # show the latest storms from Storm Reports under the body
+    parent: tuple[str, str] | None = None   # (name, path) of the section above it, for the breadcrumb
 
 
 def _a(href: str, text: str) -> str:
@@ -39,6 +42,14 @@ SWDI = _a("https://www.ncei.noaa.gov/products/severe-weather-data-inventory", "S
 NCEI_CERT = _a("https://www.ncei.noaa.gov/services/certification", "NCEI's certification page")
 CENSUS = _a("https://geocoding.geo.census.gov/", "US Census Bureau Geocoder")
 
+
+def _storms(text: str, kind: str = "") -> str:
+    """A link to the storm table with all its years: the default view is 30 days, and a date of loss is often older."""
+    return f'<a href="/storm-reports?period=all{"&amp;kind=" + kind if kind else ""}">{text}</a>'
+
+
+
+
 CTA = f"""<div class="cta-box"><div><b>Get these records for one address and date</b>
 <span>Stations, warnings, storm reports, Storm Events, radar hail and lightning in one PDF, each with its distance
 and direction from the property. {PRICE}.</span></div><a class="btn btn-amber" href="/order">Start a report</a></div>"""
@@ -51,7 +62,7 @@ METHODOLOGY = Page(
     eyebrow="Methodology",
     description="The public NOAA, NWS and Census records behind every report, how distances and warning checks are "
                 "worked out, how current each source is, and what the report does not show.",
-    updated=date(2026, 10, 15),
+    updated=date(2026, 11, 6),
     body=f"""
 <p class="lede">Every number in the report comes from a public US government record, and the report names the record
 it came from. Values are shown as published, never blended or smoothed. Here is what we use and how.</p>
@@ -82,6 +93,7 @@ issued, sorted by distance from the property.</p>
 <p>The {NCEI_STORM_EVENTS} is NOAA's reviewed record of significant weather, including tornado paths. It is
 published a few months after each month ends. For recent dates the report says it is not published yet, which is
 different from "no event".</p>
+<p>These reports and Storm Events are also free to browse by city in our {_storms("Storm Reports")}.</p>
 
 <h2>6. Radar hail and lightning</h2>
 <p>Radar hail detections come from NEXRAD radar via NOAA's {SWDI}. They estimate hail aloft from the radar, not hail
@@ -115,7 +127,7 @@ CERTIFIED = Page(
     eyebrow="Certified records",
     description="What a certified NOAA weather record is, when a court or attorney may ask for one, when an expert "
                 "meteorologist is the right call, and what an address report is for.",
-    updated=date(2026, 10, 29),
+    updated=date(2026, 11, 6),
     body=f"""
 <p class="lede">Usually not for a claim, sometimes for a lawsuit. A {BRAND} report is <b>not</b> a certified record. Here
 is the difference, so you can pick what your situation needs.</p>
@@ -141,7 +153,7 @@ opinion.</p>
 <p>For most claims the question is simpler: what did public records show near this property on this date? The report
 answers that in one PDF: measured gusts at named stations, whether the property was inside a warning area, storm
 reports and NOAA Storm Events, radar hail and lightning, each with its distance and direction. It is useful for a
-claim file, a conversation with an adjuster, or as a starting point for an expert, who can trace every number back
+claim file, a <a href="/guides/how-insurers-verify-weather-claims">conversation with an adjuster</a>, or as a starting point for an expert, who can trace every number back
 to its source.</p>
 
 <table class="ctable"><thead><tr><th></th><th>{BRAND} report</th><th>NCEI certified copy</th>
@@ -161,13 +173,17 @@ GUIDE_NOAA = Page(
     title=f"How to get NOAA weather data for an insurance claim — {BRAND}",
     h1="How to get NOAA weather data for an insurance claim",
     eyebrow="Guide",
-    description="Step by step: find storm reports, NOAA Storm Events, station wind measurements, warnings and radar hail "
-                "for your address and date of loss, all from free public sources.",
-    updated=date(2026, 10, 15),
+    description="Two ways to get it: every record for your address and date of loss in one PDF, or find storm reports, "
+                "Storm Events, station wind, warnings and radar hail yourself.",
+    updated=date(2026, 11, 6),
     guide=True,
     body=f"""
-<p class="lede">All of the weather records an insurer looks at are public and free. They are spread across several
-NOAA and NWS sites. Here is where to find each one for your address and date of loss.</p>
+<p class="lede">There are two ways. Get every record in one PDF, or find each one yourself across
+several NOAA and NWS sites, working out distances and time zones as you go.</p>
+<p><b>The fast way:</b> <a href="/order">enter your address and date</a> and get storm reports, NOAA Storm Events,
+station wind, warnings, radar hail and lightning in one PDF, each with its distance and direction from the property.
+{PRICE}, ready in about a minute.</p>
+<p><b>Prefer to do it yourself?</b> These records are public and free. Here is where to find each one.</p>
 
 <h2>1. Write down the exact location and date</h2>
 <p>Use the property's coordinates, not just the city. Use the local date: a storm at 11 pm local time is already the
@@ -175,8 +191,9 @@ next day in UTC, which many NOAA files use. If you're not sure of the date, see
 <a href="/guides/date-of-loss-weather">how to check your date of loss</a>.</p>
 
 <h2>2. Check storm reports for the day</h2>
-<p>The {SPC_REPORTS} list hail, wind and tornado reports for each day, with times and positions. They are preliminary
-but available the next morning. Note how far each report is from the property.</p>
+<p>{_storms("Our Storm Reports")} list every storm day near a city since {HISTORY_FROM}: hail, wind and tornado reports
+with times and places on a map. Recent reports are marked preliminary until NOAA reviews them. Note how far each report
+is from the property.</p>
 
 <h2>3. Search the NOAA Storm Events Database</h2>
 <p>The {NCEI_STORM_EVENTS} is NOAA's reviewed record. Search by state, county and date. It includes hail sizes, wind
@@ -194,7 +211,8 @@ contained that location, with the bulletin text.</p>
 
 <h2>6. Look for radar hail</h2>
 <p>NOAA's {SWDI} has NEXRAD hail detections by area and date. They estimate hail aloft, so treat them as supporting
-evidence alongside ground reports.</p>
+evidence alongside ground reports. If hail is your claim, see <a href="/guides/hail-damage-claim">how to prove hail at your
+address</a>.</p>
 
 <h2>7. Put it together with distances</h2>
 <p>For each record, write down its distance and direction from the property and the source it came from. An adjuster
@@ -211,20 +229,23 @@ GUIDE_DATE = Page(
     eyebrow="Guide",
     description="Why the date of loss matters for a weather claim, how to confirm which day the storm hit your "
                 "address, and what to do when the damage was found days or weeks later.",
-    updated=date(2026, 10, 15),
+    updated=date(2026, 11, 6),
     guide=True,
+    recent_storms=True,
     body=f"""
 <p class="lede">The date of loss is the day the storm happened, not the day you found the damage. Insurers check it
-against weather records, so it's worth confirming before you file.</p>
+against weather records, so it's worth confirming before you file. <a href="/order">A report for your address</a>
+shows what the records say for any one day, or you can check it yourself.</p>
 
 <h2>Why the date matters</h2>
-<p>A claim is checked against the weather on the date you give. If the storm happened on a different day, the records
+<p>A claim is <a href="/guides/how-insurers-verify-weather-claims">checked against the weather</a> on the date you give. If the storm happened on a different day, the records
 for your date may show nothing, even though the damage is real. Policy start dates and filing deadlines also depend
 on it.</p>
 
 <h2>If you found the damage later</h2>
-<ul><li>List the days with storms since the last time you know the roof or property was fine.</li>
-<li>Check {SPC_REPORTS} for hail or wind reports near you on each of those days.</li>
+<ul><li>Note the last day you know the roof or property was fine.</li>
+<li>Find your city in {_storms("our Storm Reports")}: every day with large hail, damaging wind or a tornado nearby
+since {HISTORY_FROM}, with sizes and a map.</li>
 <li>Pick the day with the strongest records closest to the property, and check it in detail.</li></ul>
 
 <h2>Watch for storms around midnight</h2>
@@ -232,12 +253,13 @@ on it.</p>
 before deciding the date. Our report covers the full local day, midnight to midnight, in the property's time zone.</p>
 
 <h2>Check more than one source</h2>
-<p>Storm reports can be missing in rural areas, and stations can be miles away. A stronger picture combines measured
-gusts at nearby stations, warnings that covered the property, ground reports and radar hail. When they agree on one
+<p>Storm reports can be missing in rural areas, and stations can be miles away. A stronger picture combines <a href="/guides/wind-speed-on-a-specific-date">measured
+gusts at nearby stations</a>, warnings that covered the property, ground reports and radar hail. When they agree on one
 day, that's your date of loss.</p>
 
 <h2>Comparing two possible dates</h2>
-<p>Order a report for each date and compare them side by side. Each costs {PRICE} and shows the same sections, so the
+<p>Every storm day in Storm Reports has a button that starts a report for that date. Order one for each date and
+compare them side by side. Each costs {PRICE} and shows the same sections, so the
 difference is easy to see.</p>
 {CTA}""")
 
@@ -249,11 +271,16 @@ GUIDE_WIND = Page(
     eyebrow="Guide",
     description="Wind is measured at weather stations, not at every address. How to find the nearest station, read "
                 "gusts versus sustained wind, and judge how close the measurement is.",
-    updated=date(2026, 10, 15),
+    updated=date(2026, 11, 6),
     guide=True,
+    recent_storms=True,
     body=f"""
 <p class="lede">No one measures the wind at every house. The closest you can get is the nearest weather station that
-recorded that day, plus any measured gusts reported nearby.</p>
+recorded that day, plus any measured gusts reported nearby. We can find them for you, or you can do it by hand.</p>
+<p><b>The fast way:</b> <a href="/order">enter your address and date</a> and get the nearest stations with their distance
+and direction, the wind charted through the day and the peak gust, plus warnings and storm reports nearby. {PRICE},
+ready in about a minute.</p>
+<p><b>Prefer to do it yourself?</b> Station records are public and free. Here is how to find and read them.</p>
 
 <h2>1. Find the nearest stations</h2>
 <p>Airport stations (ASOS and AWOS) measure wind to a common standard and report at least every hour, and more often
@@ -266,17 +293,17 @@ damages roofs and trees. Look for the highest gust in the hours of the storm, an
 
 <h2>3. Mind the units and the time</h2>
 <p>Station files often use knots or meters per second, and UTC time. 1 knot is 1.15 mph; 1 m/s is 2.24 mph. Convert
-times to the property's local time.</p>
+times to the property's local time: a late storm can land on the next day in UTC, which is how
+<a href="/guides/date-of-loss-weather">a date of loss goes wrong</a>.</p>
 
 <h2>4. Add measured gusts from storm reports</h2>
-<p>Storm reports sometimes include gusts measured by other stations or trained spotters, closer to the property. The
-{SPC_REPORTS} and the {NCEI_STORM_EVENTS} mark whether a gust was measured or estimated.</p>
+<p>Storm reports sometimes include gusts measured by other stations or trained spotters, closer to the property.
+{_storms("Our Storm Reports", "wind")} show the strongest gust reported near a city on each storm day and mark whether
+it was measured or estimated, as does the {NCEI_STORM_EVENTS}.</p>
 
 <h2>5. Judge how close is close enough</h2>
-<p>Thunderstorm gusts can vary a lot over a few miles. A station 3 miles away says more than one 20 miles away, and
-a property inside a severe thunderstorm warning area supports a strong gust even where no station measured it.</p>
-<p>Our report does this for you: it lists the nearest stations with distance and direction, charts the wind through
-the day, marks the peak gust, and adds warnings and storm reports nearby.</p>
+<p>Thunderstorm gusts can vary a lot over a few miles. A station 3 miles away says more than one 20 miles away, which is
+<a href="/guides/how-insurers-verify-weather-claims">how adjusters read it too</a>, and a property inside a severe thunderstorm warning area supports a strong gust even where no station measured it.</p>
 {CTA}""")
 
 
@@ -287,18 +314,20 @@ GUIDE_HAIL = Page(
     eyebrow="Guide",
     description="How to prove hail fell at your address on your date of loss, what size hail damages a roof, how to "
                 "tell hail from wear, and how to document it for an insurance claim.",
-    updated=date(2026, 10, 29),
+    updated=date(2026, 11, 6),
     guide=True,
+    recent_storms=True,
     body=f"""
 <p class="lede">A hail claim is decided on two things: whether hail actually fell at your address on your date of
 loss, and whether the damage looks like hail and not age. Here is how to prove both, in order.</p>
 
 <h2>1. Prove the storm first</h2>
-<p>Before you climb a ladder, establish that hail fell near your property on that date. The records are public: the
-{SPC_REPORTS} list hail by day with size and position, the {NCEI_STORM_EVENTS} is NOAA's reviewed record, and radar
+<p>Before you climb a ladder, establish that hail fell near your property on that date. The records are public: {_storms("the hail days in our Storm Reports", "hail")} list
+hail near your city with size and position, the {NCEI_STORM_EVENTS} is NOAA's reviewed record, and radar
 hail appears in the {SWDI}. The work is pulling all three and measuring each report's distance and direction from your
 address — a report three miles away means more than one twenty miles away.</p>
-<p>Our report does this step in about a minute: the hail reports near your address on your date of loss, each with its
+<p>Not sure which day it was? See <a href="/guides/date-of-loss-weather">how to check your date of loss</a>.</p>
+<p><a href="/order">Our report</a> does this step in about a minute: the hail reports near your address on your date of loss, each with its
 size, distance and direction, plus ground reports and radar detections side by side. {PRICE}.</p>
 
 <h2>2. Know what size hail damages a roof</h2>
@@ -327,9 +356,11 @@ in lines.</p>
 difference.</p>
 
 <h2>6. Build the paper trail</h2>
+<p>If hail hit your car rather than your roof, see our <a href="/reports/car-hail-damage">hail report for a damaged
+car</a>.</p>
 <p>Photograph everything before repairs, wide then close, and label each by slope and direction. Keep the claim
 number, the date of loss, every call and email with the carrier, and the summary you send the adjuster after the
-visit.</p>
+visit. It helps to know <a href="/guides/how-insurers-verify-weather-claims">how insurers verify a weather claim</a>.</p>
 
 <h2>The one step worth paying for</h2>
 <p>Steps 2 to 6 are yours to do with a camera and chalk. Step 1 — proving the storm — is the tedious, technical one:
@@ -345,17 +376,18 @@ GUIDE_LIGHTNING = Page(
     eyebrow="Guide",
     description="How to tell whether lightning struck near your property on your date of loss, what public data shows, "
                 "when a commercial strike report is worth it, and how to document the damage.",
-    updated=date(2026, 10, 29),
+    updated=date(2026, 11, 6),
     guide=True,
     body=f"""
-<p class="lede">Lightning claims usually turn on one question: was a strike near your property on your date of loss.
+<p class="lede">Lightning claims usually turn on one question: was a strike near your property on your
+<a href="/guides/date-of-loss-weather">date of loss</a>.
 Detection networks record every cloud-to-ground strike with GPS, and NOAA publishes daily counts. Here is how to check,
 from cheapest to most detailed.</p>
 
 <h2>1. Start with the free public data</h2>
 <p>NOAA's {SWDI} publishes daily lightning strike counts in grid cells of about 6–7 miles. It will not give you an
-exact strike location, but it tells you whether lightning was near your property at all on that date — which is the
-first thing an adjuster asks. Our report includes this: lightning counts near your address on your date of loss,
+exact strike location, but it tells you whether lightning was near your property at all on that date — which is
+<a href="/guides/how-insurers-verify-weather-claims">the first thing an adjuster asks</a>. <a href="/order">Our report</a> includes this: lightning counts near your address on your date of loss,
 alongside hail, wind and warnings. {PRICE}.</p>
 
 <h2>2. If you need an exact strike location</h2>
@@ -391,39 +423,51 @@ GUIDE_INSURER = Page(
     eyebrow="Guide",
     description="What adjusters check when they verify a weather claim: storm reports, NOAA Storm Events, radar and "
                 "warnings, why dates get disputed, and what to attach so the records match your date of loss.",
-    updated=date(2026, 10, 29),
+    updated=date(2026, 11, 6),
     guide=True,
     body=f"""
 <p class="lede">When you file a weather claim, the adjuster checks your claimed date of loss against archived records.
-Here is what they look at, why dates get disputed, and how to make sure the records match what you say happened.</p>
+Here is what they look at, why dates get disputed, and how to make sure the records match what you say happened. You can also
+<a href="/order">pull those records for your address</a> before you file.</p>
 
 <h2>1. What they check</h2>
 <p>The {SPC_REPORTS} list hail, wind and tornado reports for each day, with times and positions. The
 {NCEI_STORM_EVENTS} is NOAA's reviewed record, including tornado paths. NEXRAD radar hail and wind appear in the
 {SWDI}, and the {IEM_VTEC} archive shows which warnings covered your address. An adjuster will compare your date of
-loss against all of these.</p>
+loss against all of these. {_storms("Our Storm Reports")} show NWS and NOAA storm records near a city, day by day.</p>
 
 <h2>2. Why dates get disputed</h2>
 <p>The date of loss is the day the storm happened, not the day you found the damage. NOAA records often use UTC time,
-so a storm late in the evening can already be the next day. And "no hail report near you" does not mean "no hail" —
+so a storm late in the evening can already be the next day (<a href="/guides/date-of-loss-weather">how to check your date of loss</a>). And "no hail report near you" does not mean "no hail" —
 reports are sparse in rural areas, and a report may simply not have been filed.</p>
 
 <h2>3. The distance problem</h2>
-<p>A report is only as useful as its distance from your property. An adjuster will weigh a measured gust three miles
+<p>A report is only as useful as its distance from your property. An adjuster will weigh a <a href="/guides/wind-speed-on-a-specific-date">measured gust</a> three miles
 away very differently from a report twenty miles away. For every record, the distance and direction from your address
 matters.</p>
 
 <h2>4. What to attach</h2>
 <p>Attach the weather records for your address and date, plus photographs and any repair estimates. The goal is for the
 records and your claim to agree: same date, same place, same event. Where they disagree, be ready to explain why — a
-different day, a nearby station, or a preliminary report.</p>
+different day, a nearby station, or a preliminary report. The <a href="/guides/hail-damage-claim">hail</a> and
+<a href="/guides/lightning-damage-claim">lightning</a> guides cover what to photograph and keep.</p>
 
 <h2>See what the adjuster sees</h2>
 <p>Our report is the same public records an adjuster checks, organized for one address and date — hail, wind, warnings
-and lightning, each with its distance and direction. Run it before you file, so you know what the records say before
+and lightning, each with its distance and direction (<a href="/methodology">how it's built</a>). Run it before you file, so you know what the records say before
 the insurer does. {PRICE}.</p>
 {CTA}""")
 
 
 GUIDES = [GUIDE_NOAA, GUIDE_DATE, GUIDE_WIND, GUIDE_HAIL, GUIDE_LIGHTNING, GUIDE_INSURER]
 PAGES = {p.path: p for p in [METHODOLOGY, CERTIFIED, *GUIDES]}
+# Chosen by hand so that every guide is linked: the case guides are what a reader of the others goes to next.
+RELATED = {p.path: related for p, related in [
+    (METHODOLOGY, [GUIDE_NOAA, GUIDE_INSURER, CERTIFIED]),
+    (CERTIFIED, [GUIDE_INSURER, GUIDE_NOAA, GUIDE_DATE]),
+    (GUIDE_NOAA, [GUIDE_HAIL, GUIDE_LIGHTNING, GUIDE_INSURER]),
+    (GUIDE_DATE, [GUIDE_HAIL, GUIDE_LIGHTNING, GUIDE_INSURER]),
+    (GUIDE_WIND, [GUIDE_HAIL, GUIDE_DATE, GUIDE_NOAA]),
+    (GUIDE_HAIL, [GUIDE_DATE, GUIDE_INSURER, GUIDE_WIND]),
+    (GUIDE_LIGHTNING, [GUIDE_INSURER, GUIDE_DATE, GUIDE_NOAA]),
+    (GUIDE_INSURER, [GUIDE_HAIL, GUIDE_LIGHTNING, GUIDE_DATE])]}

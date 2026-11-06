@@ -170,6 +170,18 @@ def test_storm_pages(tmp_path):
         assert client.get(missing).status_code == 404, missing
 
 
+def test_guides_and_storm_reports_link_both_ways(tmp_path):
+    client = make_client(tmp_path)
+    for path in ["/storm-reports", "/storm-reports/tx", "/storm-reports/tx/plano"]:
+        html = client.get(path).text
+        assert "Using these records for a claim" in html and 'href="/guides/date-of-loss-weather"' in html, path
+    hail = client.get("/guides/hail-damage-claim").text
+    assert '<a href="/storm-reports/tx/plano"><b>Plano, TX hail storm history</b>' in hail
+    assert "Latest storm Oct 21, 2026" in hail
+    assert 'href="/storm-reports/az/phoenix"' not in hail   # 1 storm day: not indexed, so not promoted
+    assert "Recent storms" not in client.get("/guides/lightning-damage-claim").text
+
+
 def table(html: str) -> list[tuple[str, str]]:
     """(city link, date) for each table row, in order."""
     return re.findall(r'<td class="sr-cd" data-label="Date">\w+, (\w+ \d+, \d+)</td><td class="sr-cc" data-label="City">'

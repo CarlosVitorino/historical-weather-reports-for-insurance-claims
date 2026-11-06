@@ -70,6 +70,30 @@ def test_trailing_slash_redirects_to_one_url(env):  # noqa: F811
     assert r.status_code == 301 and r.headers["location"] == "/guides?utm_source=x"
 
 
+def test_every_guide_is_linked_from_other_guides_and_storm_reports_are_reachable(env):  # noqa: F811
+    _, client, _ = env
+    pages = {p: client.get(p).text for p in content.PAGES}
+    for g in content.GUIDES:
+        linked_from = [p for p, html in pages.items() if p != g.path and f'href="{g.path}"' in html]
+        assert len(linked_from) >= 3, (g.path, linked_from)
+    for g in content.GUIDES:
+        if g is not content.GUIDE_LIGHTNING:   # Storm Reports hold no lightning, so that guide has nothing to link to
+            assert 'href="/storm-reports?period=all' in pages[g.path], g.path
+    assert 'href="/storm-reports?period=all"' in client.get("/").text
+
+
+def test_guides_offer_the_report_as_a_link(env):  # noqa: F811
+    _, client, _ = env
+    for g in content.GUIDES:
+        html = client.get(g.path).text
+        assert 'href="/order">' in html[html.find('class="lede"'):html.find('class="cta-box"')], g.path
+        assert 'id="order-form"' not in html and "/static/order.js" not in html, g.path   # a guide stays a plain page
+    for g in (content.GUIDE_NOAA, content.GUIDE_WIND):
+        html = client.get(g.path).text
+        assert -1 < html.find("<b>The fast way:</b>") < html.find("Prefer to do it yourself?") < \
+            html.find("<h2>", html.find('class="lede"')), g.path
+
+
 def test_content_page_visits_are_counted_with_their_path(env):  # noqa: F811
     app, client, _ = env
     client.get("/methodology", headers={"referer": "https://www.google.com/"})

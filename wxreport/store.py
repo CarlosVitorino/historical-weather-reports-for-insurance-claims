@@ -64,7 +64,8 @@ class Store:
         with self._conn() as c:
             c.executescript(SCHEMA)
             cols = {r[1] for r in c.execute("PRAGMA table_info(orders)")}
-            for col in ("site_lat REAL", "site_lon REAL"):      # added after v1: where the report is centred
+            # added after v1: where the report is centred; the kind of report and, for some kinds, the time asked about
+            for col in ("site_lat REAL", "site_lon REAL", "report_type TEXT", "event_time TEXT"):
                 if col.split()[0] not in cols:
                     c.execute(f"ALTER TABLE orders ADD COLUMN {col}")
 

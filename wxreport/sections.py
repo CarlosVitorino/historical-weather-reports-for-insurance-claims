@@ -3,16 +3,16 @@ from datetime import datetime, timedelta
 
 from reportlab.graphics.shapes import Drawing, Line, PolyLine, Rect, String
 from reportlab.lib import colors
-from reportlab.platypus import CondPageBreak, KeepTogether, PageBreak, Paragraph
-from reportlab.lib.styles import ParagraphStyle
+from reportlab.platypus import CondPageBreak, KeepTogether, PageBreak
 
-from . import pdf, units
+from . import DOMAIN, focus, pdf, units
 from .pdf import P, STYLES, Spacer, esc, inch, table
 from .report import ReportContext
 from .sources import ghcnh, nws, stormevents, swdi
 from .timewin import fmt_local
 
-MONO = ParagraphStyle("mono", parent=STYLES["cell"], fontName="Courier", fontSize=7, leading=8.6)
+MONO = pdf.MONO
+_mono = pdf.mono
 W = 7.0 * inch  # usable width
 
 
@@ -23,10 +23,6 @@ def _t(ctx, t: datetime, with_date=False) -> str:
 def _day_label(ctx) -> str:
     d = ctx.day.day
     return f"{d:%B} {d.day}, {d.year}"
-
-
-def _mono(text: str) -> Paragraph:
-    return Paragraph(esc(text).replace("\n", "<br/>").replace("  ", "&nbsp; "), MONO)
 
 
 def _note(text: str):
@@ -132,7 +128,7 @@ def findings(ctx: ReportContext) -> list:
             table(rows, col_widths=[2.2 * inch, 4.8 * inch], header=False),
             Spacer(1, 4),
             _note("Each finding names the record it comes from. Records near the site do not by themselves "
-                  "establish conditions at the property. Detailed records and their limitations follow.")]
+                  f"establish conditions at the {ctx.kind.map_label.lower()}. Detailed records and their limitations follow.")]
 
 
 def unavailable_sources(ctx: ReportContext) -> list[str]:
@@ -157,22 +153,47 @@ def _ymd(s: str) -> str:
     return f"{s[:4]}-{s[4:6]}-{s[6:]}"
 
 
+def _location_table(ctx):
+    loc, day = ctx.loc, ctx.day
+    zones = ", ".join(ctx.zones) or "not determined"
+    return table([["Coordinates", f"{loc.lat:.5f}, {loc.lon:.5f}"],
+                  ["County · NWS zones · office",
+                   f"{loc.county + ', ' + loc.state if loc.county else 'Not determined'} · {zones} · "
+                   f"{ctx.wfo or 'not determined'}"],
+                  ["Location method", "US Census Geocoder address match" if loc.method == "census"
+                   else "Map pin placed by the requester (the address text was not geocoded)"],
+                  ["Address as entered", loc.input_address],
+                  ["Local day", f"{_t(ctx, day.start_utc, True)} to {_t(ctx, day.end_utc, True)} "
+                                f"({day.start_utc:%Y-%m-%d %H:%M}Z–{day.end_utc:%Y-%m-%d %H:%M}Z)"]],
+                 col_widths=[1.9 * inch, 5.1 * inch], header=False, zebra=False)
+
+
 # -- cover -------------------------------------------------------------------------------------
+def _date_line(ctx) -> str:
+    kind = ctx.kind
+    if kind.slug == "property":
+        return f"Date of loss <b>{_day_label(ctx)}</b> · local day in {esc(ctx.loc.tz)}"
+    at = f" at <b>{_t(ctx, ctx.event_utc)}</b>" if ctx.event_utc else ""
+    return (f"<b>{esc(kind.name)} report</b> · {esc(kind.date_label)} <b>{_day_label(ctx)}</b>{at} · local day in "
+            f"{esc(ctx.loc.tz)}")
+
+
 def cover(ctx: ReportContext) -> list:
     """Page 1: who/where/when, the area map and four key facts. Page 2: location details and the summary table."""
     from .summary import AreaMap, Legend, facts_table
     loc, day = ctx.loc, ctx.day
     place = loc.matched_address or loc.input_address
     gen = _t(ctx, datetime.fromisoformat(ctx.snap.frozen_at), True)
-    zones = ", ".join(ctx.zones) or "not determined"
     page1 = [pdf.Lockup(pdf.PRODUCT), Spacer(1, 6),
              P(f"Report ID <b>{ctx.report_id}</b> · Data retrieved {esc(gen)}", "small"),
              Spacer(1, 12),
              P(esc(place), "big"),
-             P(f"Date of loss <b>{_day_label(ctx)}</b> · local day in {esc(loc.tz)}", "body"),
+             P(_date_line(ctx), "body"),
              Spacer(1, 10)]
-    if ctx.area:
-        page1 += [AreaMap(ctx), Spacer(1, 5), Legend(), Spacer(1, 8)]
+    if ctx.kind.short:
+        page1 += focus.chart(ctx)   # where the full report has its map
+    elif ctx.area:
+        page1 += [AreaMap(ctx), Spacer(1, 5), Legend(ctx.kind.map_label), Spacer(1, 8)]
         if ctx.area.note:
             page1 += [_note(ctx.area.note), Spacer(1, 4)]
     down = unavailable_sources(ctx)
@@ -183,19 +204,10 @@ def cover(ctx: ReportContext) -> list:
         page1[-2].hAlign = "LEFT"
     page1 += [facts_table(ctx), Spacer(1, 8),
               _note("Each fact names the record it comes from; details and limitations follow. Records near the "
-                    "property do not by themselves establish conditions at it.")]
-    page2 = [PageBreak(), P("Location", "h1"),
-             table([["Coordinates", f"{loc.lat:.5f}, {loc.lon:.5f}"],
-                    ["County · NWS zones · office",
-                     f"{loc.county + ', ' + loc.state if loc.county else 'Not determined'} · {zones} · "
-                     f"{ctx.wfo or 'not determined'}"],
-                    ["Location method", "US Census Geocoder address match" if loc.method == "census"
-                     else "Map pin placed by the requester (the address text was not geocoded)"],
-                    ["Address as entered", loc.input_address],
-                    ["Local day", f"{_t(ctx, day.start_utc, True)} to {_t(ctx, day.end_utc, True)} "
-                                  f"({day.start_utc:%Y-%m-%d %H:%M}Z–{day.end_utc:%Y-%m-%d %H:%M}Z)"]],
-                   col_widths=[1.9 * inch, 5.1 * inch], header=False, zebra=False),
-             Spacer(1, 14)]
+                    f"{ctx.kind.map_label.lower()} do not by themselves establish conditions at it.")]
+    if ctx.kind.short:
+        return page1 + [Spacer(1, 12)] + focus.section(ctx)
+    page2 = [PageBreak(), P("Location", "h1"), _location_table(ctx), Spacer(1, 14)]
     return page1 + page2 + findings(ctx)
 
 
@@ -311,10 +323,25 @@ def wind_chart(ctx, sd: ghcnh.StationDay) -> Drawing:
     if pg:
         d.add(String(x(pg[0]) + 3, y(units.mph(pg[1])) - 2, f"{units.mph(pg[1]):.0f} mph", fontSize=6.5,
                      fillColor=pdf.ACCENT, fontName="Helvetica-Bold"))
-    d.add(String(left, h - 8, "mph", fontSize=6, fillColor=pdf.MUTED))
-    d.add(String(left + 30, h - 8, "■ gust   — sustained wind (gaps = no reports)   ▮ hourly precipitation", fontSize=6,
-                 fillColor=pdf.MUTED))
+    d.add(String(left - 4, h - 8, "mph", fontSize=6, textAnchor="end", fillColor=pdf.MUTED))
+    _wind_legend(d, left, h - 6, pmax if bars else None)
     return d
+
+
+def _wind_legend(d: Drawing, x: float, y: float, tallest: float | None) -> None:
+    """Drawn shapes, in the chart's own colours: the PDF's text font has no legend symbols."""
+    label = lambda at, text: d.add(String(at, y - 2.2, text, fontName="Helvetica", fontSize=6.5,  # noqa: E731
+                                          fillColor=pdf.INK))
+    d.add(Line(x, y, x + 14, y, strokeColor=colors.HexColor("#7aa6d6"), strokeWidth=1.2))
+    label(x + 18, "Sustained wind (a gap means no reports)")
+    x += 140
+    d.add(Line(x + 2, y - 3.5, x + 2, y + 2, strokeColor=pdf.ACCENT, strokeWidth=0.4))
+    d.add(Rect(x + 0.4, y + 0.4, 3.2, 3.2, fillColor=pdf.ACCENT, strokeColor=None))
+    label(x + 8, "Gust")
+    if tallest is not None:
+        x += 34
+        d.add(Rect(x, y - 3, 6, 7, fillColor=colors.HexColor("#f2a541"), strokeColor=None))
+        label(x + 10, f"Precipitation in each hourly report, inches (tallest bar {tallest:.2f} in)")
 
 
 def stations(ctx: ReportContext) -> list:
@@ -506,7 +533,8 @@ def hail_lightning(ctx: ReportContext) -> list:
 STATUS = {"ok": "retrieved", "error": "unavailable", "absent": "not published"}
 
 
-def sources(ctx: ReportContext) -> list:
+def _identity(ctx: ReportContext) -> list:
+    """What the report establishes, and the hashes of the records behind it."""
     rows = [["Source record", "Retrieved (UTC)", "Status", "SHA-256 (first 16)"]]
     tiles = []
     for name in sorted(ctx.snap.sources):
@@ -521,6 +549,27 @@ def sources(ctx: ReportContext) -> list:
         last = max(t["retrieved_at"] for t in tiles).replace("+00:00", "Z")
         rows.append([f"basemap tiles (USGS, {len(tiles)})", last, f"{ok} retrieved", "listed in manifest"])
     gen = _t(ctx, datetime.fromisoformat(ctx.snap.frozen_at), True)
+    keep = [CondPageBreak(1.2 * inch)] if ctx.kind.short else []    # no heading alone at the foot of a page
+    return [
+           *keep, P("Distances and bearings", "h2"),
+           P("Distances are great-circle miles from the site's coordinates; bearings are the direction from the site "
+             "to the record (e.g. '4.6 mi WSW' means the record lies west-southwest of the site). A record's own "
+             "position may be approximate: storm reports are often given to the nearest town or road.", "body"),
+           *keep, P("What this report establishes", "h2"),
+           P("This report compiles public US government weather records for the selected location and date. Records "
+             f"near the site do not by themselves establish conditions at the exact {ctx.kind.map_label.lower()}. Missing values are not "
+             "zero, and 'not published yet' is different from 'no record'. It does not determine property damage, "
+             "causation, insurance coverage or legal admissibility, and it is not a certified government record or "
+             "expert opinion.", "body"),
+           *keep, P("Retrieval and report identity", "h2"),
+           P(f"Data retrieved: {esc(gen)}. Report ID: {ctx.report_id}. Every source response used is stored "
+             "unmodified; the hashes below identify those exact bytes, and the report ID is derived from them and "
+             "their retrieval times, so this report can be regenerated byte-for-byte and verified.", "body"),
+           Spacer(1, 4),
+           table(rows, col_widths=[x * inch for x in [2.6, 1.6, 0.9, 1.9]], small=ctx.kind.short)]
+
+
+def sources(ctx: ReportContext) -> list:
     out = [PageBreak(), P("Sources and limitations", "h1"),
            P("Data sources", "h2"),
            P("<b>Station measurements:</b> NOAA NCEI Global Historical Climatology Network – hourly (GHCNh), per-station "
@@ -538,23 +587,32 @@ def sources(ctx: ReportContext) -> list:
            P("<b>Location:</b> US Census Bureau Geocoder; timezone from coordinates (IANA tz database).", "body"),
            P("<b>Area map:</b> USGS The National Map topographic basemap (public domain), shown muted; records are "
              "drawn at their published coordinates. Storm report positions are often approximate.", "body"),
-           P("Distances and bearings", "h2"),
-           P("Distances are great-circle miles from the site's coordinates; bearings are the direction from the site "
-             "to the record (e.g. '4.6 mi WSW' means the record lies west-southwest of the site). A record's own "
-             "position may be approximate: storm reports are often given to the nearest town or road.", "body"),
-           P("What this report establishes", "h2"),
-           P("This report compiles public US government weather records for the selected location and date. Records "
-             "near the site do not by themselves establish conditions at the exact property. Missing values are not "
-             "zero, and 'not published yet' is different from 'no record'. It does not determine property damage, "
-             "causation, insurance coverage or legal admissibility, and it is not a certified government record or "
-             "expert opinion.", "body"),
-           P("Retrieval and report identity", "h2"),
-           P(f"Data retrieved: {esc(gen)}. Report ID: {ctx.report_id}. Every source response used is stored "
-             "unmodified; the hashes below identify those exact bytes, and the report ID is derived from them and "
-             "their retrieval times, so this report can be regenerated byte-for-byte and verified.", "body"),
-           Spacer(1, 4),
-           table(rows, col_widths=[x * inch for x in [2.6, 1.6, 0.9, 1.9]])]
-    return out
+           ]
+    return out + _identity(ctx)
+
+
+SHORT_SOURCES = {
+    "stations": "<b>Station readings:</b> NOAA NCEI Global Historical Climatology Network – hourly (GHCNh), for the "
+                "nearest reporting station. Units converted from metric for display.",
+    "warnings": "<b>Warnings:</b> NWS VTEC events and the verbatim text of NWS bulletins, retrieved from the Iowa "
+                "Environmental Mesonet archive of NWS products (Iowa State University).",
+    "lsrs": "<b>Storm reports:</b> NWS Local Storm Reports via the Iowa Environmental Mesonet. Preliminary, and "
+            "reproduced as issued.",
+    "hail": "<b>Radar hail:</b> NOAA NCEI Severe Weather Data Inventory (NEXRAD Level-III hail).",
+}
+
+
+def short_sources(ctx: ReportContext) -> list:
+    """The end of a short report: where it came from, its limits, and what it leaves out."""
+    used = [P(text, "body") for key, text in SHORT_SOURCES.items() if key in ctx.kind.reads]
+    return [CondPageBreak(3.5 * inch), Spacer(1, 12), P("Sources and limitations", "h1"), _location_table(ctx),
+            Spacer(1, 8), P("Data sources", "h2"), *used,
+            P("<b>Location:</b> US Census Bureau Geocoder; timezone from coordinates (IANA tz database).", "body"),
+            P("What this report leaves out", "h2"),
+            P(f"This report holds only the records that answer its question. It doesn't include every record for the "
+              f"date, such as raw station reports, all warning bulletins or the wider storm record. Our standard "
+              f"Property damage report at {DOMAIN} has them.", "body"),
+            *_identity(ctx)]
 
 
 # -- appendices --------------------------------------------------------------------------------
@@ -586,6 +644,8 @@ def appendices(ctx: ReportContext) -> list:
 
 
 def render_report(ctx: ReportContext) -> bytes:
+    if ctx.kind.short:
+        return pdf.render(cover(ctx) + short_sources(ctx), ctx.report_id, title=f"{pdf.PRODUCT} {ctx.report_id}")
     flow = (cover(ctx) + stations(ctx) + warnings(ctx) + lsrs(ctx) + storm_events(ctx) + hail_lightning(ctx)
             + sources(ctx) + appendices(ctx))
     return pdf.render(flow, ctx.report_id, title=f"{pdf.PRODUCT} {ctx.report_id}")

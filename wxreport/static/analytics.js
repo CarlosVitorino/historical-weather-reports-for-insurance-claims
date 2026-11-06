@@ -14,7 +14,7 @@
    A browser the owner switched off in /admin (localStorage umami.disabled) sends nothing: the tracker checks it. */
 (function () {
   "use strict";
-  var KEEP = /^(q|state|period|kind|sort|page|day|loss_date|utm_[a-z]+)$/;
+  var KEEP = /^(q|state|period|kind|sort|page|day|loss_date|type|utm_[a-z]+)$/;
 
   window.weScrub = function (_type, payload) {
     try {

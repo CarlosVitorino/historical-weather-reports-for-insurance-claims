@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
 from . import BRAND
+from .content import GUIDE_DATE, GUIDE_HAIL, GUIDE_INSURER, GUIDE_WIND
 from .geo import compass
 from .storms import CITY_MIN_DAYS, HAIL_MIN_IN, HISTORY_FROM, WIND_MIN_MPH, City
 
@@ -235,6 +236,25 @@ def major_tag(day: dict) -> str:
     return '<span class="sr-tag">Major storm</span>' if day.get("major") else ""
 
 
+def claim_guides() -> str:
+    """Out of the Storm Reports tree, to what a reader needs next once they have found their storm."""
+    links = [("How to check your date of loss", GUIDE_DATE), ("Did it hail at your address?", GUIDE_HAIL),
+             ("Find the wind speed on a date", GUIDE_WIND), ("How insurers verify weather claims", GUIDE_INSURER)]
+    chips = "".join(f'<li><a href="{g.path}">{escape(text)}</a></li>' for text, g in links)
+    return f'<section class="sr-block"><h2>Using these records for a claim</h2><ul class="sr-chips">{chips}</ul></section>'
+
+
+def recent_storms(cities: list[tuple[City, list[dict]]], limit: int = 4) -> str:
+    """For a guide: the cities hit most recently, as links into Storm Reports. `cities` is newest first."""
+    items = "".join(f'<li><a href="{c.path}"><b>{escape(c.label)} hail storm history</b>'
+                    f'<span>Latest storm {short_date(d[0]["day"])}: {escape(summary(d[0]))}</span></a></li>'
+                    for c, d in [x for x in cities if city_indexable(len(x[1]))][:limit])
+    if not items:
+        return ""
+    return (f'<div class="more"><h2>Recent storms</h2><ul class="glist">{items}</ul>'
+            f'<p class="fine"><a href="{SECTION}">See every city in Storm Reports</a></p></div>')
+
+
 # -- storm table: the index and the state pages -----------------------------------------------------
 PERIODS = {"7d": "Last 7 days", "30d": "Last 30 days", "year": "This year", "all": f"Since {HISTORY_FROM}"}
 KINDS = {"all": "All storms", "hail": f"Hail {HAIL_MIN_IN:.0f} in+", "tornado": "Tornado", "wind": "Damaging wind",
@@ -385,7 +405,7 @@ def storm_index(path: str, heading: str, lede: str, trail: list, table: str, whe
 <header class="sr-intro"><p class="eyebrow">Storm Reports</p><h1>{escape(heading)}</h1>
 <p class="lede">{lede}</p></header>
 <section class="sr-block sr-tbl">{table}</section>
-{cta(where=where)}{SOURCES_NOTE}</div>"""
+{cta(where=where)}{claim_guides()}{SOURCES_NOTE}</div>"""
 
 
 # -- city page -------------------------------------------------------------------------------------
@@ -447,8 +467,16 @@ def storm_panel(city: City, days: list[dict], selected: dict, also: list[City], 
 {narratives(d["reports"]) if d["reviewed"] else ""}</div>
 <footer class="sr-pf"><div class="sr-porder"><b>Was your property in this storm?</b><span>Records for one address on
 {long_date(d["day"])}: station wind, NWS warnings, storm reports, hail and lightning. PDF, {PRICE}.</span></div>
-<a class="btn btn-amber" href="/order?loss_date={d["day"].isoformat()}">Check an address</a>
+<a class="btn btn-amber" href="/order?loss_date={d["day"].isoformat()}">Check an address</a>{car_link(d)}
 <nav class="sr-pager" aria-label="Other storms near {escape(city.name)}">{newer}{older}</nav></footer></article>"""
+
+
+def car_link(d: dict) -> str:
+    """Hail days only: the same date, for the vehicle report."""
+    if not d["max_hail"]:
+        return ""
+    return (f'<a class="sr-car" href="/order?type=car-hail-damage&amp;loss_date={d["day"].isoformat()}">Car damaged? Get '
+            f'the car hail report</a>')
 
 
 def storm_days_list(city: City, days: list[dict], selected: dict) -> str:
@@ -497,7 +525,7 @@ def city_page(city: City, days: list[dict], selected: dict, also: dict[date, lis
 {first_year}<span> · within {city.radius_mi:.0f} mi of the center</span></p>{record}</section>
 <div class="sr-work">{storm_panel(city, days, selected, also.get(selected["day"], []), synced)}
 {storm_days_list(city, days, selected)}</div>
-{near_block}{SOURCES_NOTE}</div>
+{near_block}{claim_guides()}{SOURCES_NOTE}</div>
 <script defer src="/static/storm-city.js"></script>"""
 
 

@@ -280,6 +280,22 @@ def nearest_stations(snap: Snapshot, lat: float, lon: float) -> list[Station]:
     return found
 
 
+def history(snap: Snapshot, st: Station, start: datetime, end: datetime) -> tuple[list[Obs], str | None]:
+    """One station's reports from start to end. A range that crosses New Year reads both yearly files."""
+    window = LocalDay(start.date(), "UTC", start, end)
+    obs, note = [], None
+    for y in sorted({start.year, (end - timedelta(seconds=1)).year}):
+        try:
+            body = snap.fetch(f"ghcnh_{st.id}_{y}", f"{BASE}/access/by-year/{y}/psv/GHCNh_{st.id}_{y}.psv",
+                              missing_ok=True)
+        except SourceUnavailable:
+            note = f"Part of the station record for {y} could not be retrieved, so some hours are missing."
+            continue
+        if body:
+            obs += parse_psv(body.decode("utf-8", "replace"), window, after=timedelta(0))
+    return sorted(obs, key=lambda o: o.t), note
+
+
 def collect(snap: Snapshot, lat: float, lon: float, window: LocalDay) -> tuple[list[StationDay], str | None]:
     """Up to MAX_STATIONS nearest stations that actually reported during the local day."""
     try:

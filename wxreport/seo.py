@@ -7,10 +7,11 @@ from datetime import date
 from xml.sax.saxutils import escape as xml_escape
 
 from . import BRAND, DOMAIN
+from . import report_pages
 from .content import GUIDES, PAGES, Page
 from .legal import PATHS as LEGAL_PATHS, UPDATED as LEGAL_UPDATED
 
-SITE_UPDATED = date(2026, 10, 29)   # bump when the home or order page changes meaningfully
+SITE_UPDATED = date(2026, 11, 6)   # bump when the home or order page changes meaningfully
 
 
 def organization(base: str) -> dict:
@@ -43,7 +44,8 @@ def breadcrumbs(base: str, trail: list[tuple[str, str]]) -> dict:
 
 
 def article(base: str, page: Page) -> list[dict]:
-    trail = [("Home", "/")] + ([("Guides", "/guides")] if page.guide else []) + [(page.h1, page.path)]
+    parent = [page.parent] if page.parent else [("Guides", "/guides")] if page.guide else []
+    trail = [("Home", "/"), *parent, (page.h1, page.path)]
     return [{"@context": "https://schema.org", "@type": "Article", "headline": page.h1,
              "description": page.description, "url": f"{base}{page.path}",
              "dateModified": page.updated.isoformat(), "image": f"{base}/static/sample-p1.webp",
@@ -55,7 +57,8 @@ def article(base: str, page: Page) -> list[dict]:
 def sitemap(base: str, extra: list[tuple[str, date]] = ()) -> str:
     """extra: generated pages (Storm Reports) with their last change."""
     entries = [("/", SITE_UPDATED), ("/order", SITE_UPDATED), ("/guides", max(g.updated for g in GUIDES)),
-               *((p.path, p.updated) for p in PAGES.values()), *((p, LEGAL_UPDATED) for p in LEGAL_PATHS),
+               ("/reports", report_pages.UPDATED),
+               *((p.path, p.updated) for p in [*PAGES.values(), *report_pages.PAGES.values()]), *((p, LEGAL_UPDATED) for p in LEGAL_PATHS),
                ("/static/sample-report.pdf", SITE_UPDATED), *extra]
     urls = "".join(f"<url><loc>{xml_escape(base + path)}</loc><lastmod>{d.isoformat()}</lastmod></url>"
                    for path, d in entries)

@@ -47,8 +47,11 @@ guides) actually convert:
 1. **Short answer first** — the lede states the whole thing in two sentences.
 2. **Numbered, concrete steps** — real specifics (hail-size thresholds, the 10×10 chalk test square,
    "check the soft metal first", hail-vs-wear table), so it genuinely helps someone do it themselves.
-3. **The report is the shortcut for exactly one step** — the weather-data step ("prove the storm") — never
-   a fake substitute for the whole process. This keeps it honest and legally safe.
+3. **The report is the first option in every guide, as a link, not a form** (founder, 2026-11-06). Where the guide
+   is only about getting records (NOAA, wind), the report does the whole job: a "The fast way:" line under the lede
+   links to `/order`, then "Prefer to do it yourself?". Where the case has other steps (date of loss, hail,
+   lightning, insurers), a link in the text, and the report stays the shortcut for the weather-data step, never a
+   fake substitute for the whole process.
 4. **Adapt the hook to the case's reality** — hail = the tedious distance-measuring step; lightning =
    the $95-vs-$9.99 price check; insurer-verification = "see what they see".
 
@@ -90,7 +93,7 @@ data ("did it hail in [county] on [date]?"). Never every city × every date.
 
 ## Deliberately removed / ruled out
 
-- Separate per-peril landing pages (`/hail-report`, `/wind-report`, `/lightning-report`) — doorway pages.
+- Separate per-peril landing pages (`/hail-report`, `/wind-report`, `/lightning-report`) — doorway pages. This still holds for a page selling the same report under another title. It does not apply to `/reports/<slug>` (founder, 2026-11-06): each of those sells a report that really differs in its first pages and data.
 - "Historical weather" informational terms — data/API intent, tagged `awareness` in OpenSEO.
 - Named-competitor comparison on the homepage — legal risk + zero-volume keywords; the generic
   "Free / Weather Evidence / Forensic" table stays.
