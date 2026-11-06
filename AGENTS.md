@@ -4,7 +4,7 @@ What would stop this: Legally issues
 The smallest thing worth building first: A deterministic PDF generator that takes one address + loss date and produces the $9.99 report for a single region, closing the four gaps the sample shows (station-pinned measurements, distance-and-bearing proximity, Storm Events database, hail/lightning feeds) — then sell a handful against the existing StormRecord report to see if claims adjusters pay.
 Do not build:
 - Enterprise forensic meteorology engagements and expert-witness testimony
-- International weather data — v1 is US government sources only
+- A market outside the US that runs on US data — each new country needs its own reliable public government sources, checked for commercial-use licence before launch
 - Real-time or forecast data; the product is strictly historical reports
 - Building or licensing proprietary data feeds beyond the three free public inputs
 - Insurance-company integrations, APIs, or bulk claim-pipeline tooling

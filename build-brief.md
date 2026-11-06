@@ -14,7 +14,7 @@ A deterministic PDF generator that takes one address + loss date and produces th
 ## What this is not building
 
 - Enterprise forensic meteorology engagements and expert-witness testimony
-- International weather data — v1 is US government sources only
+- A market outside the US that runs on US data — each new country needs its own reliable public government sources, checked for commercial-use licence before launch
 - Real-time or forecast data; the product is strictly historical reports
 - Building or licensing proprietary data feeds beyond the three free public inputs
 - Insurance-company integrations, APIs, or bulk claim-pipeline tooling

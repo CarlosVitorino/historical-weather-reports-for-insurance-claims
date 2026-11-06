@@ -10,10 +10,10 @@ Desk research, no code changed. Two questions:
 Builds on `International demand check.md` (DE/ES/PT/FR/AU search demand, 2026-10-29), which found the
 "hail report by address" search term is a US phenomenon.
 
-> **Scope note.** `CLAUDE.md` / `build-brief.md` say *v1 is US government sources only*, *no forecast
-> data*, and *no feeds beyond the three free public inputs*. Everything below is a proposal for
-> after v1, not something to build now without a decision. The brief's own test — sell a handful of
-> US reports against StormRecord — should ideally come before a second market.
+> **Scope note (updated 2026-11-06).** Other countries are in scope as long as each market runs on
+> its own reliable public sources, licensed for commercial use (see `CLAUDE.md`). The brief still
+> excludes forecast data and feeds beyond the free public inputs. SEO and UX for multiple markets:
+> `International SEO and UX plan.md`.
 
 ---
 
@@ -129,7 +129,7 @@ reanalysis at your address estimates 19–24 m/s." Showing disagreement openly i
 ## 3. Open questions / to verify before building
 
 - Has the US "sell a handful vs StormRecord" test been run, and with what result?
-- Decision to relax the brief's "US-only" and "three inputs" limits.
+- Decision to relax the brief's "three inputs" limit (the US-only limit was lifted 2026-11-06).
 - ERA5, CERRA and EUMETSAT MTG licence terms for commercial resale (check the CDS dataset pages and
   eumetsat.int/eumetsat-data-licensing).
 - What forsikringsvejret.dk offers, who runs it, and its price.
